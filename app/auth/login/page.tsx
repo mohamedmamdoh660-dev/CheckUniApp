@@ -176,7 +176,7 @@ export default function Login() {
           >
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
-          {/* <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
             Don't have an account?{" "}
             <Link
               href="/auth/signup"
@@ -184,7 +184,7 @@ export default function Login() {
             >
               Sign up
             </Link>
-          </p> */}
+          </p>
         </form>
       </div>
     </div>

@@ -12,18 +12,11 @@ export const getNavData = (user: { roles?: string }) => {
       title: "Sections",
       url: "#",
       items: [
-        // {
-        //   title: "Dashboard",
-        //   url: "/",
-        //   icon: RiScanLine,
-        //   isActive: false,
-        // },
         {
-          title: "Conversations",
+          title: "Dashboard",
           url: "/",
-          icon: RiMessage2Line,
+          icon: RiScanLine,
           isActive: false,
-          resource: "users",
         },
       ],
     },
