@@ -3,13 +3,16 @@
 import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import API_ROUTES from "@/app/api/auth";
 import { Button } from "@/components/button";
 import { Label } from "@/components/label";
 import { Input } from "@/components/input";
-import { Settings, settingsService } from "@/modules/settings";
+import { Settings } from "@/modules/settings";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { authService } from "@/modules/auth";
+import { toast } from "sonner";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export default function SignUp() {
   const id = useId();
@@ -23,48 +26,52 @@ export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const router = useRouter();
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const { settings, signUp } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  useEffect(() => {
-    const getSettings = async () => {
-      const settings = await settingsService.getSettingsById();
-      setSettings(settings);
-    };
-    getSettings();
-  }, []);
+  const [userExists, setUserExists] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setUserExists(false);
 
     try {
-      const response = await fetch(API_ROUTES.SIGNUP, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      // Prepare signup data in the format expected by AuthContext
+      const signupData = {
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+          },
         },
-        body: JSON.stringify(formData),
-      });
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      };
 
-      const data = await response.json();
+      const result = await signUp(signupData);
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to register");
+      router.push("/auth/verify?email=" + formData.email);
+    } catch (error: any) {
+      // Handle specific error cases
+      if (error.message?.includes("User already registered")) {
+        setUserExists(true);
+        toast.error(
+          "An account with this email already exists. Please login instead."
+        );
+      } else {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "An error occurred during registration"
+        );
       }
-
-      // Redirect to verification page or login page
-      router.push("/auth/verify");
-    } catch (error) {
-      setError(
-        error instanceof Error
-          ? error.message
-          : "An error occurred during registration"
-      );
-    } finally {
       setIsLoading(false);
     }
   };
@@ -74,35 +81,41 @@ export default function SignUp() {
       <div className="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 bg-sidebar hover:bg-sidebar-hover p-8 rounded-lg shadow">
           <div className="flex flex-col items-center gap-2">
-            <div
-              className="flex shrink-0 items-center justify-center rounded-md border border-sidebar-border relative"
-              aria-hidden="true"
-            >
-              {/* <div
-                className={cn(
-                  "absolute inset-0 bg-sidebar-border dark:bg-sidebar-border animate-pulse rounded-md",
-                  isImageLoading ? "opacity-100" : "opacity-0"
-                )}
-              /> */}
-              <Image
-                src={
-                  settings?.logo_url ||
-                  process.env.NEXT_PUBLIC_SITE_LOGO ||
-                  "/favicon.ico"
-                }
-                alt="logo"
-                width={50}
-                height={50}
-                className={cn(
-                  "w-full h-full object-cover rounded-md transition-opacity duration-300",
-                  isImageLoading ? "opacity-0" : "opacity-100"
-                )}
-                onLoadingComplete={() => setIsImageLoading(false)}
-                priority
-              />
-            </div>
+            {(
+              settings?.logo_setting === "horizontal"
+                ? settings?.logo_horizontal_url
+                : settings?.logo_url
+            ) ? (
+              <div
+                className="flex shrink-0 items-center justify-center rounded-md  border-sidebar-border relative"
+                aria-hidden="true"
+              >
+                <Image
+                  src={
+                    (settings?.logo_setting === "horizontal"
+                      ? settings?.logo_horizontal_url
+                      : settings?.logo_url) ||
+                    generateNameAvatar("Daxow Agent Portal")
+                  }
+                  alt="logo"
+                  width={50}
+                  height={50}
+                  unoptimized
+                  className={cn(
+                    `w-[${settings?.logo_setting === "horizontal" ? "60%" : "30%"}] h-full object-cover rounded-md transition-opacity duration-300`,
+                    isImageLoading ? "opacity-0" : "opacity-100"
+                  )}
+                  style={{
+                    width:
+                      settings?.logo_setting === "horizontal" ? "60%" : "30%",
+                  }}
+                  onLoadingComplete={() => setIsImageLoading(false)}
+                  priority
+                />
+              </div>
+            ) : null}
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-              {settings?.site_name || process.env.NEXT_PUBLIC_SITE_NAME}
+              Create an account
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
               We just need a few details to get you started.
@@ -189,11 +202,12 @@ export default function SignUp() {
 
             <Button
               type="submit"
-              className="w-full bg-[#ec4899]  hover:bg-[#ec4899]/90 text-white cursor-pointer"
+              className="w-full bg-[#ec4899] hover:bg-[#ec4899]/90 text-white cursor-pointer"
               disabled={isLoading}
             >
               {isLoading ? "Signing up..." : "Sign up"}
             </Button>
+
             <div className="space-y-2 text-center">
               <p className="text-muted-foreground text-xs dark:text-gray-400">
                 By signing up you agree to our{" "}

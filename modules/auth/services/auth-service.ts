@@ -1,5 +1,6 @@
 import { emailService } from "@/lib/email-service";
 import { supabase } from "@/lib/supabase-auth-client";
+import { supabaseServerClient } from "@/lib/supabase-server-client";
 import { rolesService } from "@/modules/roles";
 import { usersService } from "@/modules/users";
 
@@ -16,19 +17,36 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const authService = {
   signUp: async ({ email, password, firstName, lastName, role_id = "" }: AuthSignupData) => {
-    // Create the user in Supabase Auth
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    // First check if user exists with the given email
+    const existingUser = await usersService.getUserByEmail({
+    
+        email: {
+          eq: email
+        }
+      
+    });
+
+    
+    if (existingUser) {
+      throw new Error("User already registered with this email");
+    }
+    
+    // Create the user in Supabase Auth if not exists
+    const { data, error } = await supabase.auth.signUp({ 
+      email, 
+      password, 
+      options: { data: { first_name: firstName, last_name: lastName } } 
+    });
+    console.log("🚀 ~ data:", data)
     if (error) throw error;
 
     if (data?.user) {
-      // Wait a moment for the auth user to be fully created before inserting into users table
-      await delay(2000);
       try {
         // Get the default user role using GraphQL
         const roleId = await rolesService.getRoleByName();
         const payload = {
           id: data?.user?.id,
-          email: data?.user?.email,
+          email: data?.user?.email, 
           role_id: role_id || roleId,
           first_name: firstName || null,
           last_name: lastName || null,
@@ -38,6 +56,7 @@ export const authService = {
         await usersService.insertUser(payload)
       } catch (profileError) {
         console.error('Error in profile creation:', profileError);
+        throw profileError;
       }
     }
 
@@ -45,7 +64,7 @@ export const authService = {
   },
 
   signIn: async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseServerClient().auth.signInWithPassword({
       email,
       password
     });
@@ -55,13 +74,8 @@ export const authService = {
   },
 
   signOut: async () => {
-    const { error } = await supabase.auth.signOut();
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/logout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const { error } = await supabaseServerClient().auth.signOut();
+   
     if (error) throw error;
   },
 
@@ -73,7 +87,7 @@ export const authService = {
       });
       if (error) throw error;
 
-      emailService.sendInviteEmail(email, "http://localhost:3010/auth/accept-invite/" + data?.user?.id)
+      emailService.sendInviteEmail(email, `${process.env.NEXT_PUBLIC_APP_URL}/auth/accept-invite/${data?.user?.id}`)
       if (data?.user) {
         // Wait a moment for the auth user to be fully created before inserting into users table
         await delay(2000);
@@ -96,6 +110,16 @@ export const authService = {
       }
       return data;
     }
+  },
+
+  resendVerificationEmail: async (email: string) => {
+    const { data, error } = await supabase.auth.resend({
+      type: "signup",
+      email: email,
+    });
+
+    if (error) throw error;
+    return data;
   },
 
   acceptInvite: async (token: string, password: string) => {

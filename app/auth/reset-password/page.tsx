@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { toast } from "sonner";
 import { resetPassword } from "@/lib/actions/auth-actions";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -22,20 +23,12 @@ export default function ResetPassword() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const { settings } = useAuth();
 
-  const [settings, setSettings] = useState<Settings | null>(null);
   const [passwordMessage, setPasswordMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
-
-  useEffect(() => {
-    const getSettings = async () => {
-      const settings = await settingsService.getSettingsById();
-      setSettings(settings);
-    };
-    getSettings();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,27 +81,26 @@ export default function ResetPassword() {
                   (settings?.logo_setting === "horizontal"
                     ? settings?.logo_horizontal_url
                     : settings?.logo_url) ||
-                  process.env.NEXT_PUBLIC_SITE_LOGO ||
-                  "/favicon.ico"
+                  generateNameAvatar("Daxow Agent Portal")
                 }
                 alt="logo"
                 width={50}
                 height={50}
                 unoptimized
-                style={{
-                  width:
-                    settings?.logo_setting === "horizontal" ? "60%" : "30%",
-                }}
                 className={cn(
                   `w-[${settings?.logo_setting === "horizontal" ? "60%" : "30%"}] h-full object-cover rounded-md transition-opacity duration-300`,
                   isImageLoading ? "opacity-0" : "opacity-100"
                 )}
+                style={{
+                  width:
+                    settings?.logo_setting === "horizontal" ? "60%" : "30%",
+                }}
                 onLoadingComplete={() => setIsImageLoading(false)}
                 priority
               />
             </div>
           ) : null}
-          <h2 className="mt-3 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Reset Password
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">

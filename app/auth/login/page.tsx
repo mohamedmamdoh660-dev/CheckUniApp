@@ -4,15 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import API_ROUTES from "@/app/api/auth";
 import { Label } from "@/components/label";
 import { Input } from "@/components/input";
 import { Button } from "@/components/button";
 import { Checkbox } from "@/components/checkbox";
-import { Settings, settingsService } from "@/modules/settings";
+import { Settings } from "@/modules/settings";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { authService } from "@/modules/auth";
+import { toast } from "sonner";
 
 export default function Login() {
   const id = useId();
@@ -20,50 +21,65 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEmailVerificationLoading, setIsEmailVerificationLoading] =
+    useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
-  const { setUser } = useAuth();
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const { signIn, settings } = useAuth();
 
-  useEffect(() => {
-    const getSettings = async () => {
-      const settings = await settingsService.getSettingsById();
-      console.log("🚀 ~ getSettings ~ settings:", settings);
-      setSettings(settings);
-    };
-    getSettings();
-  }, []);
+  const [emailVerificationNeeded, setEmailVerificationNeeded] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setEmailVerificationNeeded(false);
 
     try {
-      const response = await fetch(API_ROUTES.LOGIN, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
-      });
+      const result = await signIn(email, password);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to login");
-      }
-
-      setUser(data.user);
+      // If we get here, login was successful
       window.location.href = "/";
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false);
+
+      // Handle specific error cases
+      if (error.message?.includes("Email not confirmed")) {
+        setEmailVerificationNeeded(true);
+        setError(
+          "Email not confirmed. Please verify your email or resend the verification link."
+        );
+      } else if (error.message?.includes("Invalid login credentials")) {
+        setError("Invalid credentials. Please check your email and password.");
+      } else {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "An error occurred during login"
+        );
+      }
+    }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      setIsEmailVerificationLoading(true);
+      // Since there's no direct method in authService for this,
+      // we'll need to use the signUp method which triggers email verification
+      await authService.resendVerificationEmail(email);
+      toast.success("Verification email sent. Please check your inbox.");
+      setEmailVerificationNeeded(false);
+      setError(null);
+    } catch (error: any) {
+      // If the error indicates user already exists, that's expected
 
       setError(
         error instanceof Error
           ? error.message
-          : "An error occurred during login"
+          : "Failed to resend verification email"
       );
+    } finally {
+      setIsEmailVerificationLoading(false);
     }
   };
 
@@ -103,7 +119,7 @@ export default function Login() {
               />
             </div>
           ) : null}
-          <h2 className="mt-3 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Welcome Back
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
@@ -168,14 +184,28 @@ export default function Login() {
               Forgot password?
             </Link>
           </div>
+          <div className="flex flex-col gap-2">
+            {emailVerificationNeeded && (
+              <Button
+                type="button"
+                onClick={handleResendVerification}
+                className={`w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md cursor-pointer`}
+                disabled={isEmailVerificationLoading}
+              >
+                {isEmailVerificationLoading
+                  ? "Sending..."
+                  : "Resend Verification Email"}
+              </Button>
+            )}
+            <Button
+              type="submit"
+              className={`w-full bg-[#ec4899] hover:bg-[#ec4899]/90 text-white p-2 rounded-md cursor-pointer`}
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign in"}
+            </Button>
+          </div>
 
-          <Button
-            type="submit"
-            className={`w-full  bg-[#ec4899]  hover:bg-[#ec4899]/90 text-white p-2 rounded-md cursor-pointer`}
-            disabled={isLoading}
-          >
-            {isLoading ? "Signing in..." : "Sign in"}
-          </Button>
           <p className="text-center text-sm text-gray-600 dark:text-gray-400">
             Don't have an account?{" "}
             <Link

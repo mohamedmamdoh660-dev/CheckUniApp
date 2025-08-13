@@ -8,6 +8,8 @@ import { User } from "@/types/types";
 import Cookies from "js-cookie";
 import { Settings, settingsService } from "@/modules/settings";
 import Loader from "@/components/loader";
+import { supabase } from "@/lib/supabase-auth-client";
+import { checkAuthentication } from "@/utils/check-authentication";
 
 type AuthContextType = {
   user: User | null;
@@ -56,31 +58,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Function to get user data from Supabase and user_profile table
   const fetchUserData = async () => {
     try {
-      // Get current session
-      const userStr = Cookies.get("auth.user");
+      const { user, status } = await checkAuthentication();
+      console.log("🚀 ~ fetchUserData ~ user:", user);
 
-      if (userStr) {
-        const userResponse = JSON.parse(userStr);
+      if (user) {
+        checkRouteAccess(window.location.pathname, user);
 
-        const userRec = userResponse.user.user_profileCollection.edges[0].node;
-        checkRouteAccess(window.location.pathname, userRec);
-
-        setUser(userResponse.user);
-        setSession(userResponse.session);
+        setUser(user);
+        setSession(user as unknown as Session);
 
         // Fetch user profile data from user_profile table
-        const userData = await usersService.getUserById(userRec.id);
+        const userData = await usersService.getUserById(user.id);
+        console.log("🚀 ~ fetchUserData ~ userData:", userData);
         if (userData) {
           setUserProfile(userData);
         }
-
-        // Fetch settings data
-        const settingsData = await settingsService.getSettingsById();
-        if (settingsData) {
-          setSettings(settingsData);
-        }
       } else {
-        if (userStr) {
+        if (user) {
           signOut();
         }
         setUser(null);
@@ -92,13 +86,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       setUserProfile(null);
       setSettings(null);
+      signOut();
     }
     setLoading(false);
+  };
+
+  const fetchSettings = async () => {
+    const settingsData = await settingsService.getSettingsById();
+    if (settingsData) {
+      setSettings(settingsData);
+    }
   };
 
   // Handle auth state and routing
   useEffect(() => {
     fetchUserData();
+    fetchSettings();
   }, []);
 
   // Listen for settings updates
@@ -136,45 +139,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signUp = async (data: AuthSignupData) => {
-    const result = await authService.signUp(data);
-    if ("session" in result && result.session) {
-      setSession(result.session);
-      setUser(result.user);
+    try {
+      const result = await authService.signUp(data);
 
-      // Fetch user profile after signup
-      if (result.user) {
-        try {
-          const userData = await usersService.getUserById(result.user.id);
-          setUserProfile(userData);
-
-          // Fetch settings after signup
-          const settingsData = await settingsService.getSettingsById();
-          setSettings(settingsData);
-        } catch (error) {
-          console.error("Error fetching user profile after signup:", error);
-        }
-      }
+      return result;
+    } catch (error) {
+      console.error("Sign up error:", error);
+      throw error;
     }
-    return result;
   };
 
   const signIn = async (email: string, password: string) => {
     try {
       const result = await authService.signIn(email, password);
-
-      // Fetch user profile after sign in
-      if (result.user) {
-        try {
-          const userData = await usersService.getUserById(result.user.id);
-          setUserProfile(userData);
-
-          // Fetch settings after sign in
-          const settingsData = await settingsService.getSettingsById();
-          setSettings(settingsData);
-        } catch (error) {
-          console.error("Error fetching user profile after sign in:", error);
-        }
-      }
 
       return result;
     } catch (error) {

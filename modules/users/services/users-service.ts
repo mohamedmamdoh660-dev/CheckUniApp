@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase-auth-client';
-import { DELETE_USER, GET_USERS, GET_USERS_BY_ID, GET_USERS_COUNT, GET_USERS_PAGINATION, INSERT_USER, UPDATE_USER } from "./users-graphql";
+import { DELETE_USER, GET_USERS, GET_USERS_BY_EMAIL, GET_USERS_BY_ID, GET_USERS_COUNT, GET_USERS_PAGINATION, INSERT_USER, UPDATE_USER } from "./users-graphql";
 import { executeGraphQLBackend } from "@/lib/graphql-server";
 
 export const usersService = {
@@ -20,6 +20,11 @@ export const usersService = {
         }
       ]
     })
+  },
+  getUserByEmail: async (filter: any) => {
+    const response = await executeGraphQLBackend(GET_USERS_BY_EMAIL, { filter });
+    console.log("🚀 ~ response:", response)
+    return response.user_profileCollection.edges[0]?.node || null;
   },
   /**
    * Create a user - wrapper for insertUser

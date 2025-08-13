@@ -43,7 +43,9 @@ export function NavUser({ user }: { user: User | null }) {
                       user?.profile?.includes("http")
                         ? user?.profile
                         : generateNameAvatar(
-                            user?.first_name + " " + user?.last_name
+                            (user?.first_name || "") +
+                              " " +
+                              (user?.last_name || "")
                           )
                     }
                     alt={user?.first_name}
@@ -52,7 +54,7 @@ export function NavUser({ user }: { user: User | null }) {
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">
-                    {user?.first_name + " " + user?.last_name}
+                    {(user?.first_name || "") + " " + (user?.last_name || "")}
                   </span>
                   <span className="truncate text-xs">{user?.email}</span>
                 </div>

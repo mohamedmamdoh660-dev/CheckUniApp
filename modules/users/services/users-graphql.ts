@@ -16,6 +16,28 @@ export const INSERT_USER = `
     }
   }
 `;
+
+
+export const GET_USERS_BY_EMAIL = `
+query GetUsersByEmail($filter: user_profileFilter) {
+  user_profileCollection(filter: $filter) {
+    edges {
+      node {
+        id
+        email
+        role_id
+        first_name
+        last_name
+        is_active
+        last_login
+        profile
+        created_at
+      }
+    }
+  }
+}
+`;
+
 export const GET_USERS_PAGINATION = `
 query GetUsers($search: String, $limit: Int = 10, $offset: Int = 0) {
   user_profileCollection(

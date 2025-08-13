@@ -11,6 +11,7 @@ import { Button } from "@/components/button";
 import { Settings, settingsService } from "@/modules/settings";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export default function Login() {
   const { token } = useParams();
@@ -80,8 +81,7 @@ export default function Login() {
                   (settings?.logo_setting === "horizontal"
                     ? settings?.logo_horizontal_url
                     : settings?.logo_url) ||
-                  process.env.NEXT_PUBLIC_SITE_LOGO ||
-                  "/favicon.ico"
+                  generateNameAvatar("Daxow Agent Portal")
                 }
                 alt="logo"
                 width={50}

@@ -40,6 +40,7 @@ export default function ForgotPassword() {
         "If your email exists in our system, a reset link has been sent."
       );
     } catch (err) {
+      console.log("🚀 ~ handleSubmit ~ err:", err);
       toast.error("Something went wrong, so please try again later.");
     } finally {
       setIsLoading(false);
@@ -64,8 +65,7 @@ export default function ForgotPassword() {
                   (settings?.logo_setting === "horizontal"
                     ? settings?.logo_horizontal_url
                     : settings?.logo_url) ||
-                  process.env.NEXT_PUBLIC_SITE_LOGO ||
-                  "/favicon.ico"
+                  generateNameAvatar("Daxow Agent Portal")
                 }
                 alt="logo"
                 width={50}
@@ -84,7 +84,7 @@ export default function ForgotPassword() {
               />
             </div>
           ) : null}
-          <h2 className="mt-3 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Forgot Password
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">

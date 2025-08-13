@@ -88,10 +88,7 @@ export async function requestPasswordReset(email: string, type: string) {
       if (error) throw new Error(error.message);
       if (!data) throw new Error("User not found"); // Don't reveal
       userId = data.id;
-    } else if (type === "developer") {
-      // Add developer logic if needed
-      return { success: false, error: "Developer reset not implemented" };
-    }
+    } 
     if (!userId) throw new Error("User not found");
 
     // 2. Generate secure token
@@ -118,6 +115,7 @@ export async function requestPasswordReset(email: string, type: string) {
       html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p><p>If you did not request this, ignore this email.</p>`
     });
   } catch (error) {
+    console.log("🚀 ~ requestPasswordReset ~ error:", error)
     throw new Error("Something went wrong, so please try again later.");
   }
 }
