@@ -2,6 +2,7 @@ export const GET_PROGRAMS = `
   query GetPrograms  {
     zoho_programsCollection(
           filter: { and: [{ active_applications: { eq: true } }, { active: { eq: true } }] }
+      first: 20
 
     ) {
       edges {

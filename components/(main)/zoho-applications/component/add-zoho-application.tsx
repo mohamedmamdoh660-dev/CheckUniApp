@@ -42,8 +42,9 @@ import {
   ZohoUniversity,
 } from "@/modules/zoho-programs/models/zoho-program";
 import Image from "next/image";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -245,9 +246,9 @@ export default function AddZohoApplication({
                             <SelectItem key={student.id} value={student.id}>
                               <div className="flex items-center gap-2">
                                 <Avatar className="h-6 w-6">
-                                  <AvatarFallback className="text-xs">
-                                    {initials}
-                                  </AvatarFallback>
+                                  <AvatarImage
+                                    src={generateNameAvatar(fullName)}
+                                  />
                                 </Avatar>
                                 <span>{fullName}</span>
                               </div>
@@ -388,7 +389,7 @@ export default function AddZohoApplication({
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        disabled={!form.watch("country")}
+                        // disabled={!form.watch("country")}
                       >
                         <FormControl>
                           <SelectTrigger>
