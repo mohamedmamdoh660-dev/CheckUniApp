@@ -1,0 +1,203 @@
+"use client";
+
+import React, { useState } from "react";
+import { Row } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import {
+  Ellipsis,
+  Edit,
+  Trash,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
+import { ZohoApplication } from "@/modules/zoho-applications/models/zoho-application";
+import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
+import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
+import EditZohoApplication from "@/components/(main)/zoho-applications/component/edit-zoho-application";
+// import EditZohoApplication from "@/components/(main)/zoho-applications/component/edit-zoho-application";
+
+interface ZohoApplicationsTableRowActionsProps {
+  row: Row<ZohoApplication>;
+  fetchApplications: () => void;
+}
+
+export function ZohoApplicationsTableRowActions({
+  row,
+  fetchApplications,
+}: ZohoApplicationsTableRowActionsProps) {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [confirmationDialog, setConfirmationDialog] = useState<{
+    isOpen: boolean;
+    action: "delete" | "complete" | "pending" | "fail" | null;
+  }>({ isOpen: false, action: null });
+
+  const values: ZohoApplication = { ...row.original };
+
+  const handleConfirmation = (
+    action: "delete" | "complete" | "pending" | "fail"
+  ) => {
+    setConfirmationDialog({ isOpen: true, action });
+  };
+
+  const onConfirm = async () => {
+    if (!values?.id) {
+      return;
+    }
+    try {
+      setLoading(true);
+      const action = confirmationDialog.action;
+
+      if (action === "delete") {
+        await zohoApplicationsService.deleteApplication(values.id);
+        toast.success("Application deleted successfully");
+      } else if (action === "complete") {
+        await zohoApplicationsService.updateApplication({
+          id: values.id,
+          stage: "completed",
+        });
+        toast.success("Application marked as completed");
+      } else if (action === "pending") {
+        await zohoApplicationsService.updateApplication({
+          id: values.id,
+          stage: "pending",
+        });
+        toast.success("Application marked as pending");
+      } else if (action === "fail") {
+        await zohoApplicationsService.updateApplication({
+          id: values.id,
+          stage: "failed",
+        });
+        toast.success("Application marked as failed");
+      }
+
+      setConfirmationDialog({ isOpen: false, action: null });
+      fetchApplications(); // Refresh the application list after action
+    } catch (error: any) {
+      toast.error(error?.message || "Unknown error");
+    } finally {
+      setLoading(false);
+      setConfirmationDialog((prev) => ({ ...prev, isOpen: false }));
+    }
+  };
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted cursor-pointer"
+          >
+            <Ellipsis className="h-4 w-4" />
+            <span className="sr-only">Open menu</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-max">
+          <DropdownMenuItem
+            onClick={() => {
+              setIsEditDialogOpen(true);
+            }}
+            className="cursor-pointer flex items-center"
+          >
+            <Edit className="mr-1 h-4 w-4" />
+            Edit
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => handleConfirmation("delete")}
+            className="cursor-pointer flex items-center"
+          >
+            <Trash className="mr-1 h-4 w-4" />
+            Remove
+          </DropdownMenuItem>
+
+          {/* <DropdownMenuItem
+            onClick={() => handleConfirmation("complete")}
+            className="cursor-pointer flex items-center"
+          >
+            <CheckCircle className="mr-1 h-4 w-4" />
+            Mark as Completed
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => handleConfirmation("pending")}
+            className="cursor-pointer flex items-center"
+          >
+            <Clock className="mr-1 h-4 w-4" />
+            Mark as Pending
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => handleConfirmation("fail")}
+            className="cursor-pointer flex items-center"
+          >
+            <AlertCircle className="mr-1 h-4 w-4" />
+            Mark as Failed
+          </DropdownMenuItem> */}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {isEditDialogOpen && (
+        <EditZohoApplication
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          applicationData={values}
+          fetchApplications={fetchApplications}
+        />
+      )}
+
+      <ConfirmationDialogBox
+        title={
+          confirmationDialog.action === "delete"
+            ? `Are you sure you want to delete this application?`
+            : confirmationDialog.action === "complete"
+              ? `Are you sure you want to mark this application as completed?`
+              : confirmationDialog.action === "pending"
+                ? `Are you sure you want to mark this application as pending?`
+                : `Are you sure you want to mark this application as failed?`
+        }
+        description={
+          confirmationDialog.action === "delete"
+            ? `This action cannot be undone. This will permanently delete the selected application.`
+            : `This will change the status of the application.`
+        }
+        cancelText="Cancel"
+        confirmText={
+          confirmationDialog.action === "delete"
+            ? "Delete"
+            : confirmationDialog.action === "complete"
+              ? "Mark as Completed"
+              : confirmationDialog.action === "pending"
+                ? "Mark as Pending"
+                : "Mark as Failed"
+        }
+        isOpen={confirmationDialog.isOpen}
+        setIsOpen={(isOpen: boolean) =>
+          setConfirmationDialog((prev) => ({ ...prev, isOpen }))
+        }
+        loading={loading}
+        onConfirm={onConfirm}
+        icon={
+          confirmationDialog.action === "delete" ? (
+            <Trash className="mr-2 h-4 w-4" />
+          ) : confirmationDialog.action === "complete" ? (
+            <CheckCircle className="mr-2 h-4 w-4" />
+          ) : confirmationDialog.action === "pending" ? (
+            <Clock className="mr-2 h-4 w-4" />
+          ) : (
+            <AlertCircle className="mr-2 h-4 w-4" />
+          )
+        }
+      />
+    </>
+  );
+}

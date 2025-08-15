@@ -5,10 +5,8 @@ import { authService, AuthSignupData } from "@/modules/auth";
 
 import { usersService } from "@/modules/users";
 import { User } from "@/types/types";
-import Cookies from "js-cookie";
 import { Settings, settingsService } from "@/modules/settings";
 import Loader from "@/components/loader";
-import { supabase } from "@/lib/supabase-auth-client";
 import { checkAuthentication } from "@/utils/check-authentication";
 
 type AuthContextType = {

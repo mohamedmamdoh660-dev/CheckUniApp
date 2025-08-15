@@ -1,0 +1,176 @@
+"use client";
+
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTableColumnHeader } from "../data-table-column-header";
+import { ZohoStudentsTableRowActions } from "../actions/zoho-students-actions";
+import { currentTimezone } from "@/lib/helper/current-timezone";
+import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+
+export function getZohoStudentsColumns(
+  fetchStudents: () => void
+): ColumnDef<ZohoStudent>[] {
+  const columns: ColumnDef<ZohoStudent, unknown>[] = [
+    {
+      accessorKey: "name",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Student Name" />
+      ),
+      cell: ({ row }) => {
+        const fullName =
+          `${row.original.first_name || ""} ${row.original.last_name || ""}`.trim();
+        const initials =
+          `${row.original.first_name?.[0] || ""}${row.original.last_name?.[0] || ""}`.toUpperCase();
+
+        return (
+          <div className="flex items-center w-full">
+            <Avatar className="border-foreground/10 border-[1px]">
+              <AvatarImage src={generateNameAvatar(fullName)} />
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight ml-3">
+              <span className="truncate font-semibold">{fullName || "-"}</span>
+              <span className="truncate text-xs">
+                {row.original.email || "-"}
+              </span>
+            </div>
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      accessorKey: "gender",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Gender" />
+      ),
+      cell: ({ row }) => {
+        return <div className="text-left">{row.original.gender || "-"}</div>;
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      accessorKey: "date_of_birth",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Date of Birth" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-left">{row.original.date_of_birth || "-"}</div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      accessorKey: "nationality",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Nationality" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-left">
+            {row.original.nationality ? `ID: ${row.original.nationality}` : "-"}
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      accessorKey: "passport",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Passport" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-left">
+            <div>{row.original.passport_number || "-"}</div>
+            {row.original.passport_expiry_date && (
+              <div className="text-xs">
+                Expires: {row.original.passport_expiry_date}
+              </div>
+            )}
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      accessorKey: "mobile",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Contact" />
+      ),
+      cell: ({ row }) => {
+        return <div className="text-left">{row.original.mobile || "-"}</div>;
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      accessorKey: "parents",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Parents" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-left">
+            {row.original.father_name && (
+              <div className="text-xs">Father: {row.original.father_name}</div>
+            )}
+            {row.original.mother_name && (
+              <div className="text-xs">Mother: {row.original.mother_name}</div>
+            )}
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      accessorKey: "created_at",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Created" />
+      ),
+      cell: ({ row }) => {
+        const created = row.original.created_at;
+        return (
+          <div className="text-left overflow-hidden whitespace-nowrap">
+            {created
+              ? currentTimezone(created)?.toLocaleString()?.replace("GMT", "")
+              : "-"}
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      id: "actions",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Actions" />
+      ),
+      cell: ({ row }) => (
+        <div className="text-center">
+          <ZohoStudentsTableRowActions
+            row={row}
+            fetchStudents={fetchStudents}
+          />
+        </div>
+      ),
+    },
+  ];
+
+  return columns;
+}

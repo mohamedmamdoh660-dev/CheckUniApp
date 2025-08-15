@@ -1,0 +1,356 @@
+export const GET_APPLICATIONS = `
+  query GetApplications {
+    zoho_applicationsCollection {
+      edges {
+        node {
+          id
+          created_at
+          updated_at
+          student
+          program
+          acdamic_year
+          semester
+          country
+          university
+          stage
+          degree
+          zoho_students {
+            id
+            first_name
+            last_name
+            email
+            mobile
+          }
+          zoho_programs {
+            id
+            name
+            faculty
+            speciality
+            degree
+            language
+            university
+            city
+            country
+            zoho_degrees {
+              id
+              name
+            }
+          }
+          zoho_academic_years {
+            id
+            name
+            active
+          }
+          zoho_semesters {
+            id
+            name
+            active
+          }
+          zoho_countries {
+            id
+            name
+            country_code
+          }
+          zoho_universities {
+            id
+            name
+            logo
+            sector
+          }
+          zoho_degrees {
+            id
+            name
+            code
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_APPLICATIONS_PAGINATION = `
+  query GetApplicationsPagination($search: String!, $limit: Int!, $offset: Int!) {
+    zoho_applicationsCollection(
+      filter: { 
+        or: [
+          { stage: { like: $search } }
+        ]
+      }
+      first: $limit
+      offset: $offset
+    ) {
+      edges {
+        node {
+          id
+          created_at
+          updated_at
+          student
+          program
+          acdamic_year
+          semester
+          country
+          university
+          stage
+          degree
+          zoho_students {
+            id
+            first_name
+            last_name
+            email
+            mobile
+          }
+          zoho_programs {
+            id
+            name
+           
+          }
+          zoho_academic_years {
+            id
+            name
+            active
+          }
+          zoho_semesters {
+            id
+            name
+            active
+          }
+          zoho_countries {
+            id
+            name
+            country_code
+          }
+          zoho_universities {
+            id
+            name
+            logo
+            sector
+          }
+          zoho_degrees {
+            id
+            name
+            code
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_APPLICATIONS_COUNT = `
+  query GetApplicationsCount($search: String!) {
+    zoho_applicationsCollection(
+      filter: { 
+        or: [
+          { stage: { like: $search } }
+        ]
+      }
+    ) {
+      edges {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+
+export const GET_APPLICATION_BY_ID = `
+  query GetApplicationById($id: ID!) {
+    zoho_applicationsCollection(filter: { id: { eq: $id } }) {
+      edges {
+        node {
+          id
+          created_at
+          updated_at
+          student
+          program
+          acdamic_year
+          semester
+          country
+          university
+          stage
+          degree
+          zoho_students {
+            id
+            first_name
+            last_name
+            email
+            mobile
+          }
+          zoho_programs {
+            id
+            name
+            faculty
+            speciality
+            degree
+            language
+            university
+            city
+            country
+            zoho_degrees {
+              id
+              name
+            }
+          }
+          zoho_academic_years {
+            id
+            name
+            active
+          }
+          zoho_semesters {
+            id
+            name
+            active
+          }
+          zoho_countries {
+            id
+            name
+            country_code
+          }
+          zoho_universities {
+            id
+            name
+            logo
+            sector
+          }
+          zoho_degrees {
+            id
+            name
+            code
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const INSERT_APPLICATION = `
+  mutation InsertApplication($objects: [zoho_applicationsInsertInput!]!) {
+    insertIntozoho_applicationsCollection(objects: $objects) {
+      records {
+        id
+      }
+    }
+  }
+`;
+
+export const UPDATE_APPLICATION = `
+  mutation UpdateApplication(
+    $id: ID!
+    $student: BigInt
+    $program: BigInt
+    $acdamic_year: BigInt
+    $semester: BigInt
+    $country: BigInt
+    $university: BigInt
+    $stage: String
+    $degree: BigInt
+  ) {
+    updatezoho_applicationsCollection(
+      filter: { id: { eq: $id } }
+      set: {
+        student: $student
+        program: $program
+        acdamic_year: $acdamic_year
+        semester: $semester
+        country: $country
+        university: $university
+        stage: $stage
+        degree: $degree
+        updated_at: "now()"
+      }
+    ) {
+      records {
+        id
+      }
+    }
+  }
+`;
+
+export const DELETE_APPLICATION = `
+  mutation DeleteApplication($id: ID!) {
+    deleteFromzoho_applicationsCollection(filter: { id: { eq: $id } }) {
+      records {
+        id
+      }
+    }
+  }
+`;
+
+export const GET_ZOHO_ACADEMIC_YEARS = `
+  query GetZohoAcademicYears {
+    zoho_academic_yearsCollection {
+      edges {
+        node {
+          id
+          name
+          active
+          created_at
+          updated_at
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ZOHO_SEMESTERS = `
+  query GetZohoSemesters {
+    zoho_semestersCollection {
+      edges {
+        node {
+          id
+          name
+          active
+          created_at
+          updated_at
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ZOHO_STUDENTS = `
+  query GetZohoStudents {
+    zoho_studentsCollection {
+      edges {
+        node {
+          id
+          first_name
+          last_name
+          email
+          mobile
+          gender
+          date_of_birth
+          nationality
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ZOHO_STUDENTS_SEARCH = `
+  query GetZohoStudentsSearch($search: String!) {
+    zoho_studentsCollection(
+      filter: { 
+        or: [
+          { first_name: { like: $search } },
+          { last_name: { like: $search } },
+          { email: { like: $search } }
+        ]
+      }
+    ) {
+      edges {
+        node {
+          id
+          first_name
+          last_name
+          email
+          mobile
+        }
+      }
+    }
+  }
+`;
+
+
+

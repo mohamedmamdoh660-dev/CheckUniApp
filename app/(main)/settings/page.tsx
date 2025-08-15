@@ -20,9 +20,9 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { ProfileSettings } from "@/components/module/settings/profile-settings";
-import { OrganizationSettings } from "@/components/module/settings/organization-settings";
-import { AppearanceSettings } from "@/components/module/settings/appearance-settings";
+import { ProfileSettings } from "@/components/(main)/settings/profile-settings";
+import { OrganizationSettings } from "@/components/(main)/settings/organization-settings";
+import { AppearanceSettings } from "@/components/(main)/settings/appearance-settings";
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";

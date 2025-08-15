@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase-auth-client';
 import { GET_USER_BY_ID } from '@/modules/auth/services/auth-graphql';
 import { executeGraphQL } from '@/lib/graphql-client';
-import { authService } from '@/modules';
+import { authService } from '@/modules/auth';
 
 export async function POST(request: NextRequest) {
   try {

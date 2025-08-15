@@ -4,7 +4,10 @@ import {
   RiMessage2Line,
   RiSettings3Line,
   RiTeamLine,
+  RiFileListLine,
+  RiUserLine,
 } from "@remixicon/react";
+import { SearchIcon } from "lucide-react";
 
 export const getNavData = (user: { roles?: string }) => {
   const navMain = [
@@ -16,6 +19,24 @@ export const getNavData = (user: { roles?: string }) => {
           title: "Dashboard",
           url: "/",
           icon: RiScanLine,
+          isActive: false,
+        },
+        {
+          title: "Search Programs",
+          url: "/search-programs",
+          icon: SearchIcon,
+          isActive: false,
+        },
+        {
+          title: "Applications",
+          url: "/applications",
+          icon: RiFileListLine,
+          isActive: false,
+        },
+        {
+          title: "Students",
+          url: "/students",
+          icon: RiUserLine,
           isActive: false,
         },
       ],

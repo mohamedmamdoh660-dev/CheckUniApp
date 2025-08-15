@@ -1,0 +1,290 @@
+import { supabase } from "@/lib/supabase-auth-client";
+
+export const dashboardService = {
+  /**
+   * Get dashboard statistics
+   */
+  getDashboardStats: async () => {
+    try {
+      // Get total students count
+      const { count: totalStudents, error: studentsError } = await supabase
+        .from('zoho_students')
+        .select('*', { count: 'exact', head: true });
+
+      if (studentsError) throw studentsError;
+
+      // Get total applications count
+      const { count: totalApplications, error: applicationsError } = await supabase
+        .from('zoho_applications')
+        .select('*', { count: 'exact', head: true });
+
+      if (applicationsError) throw applicationsError;
+
+      // Get total universities count
+      const { count: totalUniversities, error: universitiesError } = await supabase
+        .from('zoho_universities')
+        .select('*', { count: 'exact', head: true });
+
+      if (universitiesError) throw universitiesError;
+
+      // Get completed applications count
+      const { count: completedApplications, error: completedError } = await supabase
+        .from('zoho_applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('stage', 'completed');
+
+      if (completedError) throw completedError;
+
+      // Calculate success rate
+      const successRate = totalApplications && totalApplications > 0
+        ? ((completedApplications || 0) / totalApplications * 100).toFixed(1)
+        : "0.0";
+
+      return {
+        totalStudents: totalStudents || 0,
+        totalApplications: totalApplications || 0,
+        totalUniversities: totalUniversities || 0,
+        successRate
+      };
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get application stages count
+   */
+  getApplicationStages: async () => {
+    try {
+      // Get pending applications count
+      const { count: pending, error: pendingError } = await supabase
+        .from('zoho_applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('stage', 'pending');
+
+      if (pendingError) throw pendingError;
+
+      // Get processing applications count
+      const { count: processing, error: processingError } = await supabase
+        .from('zoho_applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('stage', 'processing');
+
+      if (processingError) throw processingError;
+
+      // Get completed applications count
+      const { count: completed, error: completedError } = await supabase
+        .from('zoho_applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('stage', 'completed');
+
+      if (completedError) throw completedError;
+
+      // Get failed applications count
+      const { count: failed, error: failedError } = await supabase
+        .from('zoho_applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('stage', 'failed');
+
+      if (failedError) throw failedError;
+
+      return {
+        pending: pending || 0,
+        processing: processing || 0,
+        completed: completed || 0,
+        failed: failed || 0
+      };
+    } catch (error) {
+      console.error("Error fetching application stages:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get university distribution
+   */
+  getUniversityDistribution: async () => {
+    try {
+        const { data, error } = await supabase
+        .from('zoho_applications')
+        .select('university::text, zoho_universities(id::text, name)')
+        .not('university', 'is', null);
+
+      if (error) throw error;
+      console.log("🚀 ~ data:", data)
+
+      // Count applications per university
+      const universityCounts = data.reduce((acc: Record<string, any>, item: any) => {
+        const universityId = item.university;
+        const universityName = item.zoho_universities?.name || `University ${universityId}`;
+        
+        if (!acc[universityId]) {
+          acc[universityId] = {
+            university: universityName,
+            applications: 0
+          };
+        }
+        
+        acc[universityId].applications++;
+        return acc;
+      }, {});
+
+      // Transform to array for chart
+      const chartData = Object.values(universityCounts).map((item: any, index: number) => ({
+        ...item,
+        fill: `var(--chart-${(index % 5) + 1})`
+      }));
+
+      return chartData;
+    } catch (error) {
+      console.error("Error fetching university distribution:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get gender distribution
+   */
+  getGenderDistribution: async () => {
+    try {
+      // Get students grouped by gender
+      const { data, error } = await supabase
+        .from('zoho_students')
+        .select('gender')
+        .not('gender', 'is', null);
+
+      if (error) throw error;
+
+      // Count students per gender
+      const genderCounts = data.reduce((acc: Record<string, any>, item: any) => {
+        const gender = item.gender.charAt(0).toUpperCase() + item.gender.slice(1);
+        
+        if (!acc[gender]) {
+          acc[gender] = {
+            gender,
+            students: 0
+          };
+        }
+        
+        acc[gender].students++;
+        return acc;
+      }, {});
+
+      // Transform to array for chart
+      const chartData = Object.values(genderCounts).map((item: any, index: number) => ({
+        ...item,
+        fill: `var(--chart-${(index % 5) + 1})`
+      }));
+
+      return chartData;
+    } catch (error) {
+      console.error("Error fetching gender distribution:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get recent applications
+   */
+  getRecentApplications: async (limit = 10) => {
+    try {
+      const { data, error } = await supabase
+        .from('zoho_applications')
+        .select(`
+          id,
+          created_at,
+          updated_at,
+          stage,
+          zoho_students (
+            id,
+            first_name,
+            last_name,
+            email
+          ),
+          zoho_programs (
+            id,
+            name
+          ),
+          zoho_universities (
+            id,
+            name,
+            logo
+          ),
+          zoho_academic_years (
+            id,
+            name
+          ),
+          zoho_semesters (
+            id,
+            name
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error fetching recent applications:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get application timeline data
+   */
+  getApplicationTimeline: async (days = 30) => {
+    try {
+      // Calculate the date range
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      // Fetch applications within the date range
+      const { data, error } = await supabase
+        .from('zoho_applications')
+        .select('created_at, stage')
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
+
+      if (error) throw error;
+
+      // Create a map for each day in the range
+      const dateMap = new Map();
+      for (let i = 0; i < days; i++) {
+        const date = new Date(endDate);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        dateMap.set(dateStr, {
+          date: dateStr,
+          pending: 0,
+          processing: 0,
+          completed: 0,
+          failed: 0
+        });
+      }
+
+      // Fill in the data
+      data.forEach((app: any) => {
+        const dateStr = new Date(app.created_at).toISOString().split('T')[0];
+        if (dateMap.has(dateStr)) {
+          const entry = dateMap.get(dateStr);
+          const stage = app.stage?.toLowerCase() || 'pending';
+          if (['pending', 'processing', 'completed', 'failed'].includes(stage)) {
+            entry[stage]++;
+          }
+        }
+      });
+
+      // Convert map to array and sort by date
+      const result = Array.from(dateMap.values())
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+      return result;
+    } catch (error) {
+      console.error("Error fetching application timeline:", error);
+      throw error;
+    }
+  }
+};

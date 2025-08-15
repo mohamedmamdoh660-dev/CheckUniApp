@@ -72,6 +72,7 @@ export function TeamSwitcher({
                   src={settings.logo_horizontal_url}
                   width={120}
                   height={32}
+                  unoptimized={true}
                   alt={
                     settings.site_name ??
                     process.env.NEXT_PUBLIC_SITE_NAME ??

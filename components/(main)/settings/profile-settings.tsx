@@ -146,15 +146,15 @@ export function ProfileSettings() {
     try {
       await usersService.updateUser({
         id: userId,
-        first_name: userProfile.first_name,
-        last_name: userProfile.last_name,
-        profile: userProfile.profile ?? null,
+        first_name: userProfile?.first_name,
+        last_name: userProfile?.last_name,
+        profile: userProfile?.profile ?? null,
       });
       setUserProfileAuth({
         ...userProfileAuth,
-        first_name: userProfile.first_name,
-        last_name: userProfile.last_name,
-        profile: userProfile.profile,
+        first_name: userProfile?.first_name,
+        last_name: userProfile?.last_name,
+        profile: userProfile?.profile,
       });
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -194,13 +194,13 @@ export function ProfileSettings() {
                 onDrop={handleDrop}
                 data-dragging={isDragging || undefined}
                 aria-label={
-                  userProfile.profile ? "Change image" : "Upload image"
+                  userProfile?.profile ? "Change image" : "Upload image"
                 }
               >
-                {userProfile.profile ? (
+                {userProfile?.profile ? (
                   <img
                     className="h-full w-full object-cover"
-                    src={userProfile.profile}
+                    src={userProfile?.profile}
                     alt="User avatar"
                     width={80}
                     height={80}
@@ -211,7 +211,7 @@ export function ProfileSettings() {
                   </div>
                 )}
               </button>
-              {userProfile.profile && (
+              {userProfile?.profile && (
                 <Button
                   onClick={handleRemoveAvatar}
                   size="icon"
@@ -248,7 +248,7 @@ export function ProfileSettings() {
               <Input
                 id="first-name"
                 placeholder="Enter first name"
-                value={userProfile.first_name}
+                value={userProfile?.first_name}
                 onChange={(e) =>
                   setUserProfile((prev) => ({
                     ...prev,
@@ -262,7 +262,7 @@ export function ProfileSettings() {
               <Input
                 id="last-name"
                 placeholder="Enter last name"
-                value={userProfile.last_name}
+                value={userProfile?.last_name}
                 onChange={(e) =>
                   setUserProfile((prev) => ({
                     ...prev,
@@ -288,7 +288,7 @@ export function ProfileSettings() {
               id="email"
               type="email"
               placeholder="Enter email address"
-              value={userProfile.email}
+              value={userProfile?.email}
               disabled
               className="bg-muted/50"
             />

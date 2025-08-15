@@ -19,6 +19,7 @@ export default function UserManagementPage({ type }: { type: string }) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+
   async function fetchUsers() {
     setIsRefetching(true);
     try {
