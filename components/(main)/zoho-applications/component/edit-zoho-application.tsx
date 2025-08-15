@@ -42,8 +42,9 @@ import {
   ZohoUniversity,
 } from "@/modules/zoho-programs/models/zoho-program";
 import Image from "next/image";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -155,20 +156,6 @@ export default function EditZohoApplication({
     }
   }, [applicationData, form]);
 
-  // Filter universities based on selected country
-  useEffect(() => {
-    const countryId = form.watch("country");
-
-    if (countryId) {
-      const filtered = universities.filter(
-        (uni) => uni.country === parseInt(countryId)
-      );
-      setFilteredUniversities(filtered);
-    } else {
-      setFilteredUniversities(universities);
-    }
-  }, [form.watch("country"), universities]);
-
   // Handler for saving changes
   const onSubmit = async (values: FormSchema) => {
     if (!applicationData) return;
@@ -178,18 +165,17 @@ export default function EditZohoApplication({
       // Update application
       const updatedApplicationData = {
         id: applicationData.id,
-        student: values.student ? parseInt(values.student) : undefined,
-        program: values.program ? parseInt(values.program) : undefined,
-        acdamic_year: values.acdamic_year
-          ? parseInt(values.acdamic_year)
-          : undefined,
-        semester: values.semester ? parseInt(values.semester) : undefined,
-        country: values.country ? parseInt(values.country) : undefined,
-        university: values.university ? parseInt(values.university) : undefined,
+        student: values.student || null,
+        program: values.program || null,
+        acdamic_year: values.acdamic_year || null,
+        semester: values.semester || null,
+        country: values.country || null,
+        university: values.university || null,
         stage: values.stage,
-        degree: values.degree ? parseInt(values.degree) : undefined,
+        degree: values.degree || null,
       };
 
+      // @ts-ignore
       await zohoApplicationsService.updateApplication(updatedApplicationData);
       toast.success("Application updated successfully");
       if (onOpenChange) onOpenChange(false);
@@ -246,9 +232,9 @@ export default function EditZohoApplication({
                             <SelectItem key={student.id} value={student.id}>
                               <div className="flex items-center gap-2">
                                 <Avatar className="h-6 w-6">
-                                  <AvatarFallback className="text-xs">
-                                    {initials}
-                                  </AvatarFallback>
+                                  <AvatarImage
+                                    src={generateNameAvatar(fullName)}
+                                  />
                                 </Avatar>
                                 <span>{fullName}</span>
                               </div>
@@ -391,7 +377,7 @@ export default function EditZohoApplication({
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         value={field.value}
-                        disabled={!form.watch("country")}
+                        // disabled={!form.watch("country")}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -399,7 +385,7 @@ export default function EditZohoApplication({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {filteredUniversities.map((university) => (
+                          {universities.map((university) => (
                             <SelectItem
                               key={university.id}
                               value={university.id}
