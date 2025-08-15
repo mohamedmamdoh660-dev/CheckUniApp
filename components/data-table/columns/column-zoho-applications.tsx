@@ -34,8 +34,8 @@ export function getZohoApplicationsColumns(
               <AvatarImage src={generateNameAvatar(fullName)} />
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
-              <span className="truncate font-semibold">{fullName}</span>
-              <span className="truncate text-xs">{student?.email || "-"}</span>
+              <span className=" font-semibold">{fullName}</span>
+              <span className=" text-xs">{student?.email || "-"}</span>
             </div>
           </div>
         );
