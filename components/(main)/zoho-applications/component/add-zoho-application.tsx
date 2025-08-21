@@ -210,11 +210,11 @@ export default function AddZohoApplication({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] pb-2 overflow-y-auto max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Add New Application</DialogTitle>
         </DialogHeader>
-        <div className="overflow-y-auto max-h-[80vh]">
+        <div className="">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}

@@ -151,65 +151,65 @@ export default function AddZohoProgram({
   }, [open]);
 
   // Filter specialities based on selected faculty
-  useEffect(() => {
-    const facultyId = form.watch("faculty");
-    if (facultyId) {
-      const filtered = specialities.filter(
-        (spec) => spec.faculty_id === parseInt(facultyId)
-      );
-      setFilteredSpecialities(filtered);
-    } else {
-      setFilteredSpecialities(specialities);
-    }
-  }, [form.watch("faculty"), specialities]);
+  // useEffect(() => {
+  //   const facultyId = form.watch("faculty");
+  //   if (facultyId) {
+  //     const filtered = specialities.filter(
+  //       (spec) => spec.faculty_id === parseInt(facultyId)
+  //     );
+  //     setFilteredSpecialities(filtered);
+  //   } else {
+  //     setFilteredSpecialities(specialities);
+  //   }
+  // }, [form.watch("faculty"), specialities]);
 
-  // Filter cities based on selected country
-  useEffect(() => {
-    const countryId = form.watch("country");
-    if (countryId) {
-      const filtered = cities.filter(
-        (city) => city.country === parseInt(countryId)
-      );
-      setFilteredCities(filtered);
+  // // Filter cities based on selected country
+  // useEffect(() => {
+  //   const countryId = form.watch("country");
+  //   if (countryId) {
+  //     const filtered = cities.filter(
+  //       (city) => city.country === parseInt(countryId)
+  //     );
+  //     setFilteredCities(filtered);
 
-      // Reset city if not in filtered list
-      const cityId = form.watch("city");
-      if (cityId && !filtered.some((city) => city.id === cityId)) {
-        form.setValue("city", "");
-      }
-    } else {
-      setFilteredCities(cities);
-    }
-  }, [form.watch("country"), cities, form]);
+  //     // Reset city if not in filtered list
+  //     const cityId = form.watch("city");
+  //     if (cityId && !filtered.some((city) => city.id === cityId)) {
+  //       form.setValue("city", "");
+  //     }
+  //   } else {
+  //     setFilteredCities(cities);
+  //   }
+  // }, [form.watch("country"), cities, form]);
 
-  // Filter universities based on selected city and country
-  useEffect(() => {
-    const cityId = form.watch("city");
-    const countryId = form.watch("country");
+  // // Filter universities based on selected city and country
+  // useEffect(() => {
+  //   const cityId = form.watch("city");
+  //   const countryId = form.watch("country");
 
-    if (cityId) {
-      const filtered = universities.filter(
-        (uni) => uni.city === parseInt(cityId)
-      );
-      setFilteredUniversities(filtered);
-    } else if (countryId) {
-      const filtered = universities.filter(
-        (uni) => uni.country === parseInt(countryId)
-      );
-      setFilteredUniversities(filtered);
-    } else {
-      setFilteredUniversities(universities);
-    }
+  //   if (cityId) {
+  //     const filtered = universities.filter(
+  //       (uni) => uni.city === parseInt(cityId)
+  //     );
+  //     setFilteredUniversities(filtered);
+  //   } else if (countryId) {
+  //     const filtered = universities.filter(
+  //       (uni) => uni.country === parseInt(countryId)
+  //     );
+  //     setFilteredUniversities(filtered);
+  //   } else {
+  //     setFilteredUniversities(universities);
+  //   }
 
-    // Reset university if not in filtered list
-    const universityId = form.watch("university");
-    if (
-      universityId &&
-      !filteredUniversities.some((uni) => uni.id === universityId)
-    ) {
-      form.setValue("university", "");
-    }
-  }, [form.watch("city"), form.watch("country"), universities, form]);
+  //   // Reset university if not in filtered list
+  //   const universityId = form.watch("university");
+  //   if (
+  //     universityId &&
+  //     !filteredUniversities.some((uni) => uni.id === universityId)
+  //   ) {
+  //     form.setValue("university", "");
+  //   }
+  // }, [form.watch("city"), form.watch("country"), universities, form]);
 
   // Handler for creating program
   const onSubmit = async (values: FormSchema) => {
@@ -255,22 +255,27 @@ export default function AddZohoProgram({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[800px] pb-2 overflow-y-auto max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Add New Program</DialogTitle>
         </DialogHeader>
-        <div className="overflow-y-auto max-h-[80vh]">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 py-4"
-            >
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 py-4"
+          >
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Basic Information
+              </h3>
+
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Program Name*</FormLabel>
+                  <FormItem>
+                    <FormLabel>Program Name *</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter program name" {...field} />
                     </FormControl>
@@ -282,176 +287,14 @@ export default function AddZohoProgram({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>Country</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select country" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {countries.map((country) => (
-                            <SelectItem key={country.id} value={country.id}>
-                              {country.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>City</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={!form.watch("country")}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select city" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {filteredCities.map((city) => (
-                            <SelectItem key={city.id} value={city.id}>
-                              {city.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="university"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>University</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={!form.watch("country")}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select university" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {filteredUniversities.map((university) => (
-                          <SelectItem key={university.id} value={university.id}>
-                            <div className="flex items-center gap-2">
-                              {university.logo && (
-                                <div className="w-5 h-5 relative overflow-hidden rounded-full">
-                                  <Image
-                                    src={university.logo}
-                                    alt={university.name || ""}
-                                    width={20}
-                                    height={20}
-                                    className="object-cover"
-                                  />
-                                </div>
-                              )}
-                              <span>{university.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="faculty"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>Faculty</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select faculty" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {facilities.map((faculty) => (
-                            <SelectItem key={faculty.id} value={faculty.id}>
-                              {faculty.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="speciality"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>Speciality</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={!form.watch("faculty")}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select speciality" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {filteredSpecialities.map((speciality) => (
-                            <SelectItem
-                              key={speciality.id}
-                              value={speciality.id}
-                            >
-                              {speciality.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
                   name="degree"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Degree</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -475,11 +318,12 @@ export default function AddZohoProgram({
                   control={form.control}
                   name="language"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Language</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -504,7 +348,7 @@ export default function AddZohoProgram({
                 control={form.control}
                 name="study_years"
                 render={({ field }) => (
-                  <FormItem className="space-y-1">
+                  <FormItem>
                     <FormLabel>Study Years</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. 4 years" {...field} />
@@ -513,13 +357,199 @@ export default function AddZohoProgram({
                   </FormItem>
                 )}
               />
+            </div>
+
+            {/* Location Information */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Location Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select country" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {countries.map((country) => (
+                            <SelectItem key={country.id} value={country.id}>
+                              {country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select city" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {cities.map((city) => (
+                            <SelectItem key={city.id} value={city.id}>
+                              {city.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="university"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>University</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select university" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {universities.map((university) => (
+                          <SelectItem key={university.id} value={university.id}>
+                            <div className="flex items-center gap-2">
+                              {university.logo && (
+                                <div className="w-5 h-5 relative overflow-hidden rounded-full">
+                                  <Image
+                                    src={university.logo}
+                                    alt={university.name || ""}
+                                    width={20}
+                                    height={20}
+                                    className="object-cover"
+                                  />
+                                </div>
+                              )}
+                              <span>{university.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Academic Information */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Academic Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="faculty"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Faculty</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select faculty" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {facilities.map((faculty) => (
+                            <SelectItem key={faculty.id} value={faculty.id}>
+                              {faculty.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="speciality"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Speciality</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select speciality" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {specialities.map((speciality) => (
+                            <SelectItem
+                              key={speciality.id}
+                              value={speciality.id}
+                            >
+                              {speciality.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Financial Information */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Financial Information
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="official_tuition"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Official Tuition</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g. 10000" {...field} />
@@ -533,7 +563,7 @@ export default function AddZohoProgram({
                   control={form.control}
                   name="discounted_tuition"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Discounted Tuition</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g. 8500" {...field} />
@@ -547,11 +577,12 @@ export default function AddZohoProgram({
                   control={form.control}
                   name="tuition_currency"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Currency</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -571,6 +602,13 @@ export default function AddZohoProgram({
                   )}
                 />
               </div>
+            </div>
+
+            {/* Status Settings */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Status Settings
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -609,22 +647,22 @@ export default function AddZohoProgram({
                   )}
                 />
               </div>
+            </div>
 
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onOpenChange?.(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Creating..." : "Create Program"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </div>
+            <DialogFooter className="gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange?.(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Creating..." : "Create Program"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

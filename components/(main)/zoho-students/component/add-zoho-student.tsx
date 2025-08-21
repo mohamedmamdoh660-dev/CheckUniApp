@@ -30,19 +30,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Define form validation schema
 const formSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   gender: z.string().optional(),
-  date_of_birth: z.string().optional(),
+  date_of_birth: z.date().optional(),
   nationality: z.string().optional(),
   passport_number: z.string().optional(),
-  passport_issue_date: z.string().optional(),
-  passport_expiry_date: z.string().optional(),
+  passport_issue_date: z.date().optional(),
+  passport_expiry_date: z.date().optional(),
   country_of_residence: z.string().optional(),
-  email: z.string().email("Invalid email address").optional(),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
   mobile: z.string().optional(),
   father_name: z.string().optional(),
   father_mobile: z.string().optional(),
@@ -64,7 +73,10 @@ export default function AddZohoStudent({
   onRefresh,
 }: AddZohoStudentProps) {
   const [isLoading, setIsLoading] = useState(false);
-
+  const [dropdown] =
+    useState<React.ComponentProps<typeof Calendar>["captionLayout"]>(
+      "dropdown"
+    );
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,11 +84,11 @@ export default function AddZohoStudent({
       first_name: "",
       last_name: "",
       gender: "",
-      date_of_birth: "",
+      date_of_birth: undefined,
       nationality: "",
       passport_number: "",
-      passport_issue_date: "",
-      passport_expiry_date: "",
+      passport_issue_date: undefined,
+      passport_expiry_date: undefined,
       country_of_residence: "",
       email: "",
       mobile: "",
@@ -94,18 +106,21 @@ export default function AddZohoStudent({
     setIsLoading(true);
 
     try {
-      // Create student
       const studentData = {
         first_name: values.first_name,
         last_name: values.last_name,
         gender: values.gender,
-        date_of_birth: values.date_of_birth,
+        date_of_birth: values.date_of_birth?.toISOString().split("T")[0],
         nationality: values.nationality
           ? parseInt(values.nationality)
           : undefined,
         passport_number: values.passport_number,
-        passport_issue_date: values.passport_issue_date,
-        passport_expiry_date: values.passport_expiry_date,
+        passport_issue_date: values.passport_issue_date
+          ?.toISOString()
+          .split("T")[0],
+        passport_expiry_date: values.passport_expiry_date
+          ?.toISOString()
+          .split("T")[0],
         country_of_residence: values.country_of_residence
           ? parseInt(values.country_of_residence)
           : undefined,
@@ -122,7 +137,8 @@ export default function AddZohoStudent({
       await zohoStudentsService.createStudent(studentData);
       toast.success("Student created successfully");
 
-      // Close dialog and refresh student list
+      // Reset form and close dialog
+      form.reset();
       if (onOpenChange) onOpenChange(false);
       if (onRefresh) onRefresh();
     } catch (error) {
@@ -138,25 +154,80 @@ export default function AddZohoStudent({
   // Gender options
   const genders = ["Male", "Female", "Other"];
 
+  // Custom Date Picker Component
+  const DatePicker = ({
+    field,
+    placeholder,
+  }: {
+    field: any;
+    placeholder: string;
+  }) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <FormControl>
+          <Button
+            variant={"outline"}
+            className={cn(
+              "w-full pl-3 text-left font-normal",
+              !field.value && "text-muted-foreground"
+            )}
+          >
+            {field.value ? (
+              format(field.value, "dd/MM/yyyy")
+            ) : (
+              <span>{placeholder}</span>
+            )}
+            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+          </Button>
+        </FormControl>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-auto p-0 !pointer-events-auto"
+        align="start"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Calendar
+          mode="single"
+          selected={field.value}
+          className="!pointer-events-auto"
+          onSelect={field.onChange}
+          captionLayout={dropdown}
+          disabled={(date) =>
+            date > new Date() || date < new Date("1900-01-01")
+          }
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[900px] pb-2 overflow-y-auto max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Add New Student</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            Add New Student
+          </DialogTitle>
         </DialogHeader>
-        <div className="overflow-y-auto max-h-[80vh]">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 py-4"
-            >
+
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 py-4"
+          >
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Basic Information
+              </h3>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="first_name"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>First Name*</FormLabel>
+                    <FormItem>
+                      <FormLabel>First Name *</FormLabel>
                       <FormControl>
                         <Input placeholder="First name" {...field} />
                       </FormControl>
@@ -169,8 +240,8 @@ export default function AddZohoStudent({
                   control={form.control}
                   name="last_name"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>Last Name*</FormLabel>
+                    <FormItem>
+                      <FormLabel>Last Name *</FormLabel>
                       <FormControl>
                         <Input placeholder="Last name" {...field} />
                       </FormControl>
@@ -185,11 +256,12 @@ export default function AddZohoStudent({
                   control={form.control}
                   name="gender"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Gender</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -213,10 +285,49 @@ export default function AddZohoStudent({
                   control={form.control}
                   name="date_of_birth"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Date of Birth</FormLabel>
+                      <DatePicker field={field} placeholder="Select date" />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Contact Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <Input
+                          type="email"
+                          placeholder="Email address"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="mobile"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mobile</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Mobile number" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -229,7 +340,7 @@ export default function AddZohoStudent({
                   control={form.control}
                   name="nationality"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Nationality</FormLabel>
                       <FormControl>
                         <Input
@@ -247,7 +358,7 @@ export default function AddZohoStudent({
                   control={form.control}
                   name="country_of_residence"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Country of Residence</FormLabel>
                       <FormControl>
                         <Input
@@ -261,13 +372,20 @@ export default function AddZohoStudent({
                   )}
                 />
               </div>
+            </div>
+
+            {/* Passport Information */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Passport Information
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="passport_number"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Passport Number</FormLabel>
                       <FormControl>
                         <Input placeholder="Passport number" {...field} />
@@ -281,11 +399,9 @@ export default function AddZohoStudent({
                   control={form.control}
                   name="passport_issue_date"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Issue Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
+                      <DatePicker field={field} placeholder="Select date" />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -295,26 +411,31 @@ export default function AddZohoStudent({
                   control={form.control}
                   name="passport_expiry_date"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
+                    <FormItem>
                       <FormLabel>Expiry Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
+                      <DatePicker field={field} placeholder="Select date" />
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Family Information */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Family Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="father_name"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>Email</FormLabel>
+                    <FormItem>
+                      <FormLabel>Father's Name</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="Email" {...field} />
+                        <Input placeholder="Father's name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -323,12 +444,26 @@ export default function AddZohoStudent({
 
                 <FormField
                   control={form.control}
-                  name="mobile"
+                  name="father_mobile"
                   render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>Mobile</FormLabel>
+                    <FormItem>
+                      <FormLabel>Father's Mobile</FormLabel>
                       <FormControl>
-                        <Input placeholder="Mobile number" {...field} />
+                        <Input placeholder="Father's mobile" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="father_job"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Father's Job</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Father's job" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -336,115 +471,65 @@ export default function AddZohoStudent({
                 />
               </div>
 
-              <div className="border-t pt-4 mt-4">
-                <h3 className="font-medium mb-2">Father's Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="father_name"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Father's Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Father's name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="mother_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mother's Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Mother's name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="father_mobile"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Father's Mobile</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Father's mobile" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <FormField
+                  control={form.control}
+                  name="mother_mobile"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mother's Mobile</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Mother's mobile" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="father_job"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Father's Job</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Father's job" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="mother_job"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mother's Job</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Mother's job" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
+            </div>
 
-              <div className="border-t pt-4">
-                <h3 className="font-medium mb-2">Mother's Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="mother_name"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Mother's Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Mother's name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="mother_mobile"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Mother's Mobile</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Mother's mobile" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="mother_job"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Mother's Job</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Mother's job" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onOpenChange?.(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Creating..." : "Create Student"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </div>
+            <DialogFooter className="gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange?.(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Creating..." : "Create Student"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
