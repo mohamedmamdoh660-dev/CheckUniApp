@@ -1,9 +1,10 @@
 export const GET_PROGRAMS = `
-  query GetPrograms  {
+  query GetPrograms($filter: zoho_programsFilter, $limit: Int!, $offset: Int!) {
     zoho_programsCollection(
-          filter: { and: [{ active_applications: { eq: true } }, { active: { eq: true } }] }
-      first: 20
-
+      filter: $filter
+      first: $limit
+      offset: $offset
+      orderBy: [{ name: AscNullsLast }]
     ) {
       edges {
         node {
@@ -217,8 +218,13 @@ export const DELETE_PROGRAM = `
 `;
 
 export const GET_ZOHO_COUNTRIES = `
-  query GetZohoCountries {
-    zoho_countriesCollection {
+  query GetZohoCountries($filter: zoho_countriesFilter, $limit: Int!, $offset: Int!) {
+    zoho_countriesCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+      orderBy: [{ name: AscNullsLast }]
+    ) {
       edges {
         node {
           id
@@ -231,8 +237,13 @@ export const GET_ZOHO_COUNTRIES = `
 `;
 
 export const GET_ZOHO_CITIES = `
-  query GetZohoCities {
-    zoho_citiesCollection {
+  query GetZohoCities($filter: zoho_citiesFilter, $limit: Int!, $offset: Int!) {
+    zoho_citiesCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+      orderBy: [{ name: AscNullsLast }]
+    ) {
       edges {
         node {
           id
@@ -259,8 +270,13 @@ export const GET_ZOHO_CITIES_BY_COUNTRY = `
 `;
 
 export const GET_ZOHO_UNIVERSITIES = `
-  query GetZohoUniversities {
-    zoho_universitiesCollection {
+  query GetZohoUniversities($filter: zoho_universitiesFilter, $limit: Int!, $offset: Int!) {
+    zoho_universitiesCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+      orderBy: [{ name: AscNullsLast }]
+    ) {
       edges {
         node {
           id
@@ -303,8 +319,13 @@ export const GET_ZOHO_UNIVERSITIES_BY_COUNTRY = `
 `;
 
 export const GET_ZOHO_DEGREES = `
-  query GetZohoDegrees {
-    zoho_degreesCollection {
+  query GetZohoDegrees($filter: zoho_degreesFilter, $limit: Int!, $offset: Int!) {
+    zoho_degreesCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+      orderBy: [{ name: AscNullsLast }]
+    ) {
       edges {
         node {
           id
@@ -318,8 +339,13 @@ export const GET_ZOHO_DEGREES = `
 `;
 
 export const GET_ZOHO_FACILITIES = `
-  query GetZohoFacilities {
-    zoho_facultyCollection {
+  query GetZohoFacilities($filter: zoho_facultyFilter, $limit: Int!, $offset: Int!) {
+    zoho_facultyCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+      orderBy: [{ name: AscNullsLast }]
+    ) {
       edges {
         node {
           id
@@ -332,8 +358,13 @@ export const GET_ZOHO_FACILITIES = `
 `;
 
 export const GET_ZOHO_LANGUAGES = `
-  query GetZohoLanguages {
-    zoho_languagesCollection {
+  query GetZohoLanguages($filter: zoho_languagesFilter, $limit: Int!, $offset: Int!) {
+    zoho_languagesCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+      orderBy: [{ name: AscNullsLast }]
+    ) {
       edges {
         node {
           id
@@ -345,8 +376,13 @@ export const GET_ZOHO_LANGUAGES = `
 `;
 
 export const GET_ZOHO_SPECIALITIES = `
-  query GetZohoSpecialities {
-    zoho_specialityCollection {
+  query GetZohoSpecialities($filter: zoho_specialityFilter, $limit: Int!, $offset: Int!) {
+    zoho_specialityCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+      orderBy: [{ name: AscNullsLast }]
+    ) {
       edges {
         node {
           id

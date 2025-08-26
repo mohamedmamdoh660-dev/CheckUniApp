@@ -278,8 +278,13 @@ export const DELETE_APPLICATION = `
 `;
 
 export const GET_ZOHO_ACADEMIC_YEARS = `
-  query GetZohoAcademicYears {
-    zoho_academic_yearsCollection {
+  query GetZohoAcademicYears($filter: zoho_academic_yearsFilter, $limit: Int!, $offset: Int!) {
+    zoho_academic_yearsCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+      orderBy: [{ name: AscNullsLast }]
+    ) {
       edges {
         node {
           id

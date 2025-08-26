@@ -122,9 +122,12 @@ export const zohoApplicationsService = {
   /**
    * Get all academic years
    */
-  getAcademicYears: async (): Promise<ZohoAcademicYear[]> => {
+  getAcademicYears: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoAcademicYear[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_ACADEMIC_YEARS);
+      const offset = (page ) * pageSize;
+      const searchPattern = `%${search}%`;
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_ACADEMIC_YEARS, { filter, limit: pageSize, offset });
       return response.zoho_academic_yearsCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting academic years:', error);
@@ -135,9 +138,12 @@ export const zohoApplicationsService = {
   /**
    * Get all semesters
    */
-  getSemesters: async (): Promise<ZohoSemester[]> => {
+  getSemesters: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoSemester[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_SEMESTERS);
+      const offset = (page ) * pageSize;
+      const searchPattern = `%${search}%`;
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_SEMESTERS, { filter, limit: pageSize, offset });
       return response.zoho_semestersCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting semesters:', error);
@@ -148,9 +154,12 @@ export const zohoApplicationsService = {
   /**
    * Get all students
    */
-  getStudents: async (): Promise<ZohoStudent[]> => {
+  getStudents: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoStudent[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_STUDENTS);
+      const offset = (page ) * pageSize;
+      const searchPattern = `%${search}%`;
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_STUDENTS, { filter, limit: pageSize, offset });
       return response.zoho_studentsCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting students:', error);

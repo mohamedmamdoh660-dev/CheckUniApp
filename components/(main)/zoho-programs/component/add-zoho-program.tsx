@@ -31,16 +31,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  ZohoCity,
-  ZohoCountry,
-  ZohoDegree,
-  Zohofaculty,
-  ZohoLanguage,
-  ZohoSpeciality,
-  ZohoUniversity,
-} from "@/modules/zoho-programs/models/zoho-program";
-import Image from "next/image";
+
+import { SearchableDropdown } from "@/components/searchable-dropdown";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -74,20 +66,6 @@ export default function AddZohoProgram({
   onRefresh,
 }: AddZohoProgramProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [countries, setCountries] = useState<ZohoCountry[]>([]);
-  const [cities, setCities] = useState<ZohoCity[]>([]);
-  const [filteredCities, setFilteredCities] = useState<ZohoCity[]>([]);
-  const [universities, setUniversities] = useState<ZohoUniversity[]>([]);
-  const [filteredUniversities, setFilteredUniversities] = useState<
-    ZohoUniversity[]
-  >([]);
-  const [degrees, setDegrees] = useState<ZohoDegree[]>([]);
-  const [facilities, setFacilities] = useState<Zohofaculty[]>([]);
-  const [languages, setLanguages] = useState<ZohoLanguage[]>([]);
-  const [specialities, setSpecialities] = useState<ZohoSpeciality[]>([]);
-  const [filteredSpecialities, setFilteredSpecialities] = useState<
-    ZohoSpeciality[]
-  >([]);
 
   // Initialize form
   const form = useForm<FormSchema>({
@@ -109,107 +87,6 @@ export default function AddZohoProgram({
       study_years: "",
     },
   });
-
-  // Fetch reference data
-  useEffect(() => {
-    if (open) {
-      const fetchReferenceData = async () => {
-        try {
-          const [
-            countriesData,
-            citiesData,
-            universitiesData,
-            degreesData,
-            facilitiesData,
-            languagesData,
-            specialitiesData,
-          ] = await Promise.all([
-            zohoProgramsService.getCountries(),
-            zohoProgramsService.getCities(),
-            zohoProgramsService.getUniversities(),
-            zohoProgramsService.getDegrees(),
-            zohoProgramsService.getFacilities(),
-            zohoProgramsService.getLanguages(),
-            zohoProgramsService.getSpecialities(),
-          ]);
-
-          setCountries(countriesData);
-          setCities(citiesData);
-          setUniversities(universitiesData);
-          setDegrees(degreesData);
-          setFacilities(facilitiesData);
-          setLanguages(languagesData);
-          setSpecialities(specialitiesData);
-        } catch (error) {
-          console.error("Error fetching reference data:", error);
-          toast.error("Failed to load reference data");
-        }
-      };
-
-      fetchReferenceData();
-    }
-  }, [open]);
-
-  // Filter specialities based on selected faculty
-  // useEffect(() => {
-  //   const facultyId = form.watch("faculty");
-  //   if (facultyId) {
-  //     const filtered = specialities.filter(
-  //       (spec) => spec.faculty_id === parseInt(facultyId)
-  //     );
-  //     setFilteredSpecialities(filtered);
-  //   } else {
-  //     setFilteredSpecialities(specialities);
-  //   }
-  // }, [form.watch("faculty"), specialities]);
-
-  // // Filter cities based on selected country
-  // useEffect(() => {
-  //   const countryId = form.watch("country");
-  //   if (countryId) {
-  //     const filtered = cities.filter(
-  //       (city) => city.country === parseInt(countryId)
-  //     );
-  //     setFilteredCities(filtered);
-
-  //     // Reset city if not in filtered list
-  //     const cityId = form.watch("city");
-  //     if (cityId && !filtered.some((city) => city.id === cityId)) {
-  //       form.setValue("city", "");
-  //     }
-  //   } else {
-  //     setFilteredCities(cities);
-  //   }
-  // }, [form.watch("country"), cities, form]);
-
-  // // Filter universities based on selected city and country
-  // useEffect(() => {
-  //   const cityId = form.watch("city");
-  //   const countryId = form.watch("country");
-
-  //   if (cityId) {
-  //     const filtered = universities.filter(
-  //       (uni) => uni.city === parseInt(cityId)
-  //     );
-  //     setFilteredUniversities(filtered);
-  //   } else if (countryId) {
-  //     const filtered = universities.filter(
-  //       (uni) => uni.country === parseInt(countryId)
-  //     );
-  //     setFilteredUniversities(filtered);
-  //   } else {
-  //     setFilteredUniversities(universities);
-  //   }
-
-  //   // Reset university if not in filtered list
-  //   const universityId = form.watch("university");
-  //   if (
-  //     universityId &&
-  //     !filteredUniversities.some((uni) => uni.id === universityId)
-  //   ) {
-  //     form.setValue("university", "");
-  //   }
-  // }, [form.watch("city"), form.watch("country"), universities, form]);
 
   // Handler for creating program
   const onSubmit = async (values: FormSchema) => {
@@ -291,24 +168,16 @@ export default function AddZohoProgram({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Degree</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select degree" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {degrees.map((degree) => (
-                            <SelectItem key={degree.id} value={degree.id}>
-                              {degree.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <SearchableDropdown
+                        placeholder="Select Degree..."
+                        table="zoho-degrees"
+                        searchField="name"
+                        displayField="name"
+                        initialValue={field.value}
+                        onSelect={(item) => {
+                          field.onChange(item.id);
+                        }}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -320,24 +189,16 @@ export default function AddZohoProgram({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Language</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select language" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {languages.map((language) => (
-                            <SelectItem key={language.id} value={language.id}>
-                              {language.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <SearchableDropdown
+                        placeholder="Select Language..."
+                        table="zoho-languages"
+                        searchField="name"
+                        displayField="name"
+                        initialValue={field.value}
+                        onSelect={(item) => {
+                          field.onChange(item.id);
+                        }}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -372,24 +233,19 @@ export default function AddZohoProgram({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Country</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select country" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {countries.map((country) => (
-                            <SelectItem key={country.id} value={country.id}>
-                              {country.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <SearchableDropdown
+                        placeholder="Select Country..."
+                        table="zoho-countries"
+                        searchField="name"
+                        displayField="name"
+                        initialValue={field.value}
+                        onSelect={(item) => {
+                          field.onChange(item.id);
+                          // Reset dependent fields
+                          // form.setValue("city", "");
+                          // form.setValue("university", "");
+                        }}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -401,24 +257,23 @@ export default function AddZohoProgram({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>City</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select city" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {cities.map((city) => (
-                            <SelectItem key={city.id} value={city.id}>
-                              {city.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <SearchableDropdown
+                        placeholder="Select City..."
+                        table="zoho-cities"
+                        searchField="name"
+                        displayField="name"
+                        initialValue={field.value}
+                        // dependsOn={{
+                        //   field: "country",
+                        //   value: form.watch("country") || null,
+                        // }}
+                        // disabled={!form.watch("country")}
+                        onSelect={(item) => {
+                          field.onChange(item.id);
+                          // Reset university when city changes
+                          // form.setValue("university", "");
+                        }}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -431,37 +286,43 @@ export default function AddZohoProgram({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>University</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select university" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {universities.map((university) => (
-                          <SelectItem key={university.id} value={university.id}>
-                            <div className="flex items-center gap-2">
-                              {university.logo && (
-                                <div className="w-5 h-5 relative overflow-hidden rounded-full">
-                                  <Image
-                                    src={university.logo}
-                                    alt={university.name || ""}
-                                    width={20}
-                                    height={20}
-                                    className="object-cover"
-                                  />
-                                </div>
-                              )}
-                              <span>{university.name}</span>
+                    <SearchableDropdown
+                      placeholder="Select University..."
+                      table="zoho-universities"
+                      searchField="name"
+                      displayField="name"
+                      initialValue={field.value}
+                      // dependsOn={{
+                      //   field: form.watch("city") ? "city" : "country",
+                      //   value:
+                      //     form.watch("city") || form.watch("country") || null,
+                      // }}
+                      onSelect={(item) => {
+                        field.onChange(item.id);
+                      }}
+                      renderItem={(item) => (
+                        <div className="flex items-center gap-2">
+                          {item.logo && (
+                            <div className="w-5 h-5 relative overflow-hidden rounded-full bg-muted">
+                              <div className="w-full h-full">
+                                {typeof item.logo === "string" &&
+                                  item.logo.startsWith("http") && (
+                                    <div
+                                      className="w-full h-full bg-cover bg-center"
+                                      style={{
+                                        backgroundImage: `url(${item.logo})`,
+                                      }}
+                                    />
+                                  )}
+                              </div>
                             </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                          )}
+                          <div>
+                            <div className="font-medium">{item.name}</div>
+                          </div>
+                        </div>
+                      )}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -481,24 +342,16 @@ export default function AddZohoProgram({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Faculty</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select faculty" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {facilities.map((faculty) => (
-                            <SelectItem key={faculty.id} value={faculty.id}>
-                              {faculty.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <SearchableDropdown
+                        placeholder="Select Faculty..."
+                        table="zoho-faculties"
+                        searchField="name"
+                        displayField="name"
+                        initialValue={field.value}
+                        onSelect={(item) => {
+                          field.onChange(item.id);
+                        }}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -510,27 +363,20 @@ export default function AddZohoProgram({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Speciality</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select speciality" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {specialities.map((speciality) => (
-                            <SelectItem
-                              key={speciality.id}
-                              value={speciality.id}
-                            >
-                              {speciality.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <SearchableDropdown
+                        placeholder="Select Speciality..."
+                        table="zoho-specialities"
+                        searchField="name"
+                        displayField="name"
+                        initialValue={field.value}
+                        // dependsOn={{
+                        //   field: "faculty",
+                        //   value: form.watch("faculty") || null,
+                        // }}
+                        onSelect={(item) => {
+                          field.onChange(item.id);
+                        }}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -649,7 +495,7 @@ export default function AddZohoProgram({
               </div>
             </div>
 
-            <DialogFooter className="gap-2 pt-4">
+            <DialogFooter className="gap-2 ">
               <Button
                 type="button"
                 variant="outline"

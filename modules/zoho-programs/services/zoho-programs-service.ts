@@ -25,8 +25,11 @@ export const zohoProgramsService = {
   /**
    * Get all programs
    */
-  getPrograms: async () => {
-    const response = await executeGraphQLBackend(GET_PROGRAMS);
+  getPrograms: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null) => {
+    const offset = (page ) * pageSize;
+    const searchPattern = `%${search}%`;
+    const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+    const response = await executeGraphQLBackend(GET_PROGRAMS, { filter, limit: pageSize, offset });
     return response.zoho_programsCollection.edges.map((edge: any) => edge.node);
   },
 
@@ -141,9 +144,12 @@ export const zohoProgramsService = {
   /**
    * Get all countries
    */
-  getCountries: async (): Promise<ZohoCountry[]> => {
+  getCountries: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoCountry[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_COUNTRIES);
+      const offset = (page ) * pageSize;
+      const searchPattern = `%${search}%`;
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_COUNTRIES, { filter, limit: pageSize, offset });
       return response.zoho_countriesCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting countries:', error);
@@ -154,9 +160,12 @@ export const zohoProgramsService = {
   /**
    * Get all cities
    */
-  getCities: async (): Promise<ZohoCity[]> => {
+  getCities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoCity[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_CITIES);
+      const offset = (page ) * pageSize;
+      const searchPattern = `%${search}%`;
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_CITIES, { filter, limit: pageSize, offset });
       return response.zoho_citiesCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting cities:', error);
@@ -180,9 +189,14 @@ export const zohoProgramsService = {
   /**
    * Get all universities
    */
-  getUniversities: async (): Promise<ZohoUniversity[]> => {
+  getUniversities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoUniversity[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_UNIVERSITIES);
+      const offset = (page ) * pageSize;
+      console.log("🚀 ~ offset:", offset)
+      const searchPattern = `%${search}%`;
+      console.log("🚀 ~ searchPattern:", searchPattern)
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_UNIVERSITIES, { filter, limit: pageSize, offset });
       return response.zoho_universitiesCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting universities:', error);
@@ -219,9 +233,12 @@ export const zohoProgramsService = {
   /**
    * Get all degrees
    */
-  getDegrees: async (): Promise<ZohoDegree[]> => {
+  getDegrees: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoDegree[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_DEGREES);
+      const offset = (page ) * pageSize;
+      const searchPattern = `%${search}%`;
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_DEGREES, { filter, limit: pageSize, offset });
       return response.zoho_degreesCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting degrees:', error);
@@ -232,9 +249,12 @@ export const zohoProgramsService = {
   /**
    * Get all facilities
    */
-  getFacilities: async (): Promise<Zohofaculty[]> => {
+  getFacilities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<Zohofaculty[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_FACILITIES);
+      const offset = (page ) * pageSize;
+      const searchPattern = `%${search}%`;
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_FACILITIES, { filter, limit: pageSize, offset });
       return response.zoho_facultyCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting facilities:', error);
@@ -245,9 +265,12 @@ export const zohoProgramsService = {
   /**
    * Get all languages
    */
-  getLanguages: async (): Promise<ZohoLanguage[]> => {
+  getLanguages: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoLanguage[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_LANGUAGES);
+      const offset = (page ) * pageSize;
+      const searchPattern = `%${search}%`;
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_LANGUAGES, { filter, limit: pageSize, offset });
       return response.zoho_languagesCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting languages:', error);
@@ -258,9 +281,12 @@ export const zohoProgramsService = {
   /**
    * Get all specialities
    */
-  getSpecialities: async (): Promise<ZohoSpeciality[]> => {
+  getSpecialities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoSpeciality[]> => {
     try {
-      const response = await executeGraphQLBackend(GET_ZOHO_SPECIALITIES);
+      const offset = (page ) * pageSize;
+      const searchPattern = `%${search}%`;
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const response = await executeGraphQLBackend(GET_ZOHO_SPECIALITIES, { filter, limit: pageSize, offset });
       return response.zoho_specialityCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting specialities:', error);

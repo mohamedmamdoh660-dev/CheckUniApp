@@ -1,3 +1,5 @@
+import { ZohoCountry } from "@/modules/zoho-programs/models/zoho-program";
+
 export interface ZohoStudent {
   id: string;
   created_at?: string;
@@ -6,11 +8,11 @@ export interface ZohoStudent {
   last_name?: string;
   gender?: string;
   date_of_birth?: string;
-  nationality?: number;
+  nationality?: string;
   passport_number?: string;
   passport_issue_date?: string;
   passport_expiry_date?: string;
-  country_of_residence?: number;
+  country_of_residence?: string;
   email?: string;
   mobile?: string;
   father_name?: string;
@@ -19,4 +21,6 @@ export interface ZohoStudent {
   mother_name?: string;
   mother_mobile?: string;
   mother_job?: string;
+  nationality_record?: ZohoCountry;
+  country_of_residence_record?: ZohoCountry;
 }

@@ -75,7 +75,7 @@ export function getZohoStudentsColumns(
       cell: ({ row }) => {
         return (
           <div className="text-left">
-            {row.original.nationality ? `ID: ${row.original.nationality}` : "-"}
+            {row.original.nationality_record?.name || "-"}
           </div>
         );
       },

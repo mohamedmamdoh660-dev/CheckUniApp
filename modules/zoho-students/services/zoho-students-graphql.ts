@@ -62,6 +62,14 @@ export const GET_STUDENTS_PAGINATION = `
           mother_name
           mother_mobile
           mother_job
+         nationality_record:  zoho_countries  {
+         id
+            name
+        }
+            country_of_residence_record: zoho_countries {
+            id
+            name
+          }
         }
       }
     }

@@ -40,6 +40,7 @@ import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SearchableDropdown } from "@/components/searchable-dropdown";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -155,7 +156,7 @@ export default function EditZohoStudent({
         gender: values.gender,
         date_of_birth: values.date_of_birth?.toISOString().split("T")[0],
         nationality: values.nationality
-          ? parseInt(values.nationality)
+          ? values.nationality.toString()
           : undefined,
         passport_number: values.passport_number,
         passport_issue_date: values.passport_issue_date
@@ -165,7 +166,7 @@ export default function EditZohoStudent({
           ?.toISOString()
           .split("T")[0],
         country_of_residence: values.country_of_residence
-          ? parseInt(values.country_of_residence)
+          ? values.country_of_residence.toString()
           : undefined,
         email: values.email,
         mobile: values.mobile,
@@ -377,13 +378,16 @@ export default function EditZohoStudent({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nationality</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Nationality ID"
-                          {...field}
-                        />
-                      </FormControl>
+                      <SearchableDropdown
+                        placeholder="Search nationality..."
+                        table="zoho-countries"
+                        searchField="name"
+                        displayField="name"
+                        initialValue={field.value}
+                        onSelect={(item: { id: string }) => {
+                          field.onChange(item.id);
+                        }}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -395,13 +399,16 @@ export default function EditZohoStudent({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Country of Residence</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Country ID"
-                          {...field}
-                        />
-                      </FormControl>
+                      <SearchableDropdown
+                        placeholder="Search country..."
+                        table="zoho-countries"
+                        searchField="name"
+                        displayField="name"
+                        initialValue={field.value}
+                        onSelect={(item: { id: string }) => {
+                          field.onChange(item.id);
+                        }}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -551,7 +558,7 @@ export default function EditZohoStudent({
               </div>
             </div>
 
-            <DialogFooter className="gap-2 pt-4">
+            <DialogFooter className="gap-2 ">
               <Button
                 type="button"
                 variant="outline"
