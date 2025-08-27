@@ -112,7 +112,6 @@ export default function SideBarLayout({
           <SidebarHeader>
             <TeamSwitcher teams={data.teams} settings={settings} />
             <hr className="border-t border-border mx-2 -mt-px" />
-            <SearchForm className="mt-3" />
           </SidebarHeader>
           <SidebarContent>
             <NavMain
