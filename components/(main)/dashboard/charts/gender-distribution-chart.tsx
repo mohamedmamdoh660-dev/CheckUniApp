@@ -31,7 +31,10 @@ const CustomLegend = (props: any) => {
   return (
     <ul className="flex flex-wrap gap-4 justify-center mt-4">
       {payload.map((entry: any, index: number) => (
-        <li key={`item-${index}`} className="flex items-center gap-2">
+        <li
+          key={`item-${index}`}
+          className="flex items-center gap-2 text-[#9f9fa9]"
+        >
           <div
             className="w-3 h-3 rounded-full"
             style={{ backgroundColor: entry.color }}
@@ -82,7 +85,7 @@ export function GenderDistributionChart() {
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div>
+        <div className="flex flex-col gap-1">
           <CardTitle>Gender Distribution</CardTitle>
           <CardDescription>Students by gender</CardDescription>
         </div>
@@ -111,14 +114,14 @@ export function GenderDistributionChart() {
           </div>
         ) : (
           <div className="h-[300px] w-full">
-            <PieChart width={400} height={250} className="mx-auto">
+            <PieChart width={400} height={300} className="mx-auto">
               <Pie
                 data={chartData}
                 dataKey="students"
                 nameKey="gender"
                 cx="50%"
                 cy="50%"
-                outerRadius={80}
+                outerRadius={100}
                 fill="#8884d8"
                 // label={(entry) => `${entry.gender}: ${entry.students}`}
               >

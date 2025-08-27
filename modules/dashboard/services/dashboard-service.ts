@@ -1,6 +1,11 @@
 import { supabase } from "@/lib/supabase-auth-client";
+import { adminDashboardService } from "./admin-dashboard-service";
 
 export const dashboardService = {
+  // Admin dashboard services
+  getAdminDashboardStats: adminDashboardService.getAdminDashboardStats,
+  getApplicationFunnel: adminDashboardService.getApplicationFunnel,
+  getBestPrograms: adminDashboardService.getBestPrograms,
   /**
    * Get dashboard statistics
    */

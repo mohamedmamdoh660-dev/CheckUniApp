@@ -30,10 +30,6 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Auth protection configuration
-const DEFAULT_AUTH_ROUTE = "/auth/login";
-const DEFAULT_PROTECTED_ROUTE = "/";
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);

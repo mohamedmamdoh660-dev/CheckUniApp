@@ -124,7 +124,7 @@ export function ApplicationChart() {
     <Card className="@container/card">
       <CardHeader>
         <div className="flex justify-between items-center">
-          <div>
+          <div className="flex flex-col gap-1">
             <CardTitle>Application Timeline</CardTitle>
             <CardDescription>
               <span className="hidden @[540px]/card:block">

@@ -1,28 +1,22 @@
-"use client";
-
 import React from "react";
-import { SectionCards } from "./section-cards";
-import { GenderDistributionChart } from "./charts/gender-distribution-chart";
+import { AdminStatsCards } from "./admin-stats-cards";
+import { AdminUniversityReport } from "./admin-university-report";
+import { AdminStageFunnel } from "./admin-stage-funnel";
+import { AdminBestProgram } from "./admin-best-program";
 import { UniversityDistributionChart } from "./charts/university-distribution-chart";
 import { ApplicationChart } from "./charts/application-chart";
 import { RecentApplications } from "./recent-applications";
-import { useAuth } from "@/context/AuthContext";
-import AdminDashboard from "./admin-dashboard";
 
-const Dashboard = () => {
-  const { userProfile } = useAuth();
-  const isAdmin = userProfile?.roles?.name === "admin";
-  if (isAdmin) {
-    return <AdminDashboard />;
-  }
+const AdminDashboard = () => {
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
       <div className="flex flex-col gap-4 py-4 md:gap-4 md:py-6">
-        <SectionCards />
+        <AdminStatsCards />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <GenderDistributionChart />
           <UniversityDistributionChart />
+          <AdminStageFunnel />
         </div>
+        <AdminBestProgram />
         <ApplicationChart />
         <RecentApplications />
       </div>
@@ -30,4 +24,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;

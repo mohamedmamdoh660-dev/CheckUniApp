@@ -10,6 +10,7 @@ import { CircleCheck, CircleX } from "lucide-react";
 import { User } from "@/types/types";
 import { Role } from "@/modules/roles/models/role";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export function getUserColumns(
   fetchUsers: () => void,
@@ -77,15 +78,9 @@ export function getUserColumns(
       ),
       cell: ({ row }) => {
         return row.original.is_active ? (
-          <Badge className="bg-green-500">
-            <CircleCheck className="!h-3 !w-3 mr-1" />
-            Active
-          </Badge>
+          <StatusBadge status={"active"} />
         ) : (
-          <Badge variant="outline" className="bg-red-500 text-white h-6">
-            <CircleX className="!h-3 !w-3 mr-1" />
-            Inactive
-          </Badge>
+          <StatusBadge status={"inactive"} />
         );
       },
       enableSorting: true,
