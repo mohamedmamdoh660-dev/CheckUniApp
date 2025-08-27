@@ -8,6 +8,8 @@ import { User } from "@/types/types";
 import { Settings, settingsService } from "@/modules/settings";
 import Loader from "@/components/loader";
 import { checkAuthentication } from "@/utils/check-authentication";
+import { LogOut, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type AuthContextType = {
   user: User | null;
@@ -175,6 +177,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader />
+      </div>
+    );
+  }
+
+  if (userProfile?.is_active === false) {
+    return (
+      <div className="h-[calc(100vh-100px)] flex justify-center items-center ">
+        <div className="text-center mt-6 lg:w-[40%]">
+          <XCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
+          <p className="text-muted-foreground">
+            Your account has been banned by the admin. You do not have
+            permission to access this platform. Please contact your
+            administrator if you believe this is an error.
+          </p>
+          <div className="flex justify-center w-full">
+            <Button
+              variant={"outline"}
+              className="w-max mt-5"
+              onClick={signOut}
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
