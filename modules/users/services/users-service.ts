@@ -73,8 +73,14 @@ export const usersService = {
    */
   deleteUser: async (id: string): Promise<void> => {
     try {
+  
       // Delete user from GraphQL database
       await executeGraphQLBackend(DELETE_USER, { id });
+
+      const {error} = await supabase.auth.admin.deleteUser(id);
+      if (error) {
+       throw new Error(error.message);
+      }
     } catch (error) {
       console.error('Error deleting user:', error);
       throw error;

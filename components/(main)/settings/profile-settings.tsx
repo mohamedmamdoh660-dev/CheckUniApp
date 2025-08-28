@@ -49,7 +49,6 @@ export type UserProfile = {
 };
 
 export function ProfileSettings() {
-  const userId = getUserId();
   const { userProfile: userProfileAuth, setUserProfile: setUserProfileAuth } =
     useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile>(getUserProfile());
@@ -59,7 +58,7 @@ export function ProfileSettings() {
       setUserProfile(userProfileAuth as UserProfile);
     };
     fetchUserData();
-  }, [userId]);
+  }, []);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -145,7 +144,7 @@ export function ProfileSettings() {
     setIsLoading(true);
     try {
       await usersService.updateUser({
-        id: userId,
+        id: userProfileAuth?.id,
         first_name: userProfile?.first_name,
         last_name: userProfile?.last_name,
         profile: userProfile?.profile ?? null,
