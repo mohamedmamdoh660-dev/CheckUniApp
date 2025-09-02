@@ -62,7 +62,7 @@ export const adminDashboardService = {
           zoho_programs (
             id,
             name,
-            degree
+            degree_id
           ),
           zoho_universities (
             id,
@@ -73,7 +73,7 @@ export const adminDashboardService = {
       
       // Apply filters if provided
       if (filters.degree && filters.degree !== 'All') {
-        query = query.eq('zoho_programs.degree', filters.degree);
+        query = query.eq('zoho_programs.degree_id', filters.degree);
       }
       
       if (filters.university && filters.university !== 'All') {
@@ -97,7 +97,7 @@ export const adminDashboardService = {
           acc[programId] = {
             name: programName,
             applications: 0,
-            degree: item.zoho_programs?.degree || 'Unknown'
+            degree: item.zoho_programs?.degree_id || 'Unknown'
           };
         }
         

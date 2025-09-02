@@ -29,13 +29,13 @@ export const GET_PROGRAMS_PAGINATION = `
         node {
           id
           name
-          faculty
-          speciality
-          degree
-          language
-          university
-          city
-          country
+          faculty_id
+          speciality_id
+          degree_id
+          language_id
+          university_id
+          city_id
+          country_id
           created_at
           updated_at
           official_tuition
@@ -100,13 +100,13 @@ export const GET_PROGRAM_BY_ID = `
         node {
           id
           name
-          faculty
-          speciality
-          degree
-          language
-          university
-          city
-          country
+          faculty_id
+          speciality_id
+          degree_id
+          language_id
+          university_id
+          city_id
+          country_id
           created_at
           updated_at
           official_tuition

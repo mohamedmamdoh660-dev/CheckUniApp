@@ -180,13 +180,13 @@ export const GET_APPLICATION_BY_ID = `
           zoho_programs {
             id
             name
-            faculty
-            speciality
-            degree
-            language
-            university
-            city
-            country
+            faculty_id
+            speciality_id
+            degree_id
+            language_id
+            university_id
+            city_id
+            country_id
             zoho_degrees {
               id
               name

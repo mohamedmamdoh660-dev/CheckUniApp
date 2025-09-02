@@ -31,16 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  ZohoCity,
-  ZohoCountry,
-  ZohoDegree,
-  Zohofaculty,
-  ZohoLanguage,
-  ZohoProgram,
-  ZohoSpeciality,
-  ZohoUniversity,
-} from "@/modules/zoho-programs/models/zoho-program";
+import { ZohoProgram } from "@/modules/zoho-programs/models/zoho-program";
 import Image from "next/image";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
 
@@ -84,13 +75,13 @@ export default function EditZohoProgram({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: programData?.name || "",
-      faculty: programData?.faculty?.toString() || "",
-      speciality: programData?.speciality?.toString() || "",
-      degree: programData?.degree?.toString() || "",
-      language: programData?.language?.toString() || "",
-      university: programData?.university?.toString() || "",
-      city: programData?.city?.toString() || "",
-      country: programData?.country?.toString() || "",
+      faculty: programData?.faculty_id?.toString() || "",
+      speciality: programData?.speciality_id?.toString() || "",
+      degree: programData?.degree_id?.toString() || "",
+      language: programData?.language_id?.toString() || "",
+      university: programData?.university_id?.toString() || "",
+      city: programData?.city_id?.toString() || "",
+      country: programData?.country_id?.toString() || "",
       official_tuition: programData?.official_tuition || "",
       discounted_tuition: programData?.discounted_tuition || "",
       tuition_currency: programData?.tuition_currency || "",
@@ -105,13 +96,13 @@ export default function EditZohoProgram({
     if (programData) {
       form.reset({
         name: programData.name || "",
-        faculty: programData.faculty?.toString() || "",
-        speciality: programData.speciality?.toString() || "",
-        degree: programData.degree?.toString() || "",
-        language: programData.language?.toString() || "",
-        university: programData.university?.toString() || "",
-        city: programData.city?.toString() || "",
-        country: programData.country?.toString() || "",
+        faculty: programData.faculty_id?.toString() || "",
+        speciality: programData.speciality_id?.toString() || "",
+        degree: programData.degree_id?.toString() || "",
+        language: programData.language_id?.toString() || "",
+        university: programData.university_id?.toString() || "",
+        city: programData.city_id?.toString() || "",
+        country: programData.country_id?.toString() || "",
         official_tuition: programData.official_tuition || "",
         discounted_tuition: programData.discounted_tuition || "",
         tuition_currency: programData.tuition_currency || "",

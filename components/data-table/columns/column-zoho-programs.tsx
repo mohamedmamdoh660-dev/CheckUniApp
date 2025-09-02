@@ -8,6 +8,7 @@ import { currentTimezone } from "@/lib/helper/current-timezone";
 import { ZohoProgram } from "@/modules/zoho-programs/models/zoho-program";
 import { StatusBadge } from "@/components/ui/status-badge";
 import Image from "next/image";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export function getZohoProgramsColumns(
   fetchPrograms: () => void
@@ -39,22 +40,17 @@ export function getZohoProgramsColumns(
 
         return (
           <div className="flex items-center gap-2">
-            {university?.logo && (
+            {/* {university?.logo && (
               <div className="w-8 h-8 relative overflow-hidden rounded-full">
                 <Image
-                  src={university.logo}
+                  src={generateNameAvatar(university?.name || "")}
                   alt={university?.name || "University"}
                   fill
                   className="object-cover"
                 />
               </div>
-            )}
-            <div className="text-left">
-              {university?.name ||
-                (row.original.university
-                  ? `ID: ${row.original.university}`
-                  : "-")}
-            </div>
+            )} */}
+            <div className="text-left">{university?.name}</div>
           </div>
         );
       },
@@ -69,10 +65,7 @@ export function getZohoProgramsColumns(
       ),
       cell: ({ row }) => {
         return (
-          <div className="text-left">
-            {row.original.zoho_faculty?.name ||
-              (row.original.faculty ? `ID: ${row.original.faculty}` : "-")}
-          </div>
+          <div className="text-left">{row.original.zoho_faculty?.name}</div>
         );
       },
       enableSorting: true,
@@ -86,12 +79,7 @@ export function getZohoProgramsColumns(
       ),
       cell: ({ row }) => {
         return (
-          <div className="text-left">
-            {row.original.zoho_speciality?.name ||
-              (row.original.speciality
-                ? `ID: ${row.original.speciality}`
-                : "-")}
-          </div>
+          <div className="text-left">{row.original.zoho_speciality?.name}</div>
         );
       },
       enableSorting: true,
@@ -105,10 +93,7 @@ export function getZohoProgramsColumns(
       ),
       cell: ({ row }) => {
         return (
-          <div className="text-left">
-            {row.original.zoho_degrees?.name ||
-              (row.original.degree ? `ID: ${row.original.degree}` : "-")}
-          </div>
+          <div className="text-left">{row.original.zoho_degrees?.name}</div>
         );
       },
       enableSorting: true,
@@ -151,10 +136,7 @@ export function getZohoProgramsColumns(
       ),
       cell: ({ row }) => {
         return (
-          <div className="text-left">
-            {row.original.zoho_languages?.name ||
-              (row.original.language ? `ID: ${row.original.language}` : "-")}
-          </div>
+          <div className="text-left">{row.original.zoho_languages?.name}</div>
         );
       },
       enableSorting: true,

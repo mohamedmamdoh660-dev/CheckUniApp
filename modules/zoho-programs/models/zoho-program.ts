@@ -58,13 +58,13 @@ export interface ZohoSpeciality {
 export interface ZohoProgram {
   id: string;
   name?: string;
-  faculty?: number;
-  speciality?: number;
-  degree?: number;
-  language?: number;
-  university?: number;
-  city?: number;
-  country?: number;
+  faculty_id?: number;
+  speciality_id?: number;
+  degree_id?: number;
+  language_id?: number;
+  university_id?: number;
+  city_id?: number;
+  country_id?: number;
   created_at?: string;
   updated_at?: string;
   official_tuition?: string;
