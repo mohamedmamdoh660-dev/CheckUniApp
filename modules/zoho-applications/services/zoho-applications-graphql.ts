@@ -237,14 +237,14 @@ export const INSERT_APPLICATION = `
 export const UPDATE_APPLICATION = `
   mutation UpdateApplication(
     $id: ID!
-    $student: BigInt
-    $program: BigInt
-    $acdamic_year: BigInt
-    $semester: BigInt
-    $country: BigInt
-    $university: BigInt
+    $student: String
+    $program: String
+    $acdamic_year: String
+    $semester: String
+    $country: String
+    $university: String
     $stage: String
-    $degree: BigInt
+    $degree: String
   ) {
     updatezoho_applicationsCollection(
       filter: { id: { eq: $id } }

@@ -20,7 +20,7 @@ export const GET_ACADEMIC_YEARS = `
 `;
 
 export const GET_ACADEMIC_YEAR_BY_ID = `
-  query GetAcademicYearById($id: BigInt!) {
+  query GetAcademicYearById($id: String!) {
     zoho_academic_yearsCollection(filter: { id: { eq: $id } }) {
       edges {
         node {
@@ -51,7 +51,7 @@ export const CREATE_ACADEMIC_YEAR = `
 
 export const UPDATE_ACADEMIC_YEAR = `
   mutation UpdateAcademicYear(
-    $id: BigInt!
+    $id: String!
     $name: String
     $active: Boolean
   ) {
@@ -75,7 +75,7 @@ export const UPDATE_ACADEMIC_YEAR = `
 `;
 
 export const DELETE_ACADEMIC_YEAR = `
-  mutation DeleteAcademicYear($id: BigInt!) {
+  mutation DeleteAcademicYear($id: String!) {
     deleteFromzoho_academic_yearsCollection(filter: { id: { eq: $id } }) {
       records {
         id

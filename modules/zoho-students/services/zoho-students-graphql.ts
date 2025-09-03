@@ -142,11 +142,11 @@ export const UPDATE_STUDENT = `
     $last_name: String
     $gender: String
     $date_of_birth: String
-    $nationality: BigInt
+    $nationality: String
     $passport_number: String
     $passport_issue_date: String
     $passport_expiry_date: String
-    $country_of_residence: BigInt
+    $country_of_residence: String
     $email: String
     $mobile: String
     $father_name: String

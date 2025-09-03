@@ -37,7 +37,7 @@ export const GET_UNIVERSITIES = `
 `;
 
 export const GET_UNIVERSITY_BY_ID = `
-  query GetUniversityById($id: BigInt!) {
+  query GetUniversityById($id: String!) {
     zoho_universitiesCollection(filter: { id: { eq: $id } }) {
       edges {
         node {
@@ -87,7 +87,7 @@ export const GET_COUNTRIES = `
 `;
 
 export const GET_CITIES_BY_COUNTRY = `
-  query GetCitiesByCountry($countryId: BigInt!) {
+  query GetCitiesByCountry($countryId: String!) {
     zoho_citiesCollection(filter: { country: { eq: $countryId } }) {
       edges {
         node {
@@ -124,7 +124,7 @@ export const CREATE_UNIVERSITY = `
 
 export const UPDATE_UNIVERSITY = `
   mutation UpdateUniversity(
-    $id: BigInt!
+    $id: String!
     $name: String
     $sector: String
     $acomodation: String
@@ -133,8 +133,8 @@ export const UPDATE_UNIVERSITY = `
     $logo: String
     $profile_image: String
     $address: String
-    $city: BigInt
-    $country: BigInt
+    $city: String
+    $country: String
   ) {
     updatezoho_universitiesCollection(
       filter: { id: { eq: $id } }
@@ -172,7 +172,7 @@ export const UPDATE_UNIVERSITY = `
 `;
 
 export const DELETE_UNIVERSITY = `
-  mutation DeleteUniversity($id: BigInt!) {
+  mutation DeleteUniversity($id: String!) {
     deleteFromzoho_universitiesCollection(filter: { id: { eq: $id } }) {
       records {
         id

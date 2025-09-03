@@ -32,7 +32,7 @@ export const GET_ANNOUNCEMENTS = `
 `;
 
 export const GET_ANNOUNCEMENT_BY_ID = `
-  query GetAnnouncementById($id: BigInt!) {
+  query GetAnnouncementById($id: String!) {
     zoho_announcementsCollection(filter: { id: { eq: $id } }) {
       edges {
         node {
@@ -78,12 +78,12 @@ export const CREATE_ANNOUNCEMENT = `
 
 export const UPDATE_ANNOUNCEMENT = `
   mutation UpdateAnnouncement(
-    $id: BigInt!
+    $id: String!
     $title: String
     $category: String
     $description: String
-    $university: BigInt
-    $program: BigInt
+    $university: String
+    $program: String
   ) {
     updatezoho_announcementsCollection(
       filter: { id: { eq: $id } }
@@ -111,7 +111,7 @@ export const UPDATE_ANNOUNCEMENT = `
 `;
 
 export const DELETE_ANNOUNCEMENT = `
-  mutation DeleteAnnouncement($id: BigInt!) {
+  mutation DeleteAnnouncement($id: String!) {
     deleteFromzoho_announcementsCollection(filter: { id: { eq: $id } }) {
       records {
         id

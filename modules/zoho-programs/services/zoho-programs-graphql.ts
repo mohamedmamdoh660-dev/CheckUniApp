@@ -166,13 +166,13 @@ export const UPDATE_PROGRAM = `
   mutation UpdateProgram(
     $id: ID!
     $name: String
-    $faculty: BigInt
-    $speciality: BigInt
-    $degree: BigInt
-    $language: BigInt
-    $university: BigInt
-    $city: BigInt
-    $country: BigInt
+    $faculty: String
+    $speciality: String
+    $degree: String
+    $language: String
+    $university: String
+    $city: String
+    $country: String
     $official_tuition: String
     $discounted_tuition: String
     $tuition_currency: String
@@ -256,7 +256,7 @@ export const GET_ZOHO_CITIES = `
 `;
 
 export const GET_ZOHO_CITIES_BY_COUNTRY = `
-  query GetZohoCitiesByCountry($countryId: BigInt!) {
+  query GetZohoCitiesByCountry($countryId: String!) {
     zoho_citiesCollection(filter: { country: { eq: $countryId } }) {
       edges {
         node {
@@ -289,7 +289,7 @@ export const GET_ZOHO_UNIVERSITIES = `
 `;
 
 export const GET_ZOHO_UNIVERSITIES_BY_CITY = `
-  query GetZohoUniversitiesByCity($cityId: BigInt!) {
+  query GetZohoUniversitiesByCity($cityId: String!) {
     zoho_universitiesCollection(filter: { city: { eq: $cityId } }) {
       edges {
         node {
@@ -304,7 +304,7 @@ export const GET_ZOHO_UNIVERSITIES_BY_CITY = `
 `;
 
 export const GET_ZOHO_UNIVERSITIES_BY_COUNTRY = `
-  query GetZohoUniversitiesByCountry($countryId: BigInt!) {
+  query GetZohoUniversitiesByCountry($countryId: String!) {
     zoho_universitiesCollection(filter: { country: { eq: $countryId } }) {
       edges {
         node {

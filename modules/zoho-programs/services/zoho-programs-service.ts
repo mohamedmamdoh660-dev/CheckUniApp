@@ -297,7 +297,7 @@ export const zohoProgramsService = {
   /**
    * Get specialities by faculty ID
    */
-  getSpecialitiesByFaculty: async (facultyId: number): Promise<ZohoSpeciality[]> => {
+  getSpecialitiesByFaculty: async (facultyId: string): Promise<ZohoSpeciality[]> => {
     try {
       const response = await executeGraphQLBackend(GET_ZOHO_SPECIALITIES);
       const specialities = response.zoho_specialityCollection.edges.map((edge: any) => edge.node);

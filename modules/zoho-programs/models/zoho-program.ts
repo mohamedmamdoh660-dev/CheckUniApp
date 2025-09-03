@@ -9,7 +9,7 @@ export interface ZohoCountry {
 export interface ZohoCity {
   id: string;
   name?: string;
-  country?: number;
+  country?: string;
   created_at?: string;
   update_at?: string;
 }
@@ -24,8 +24,8 @@ export interface ZohoUniversity {
   logo?: string;
   profile_image?: string;
   address?: string;
-  city?: number;
-  country?: number;
+  city?: string;
+  country?: string;
   created_at?: string;
   update_at?: string;
 }
@@ -52,19 +52,19 @@ export interface ZohoSpeciality {
   id: string;
   name?: string;
   active?: boolean;
-  faculty_id?: number;
+  faculty_id?: string;
 }
 
 export interface ZohoProgram {
   id: string;
   name?: string;
-  faculty_id?: number;
-  speciality_id?: number;
-  degree_id?: number;
-  language_id?: number;
-  university_id?: number;
-  city_id?: number;
-  country_id?: number;
+  faculty_id?: string;
+  speciality_id?: string;
+  degree_id?: string;
+  language_id?: string;
+  university_id?: string;
+  city_id?: string;
+  country_id?: string;
   created_at?: string;
   updated_at?: string;
   official_tuition?: string;

@@ -20,7 +20,7 @@ export const GET_SEMESTERS = `
 `;
 
 export const GET_SEMESTER_BY_ID = `
-  query GetSemesterById($id: BigInt!) {
+  query GetSemesterById($id: String!) {
     zoho_semestersCollection(filter: { id: { eq: $id } }) {
       edges {
         node {
@@ -51,7 +51,7 @@ export const CREATE_SEMESTER = `
 
 export const UPDATE_SEMESTER = `
   mutation UpdateSemester(
-    $id: BigInt!
+    $id: String!
     $name: String
     $active: Boolean
   ) {
@@ -75,7 +75,7 @@ export const UPDATE_SEMESTER = `
 `;
 
 export const DELETE_SEMESTER = `
-  mutation DeleteSemester($id: BigInt!) {
+  mutation DeleteSemester($id: String!) {
     deleteFromzoho_semestersCollection(filter: { id: { eq: $id } }) {
       records {
         id

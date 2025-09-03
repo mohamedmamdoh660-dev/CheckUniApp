@@ -21,14 +21,14 @@ export interface ZohoApplication {
   id: string;
   created_at?: string;
   updated_at?: string;
-  student?: number | null;
-  program?: number | null;
-  acdamic_year?: number | null;
-  semester?: number | null;
-  country?: number | null;
-  university?: number | null;
+  student?: string | null;
+  program?: string | null;
+  acdamic_year?: string | null;
+  semester?: string | null;
+  country?: string | null;
+  university?: string | null;
   stage?: string;
-  degree?: number | null;
+  degree?: string | null;
   
   // Related entities
   zoho_students?: ZohoStudent;

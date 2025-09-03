@@ -8,8 +8,8 @@ export interface University {
   logo?: string;
   profile_image?: string;
   address?: string;
-  city?: number;
-  country?: number;
+  city?: string;
+  country?: string;
   created_at?: string;
   update_at?: string;
   

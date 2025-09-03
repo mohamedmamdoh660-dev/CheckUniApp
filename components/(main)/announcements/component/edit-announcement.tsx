@@ -105,8 +105,8 @@ export default function EditAnnouncementDialog({
         title: values.title,
         category: values.category,
         description: values.description,
-        university: values.university ? parseInt(values.university) : null,
-        program: values.program ? parseInt(values.program) : null,
+        university: values.university ? values.university : null,
+        program: values.program ? values.program : null,
       };
 
       await announcementsService.updateAnnouncement(
@@ -134,7 +134,7 @@ export default function EditAnnouncementDialog({
 
     if (universityId) {
       const filtered = programs.filter(
-        (program) => program.university === parseInt(universityId)
+        (program) => program.university === universityId
       );
       setFilteredPrograms(filtered);
 

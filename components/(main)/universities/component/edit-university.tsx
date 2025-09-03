@@ -157,8 +157,8 @@ export default function EditUniversity({
         logo: values.logo,
         profile_image: values.profile_image,
         address: values.address,
-        city: values.city ? parseInt(values.city) : undefined,
-        country: values.country ? parseInt(values.country) : undefined,
+        city: values.city ? values.city : undefined,
+        country: values.country ? values.country : undefined,
       };
 
       await universitiesService.updateUniversity(university.id, universityData);

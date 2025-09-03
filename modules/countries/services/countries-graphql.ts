@@ -22,7 +22,7 @@ export const GET_COUNTRIES = `
 `;
 
 export const GET_COUNTRY_BY_ID = `
-  query GetCountryById($id: BigInt!) {
+  query GetCountryById($id: String!) {
     zoho_countriesCollection(filter: { id: { eq: $id } }) {
       edges {
         node {
@@ -57,7 +57,7 @@ export const CREATE_COUNTRY = `
 
 export const UPDATE_COUNTRY = `
   mutation UpdateCountry(
-    $id: BigInt!
+    $id: String!
     $name: String
     $country_code: String
     $active_on_nationalities: Boolean
@@ -87,7 +87,7 @@ export const UPDATE_COUNTRY = `
 `;
 
 export const DELETE_COUNTRY = `
-  mutation DeleteCountry($id: BigInt!) {
+  mutation DeleteCountry($id: String!) {
     deleteFromzoho_countriesCollection(filter: { id: { eq: $id } }) {
       records {
         id

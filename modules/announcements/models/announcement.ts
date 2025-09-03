@@ -6,8 +6,8 @@ export interface Announcement {
   title?: string;
   category?: string;
   description?: string;
-  university?: number | null;
-  program?: number | null;
+  university?: string | null;
+  program?: string | null;
   created_at?: string;
   updated_at?: string;
   
