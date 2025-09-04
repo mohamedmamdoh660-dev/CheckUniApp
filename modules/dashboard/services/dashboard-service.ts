@@ -117,7 +117,6 @@ export const dashboardService = {
         .not('university', 'is', null);
 
       if (error) throw error;
-      console.log("🚀 ~ data:", data)
 
       // Count applications per university
       const universityCounts = data.reduce((acc: Record<string, any>, item: any) => {

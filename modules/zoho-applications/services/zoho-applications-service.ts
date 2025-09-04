@@ -59,6 +59,7 @@ export const zohoApplicationsService = {
     try {
       const response = await executeGraphQLBackend(INSERT_APPLICATION, {
         objects: [{
+          id: data.id,
           student: data.student,
           program: data.program,
           acdamic_year: data.acdamic_year,

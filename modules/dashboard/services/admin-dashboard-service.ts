@@ -10,7 +10,6 @@ export const adminDashboardService = {
     if (error) {
       console.error("Error:", error);
     } else {
-      console.log("Dashboard stats:", data);
       return data;
     }
   },

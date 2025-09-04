@@ -23,7 +23,6 @@ export const usersService = {
   },
   getUserByEmail: async (filter: any) => {
     const response = await executeGraphQLBackend(GET_USERS_BY_EMAIL, { filter });
-    console.log("🚀 ~ response:", response)
     return response.user_profileCollection.edges[0]?.node || null;
   },
   /**

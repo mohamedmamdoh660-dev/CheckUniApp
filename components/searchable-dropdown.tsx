@@ -46,9 +46,6 @@ const fetchTableData = async (
   dependsOn?: { field: string; value: string | number | null },
   id?: string
 ) => {
-  console.log("🚀 ~ fetchTableData ~ id:", id);
-  console.log("🚀 ~ fetchTableData ~ page:", page);
-
   try {
     let data: any[] = [];
     let count = 0;
@@ -317,7 +314,6 @@ export function SearchableDropdown({
               { field: "id", value: initialValue },
               initialValue as string
             );
-            console.log("🚀 ~ fetchInitialItem ~ result:", result);
 
             if (result.data.length > 0) {
               setSelectedItem(result.data[0]);

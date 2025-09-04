@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
 import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
+import { updateApplicationViaWebhook } from "@/lib/actions/zoho-applications-actions";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -126,11 +127,23 @@ export default function EditZohoApplication({
         degree: values.degree || null,
       };
 
-      // @ts-ignore
-      await zohoApplicationsService.updateApplication(updatedApplicationData);
-      toast.success("Application updated successfully");
-      if (onOpenChange) onOpenChange(false);
-      fetchApplications();
+      // First, call the n8n webhook
+      const webhookResponse = await updateApplicationViaWebhook(
+        updatedApplicationData
+      );
+
+      if (webhookResponse.status) {
+        // If webhook was successful, then update in database
+        // @ts-ignore
+        await zohoApplicationsService.updateApplication(updatedApplicationData);
+        toast.success("Application updated successfully");
+        if (onOpenChange) onOpenChange(false);
+        fetchApplications();
+      } else {
+        throw new Error(
+          webhookResponse.message || "Failed to update application via webhook"
+        );
+      }
     } catch (error) {
       console.error("Error saving application data:", error);
       toast.error(

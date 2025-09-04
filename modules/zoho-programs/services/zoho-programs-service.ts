@@ -192,9 +192,7 @@ export const zohoProgramsService = {
   getUniversities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoUniversity[]> => {
     try {
       const offset = (page ) * pageSize;
-      console.log("🚀 ~ offset:", offset)
       const searchPattern = `%${search}%`;
-      console.log("🚀 ~ searchPattern:", searchPattern)
       const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
       const response = await executeGraphQLBackend(GET_ZOHO_UNIVERSITIES, { filter, limit: pageSize, offset });
       return response.zoho_universitiesCollection.edges.map((edge: any) => edge.node);

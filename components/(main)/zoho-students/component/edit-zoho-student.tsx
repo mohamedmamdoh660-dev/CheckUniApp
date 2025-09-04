@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
+import { updateStudentViaWebhook } from "@/lib/actions/zoho-students-actions";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -178,10 +179,20 @@ export default function EditZohoStudent({
         mother_job: values.mother_job,
       };
 
-      await zohoStudentsService.updateStudent(updatedStudentData);
-      toast.success("Student updated successfully");
-      if (onOpenChange) onOpenChange(false);
-      fetchStudents();
+      // First, call the n8n webhook
+      const webhookResponse = await updateStudentViaWebhook(updatedStudentData);
+
+      if (webhookResponse.status) {
+        // If webhook was successful, then update in database
+        await zohoStudentsService.updateStudent(updatedStudentData);
+        toast.success("Student updated successfully");
+        if (onOpenChange) onOpenChange(false);
+        fetchStudents();
+      } else {
+        throw new Error(
+          webhookResponse.message || "Failed to update student via webhook"
+        );
+      }
     } catch (error) {
       console.error("Error saving student data:", error);
       toast.error(

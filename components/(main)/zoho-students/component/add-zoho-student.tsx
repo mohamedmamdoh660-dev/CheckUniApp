@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
+import { createStudentViaWebhook } from "@/lib/actions/zoho-students-actions";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -135,13 +136,28 @@ export default function AddZohoStudent({
         mother_job: values.mother_job,
       };
 
-      await zohoStudentsService.createStudent(studentData);
-      toast.success("Student created successfully");
+      // First, call the n8n webhook
+      const webhookResponse = await createStudentViaWebhook(studentData);
 
-      // Reset form and close dialog
-      form.reset();
-      if (onOpenChange) onOpenChange(false);
-      if (onRefresh) onRefresh();
+      if (webhookResponse.status) {
+        // If webhook was successful, then create in database with the ID from webhook
+        const studentDataWithId = {
+          ...studentData,
+          id: webhookResponse.id,
+        };
+
+        await zohoStudentsService.createStudent(studentDataWithId);
+        toast.success("Student created successfully");
+
+        // Reset form and close dialog
+        form.reset();
+        if (onOpenChange) onOpenChange(false);
+        if (onRefresh) onRefresh();
+      } else {
+        throw new Error(
+          webhookResponse.message || "Failed to create student via webhook"
+        );
+      }
     } catch (error) {
       console.error("Error creating student:", error);
       toast.error(

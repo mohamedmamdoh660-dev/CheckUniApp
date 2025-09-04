@@ -37,7 +37,6 @@ export const authService = {
       password, 
       options: { data: { first_name: firstName, last_name: lastName } } 
     });
-    console.log("🚀 ~ data:", data)
     if (error) throw error;
 
     if (data?.user) {

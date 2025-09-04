@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Ellipsis, Edit, Trash } from "lucide-react";
 import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
+import { deleteStudentViaWebhook } from "@/lib/actions/zoho-students-actions";
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
 import EditZohoStudent from "@/components/(main)/zoho-students/component/edit-zoho-student";
 
@@ -47,8 +48,18 @@ export function ZohoStudentsTableRowActions({
       const action = confirmationDialog.action;
 
       if (action === "delete") {
-        await zohoStudentsService.deleteStudent(values.id);
-        toast.success("Student deleted successfully");
+        // First call the n8n webhook
+        const webhookResponse = await deleteStudentViaWebhook(values.id);
+
+        if (webhookResponse.status) {
+          // If webhook was successful, then delete from database
+          await zohoStudentsService.deleteStudent(values.id);
+          toast.success("Student deleted successfully");
+        } else {
+          throw new Error(
+            webhookResponse.message || "Failed to delete student via webhook"
+          );
+        }
       }
 
       setConfirmationDialog({ isOpen: false, action: null });

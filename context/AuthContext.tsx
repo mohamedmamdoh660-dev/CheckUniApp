@@ -55,7 +55,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchUserData = async () => {
     try {
       const { user, status } = await checkAuthentication();
-      console.log("🚀 ~ fetchUserData ~ user:", user);
 
       if (user) {
         checkRouteAccess(window.location.pathname, user);
@@ -65,7 +64,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         // Fetch user profile data from user_profile table
         const userData = await usersService.getUserById(user.id);
-        console.log("🚀 ~ fetchUserData ~ userData:", userData);
         if (userData) {
           setUserProfile(userData);
         }

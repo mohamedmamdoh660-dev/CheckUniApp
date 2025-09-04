@@ -20,6 +20,10 @@ import {
 } from "lucide-react";
 import { ZohoApplication } from "@/modules/zoho-applications/models/zoho-application";
 import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
+import {
+  deleteApplicationViaWebhook,
+  updateApplicationViaWebhook,
+} from "@/lib/actions/zoho-applications-actions";
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
 import EditZohoApplication from "@/components/(main)/zoho-applications/component/edit-zoho-application";
 // import EditZohoApplication from "@/components/(main)/zoho-applications/component/edit-zoho-application";
@@ -57,26 +61,73 @@ export function ZohoApplicationsTableRowActions({
       const action = confirmationDialog.action;
 
       if (action === "delete") {
-        await zohoApplicationsService.deleteApplication(values.id);
-        toast.success("Application deleted successfully");
+        // First call the n8n webhook
+        const webhookResponse = await deleteApplicationViaWebhook(values.id);
+
+        if (webhookResponse.status) {
+          // If webhook was successful, then delete from database
+          await zohoApplicationsService.deleteApplication(values.id);
+          toast.success("Application deleted successfully");
+        } else {
+          throw new Error(
+            webhookResponse.message ||
+              "Failed to delete application via webhook"
+          );
+        }
       } else if (action === "complete") {
-        await zohoApplicationsService.updateApplication({
+        const updateData = {
           id: values.id,
           stage: "completed",
-        });
-        toast.success("Application marked as completed");
+        };
+
+        // First call the n8n webhook
+        const webhookResponse = await updateApplicationViaWebhook(updateData);
+
+        if (webhookResponse.status) {
+          await zohoApplicationsService.updateApplication(updateData);
+          toast.success("Application marked as completed");
+        } else {
+          throw new Error(
+            webhookResponse.message ||
+              "Failed to update application via webhook"
+          );
+        }
       } else if (action === "pending") {
-        await zohoApplicationsService.updateApplication({
+        const updateData = {
           id: values.id,
           stage: "pending",
-        });
-        toast.success("Application marked as pending");
+        };
+
+        // First call the n8n webhook
+        const webhookResponse = await updateApplicationViaWebhook(updateData);
+
+        if (webhookResponse.status) {
+          await zohoApplicationsService.updateApplication(updateData);
+          toast.success("Application marked as pending");
+        } else {
+          throw new Error(
+            webhookResponse.message ||
+              "Failed to update application via webhook"
+          );
+        }
       } else if (action === "fail") {
-        await zohoApplicationsService.updateApplication({
+        const updateData = {
           id: values.id,
           stage: "failed",
-        });
-        toast.success("Application marked as failed");
+        };
+
+        // First call the n8n webhook
+        const webhookResponse = await updateApplicationViaWebhook(updateData);
+
+        if (webhookResponse.status) {
+          await zohoApplicationsService.updateApplication(updateData);
+          toast.success("Application marked as failed");
+        } else {
+          throw new Error(
+            webhookResponse.message ||
+              "Failed to update application via webhook"
+          );
+        }
       }
 
       setConfirmationDialog({ isOpen: false, action: null });

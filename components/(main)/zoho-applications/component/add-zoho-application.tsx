@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
 import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
+import { createApplicationViaWebhook } from "@/lib/actions/zoho-applications-actions";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -91,7 +92,6 @@ export default function AddZohoApplication({
 
   // Handler for creating application
   const onSubmit = async (values: FormSchema) => {
-    console.log("🚀 ~ onSubmit ~ values:", values);
     setIsLoading(true);
 
     try {
@@ -107,13 +107,29 @@ export default function AddZohoApplication({
         degree: values.degree || null,
       };
 
-      // @ts-ignore
-      await zohoApplicationsService.createApplication(applicationData);
-      toast.success("Application created successfully");
+      // First, call the n8n webhook
+      const webhookResponse =
+        await createApplicationViaWebhook(applicationData);
 
-      // Close dialog and refresh application list
-      if (onOpenChange) onOpenChange(false);
-      if (onRefresh) onRefresh();
+      if (webhookResponse.status) {
+        // If webhook was successful, then create in database with the ID from webhook
+        const applicationDataWithId = {
+          ...applicationData,
+          id: webhookResponse.id,
+        };
+
+        // @ts-ignore
+        await zohoApplicationsService.createApplication(applicationDataWithId);
+        toast.success("Application created successfully");
+
+        // Close dialog and refresh application list
+        if (onOpenChange) onOpenChange(false);
+        if (onRefresh) onRefresh();
+      } else {
+        throw new Error(
+          webhookResponse.message || "Failed to create application via webhook"
+        );
+      }
     } catch (error) {
       console.error("Error creating application:", error);
       toast.error(
