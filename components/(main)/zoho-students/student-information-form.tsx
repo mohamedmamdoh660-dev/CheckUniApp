@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -103,13 +103,13 @@ const formSchema = z.object({
 
 interface StudentInformationFormProps {
   mode: "create" | "edit";
-  studentId?: string;
 }
 
 export default function StudentInformationForm({
   mode,
-  studentId,
 }: StudentInformationFormProps) {
+  const params = useParams();
+  const studentId = params.id as string;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [documents, setDocuments] = useState<
