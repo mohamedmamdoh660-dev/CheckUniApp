@@ -2,7 +2,7 @@ import StudentInformationForm from "@/components/(main)/zoho-students/student-in
 
 export default function AddStudentPage() {
   return (
-    <div className=" mx-auto py-6 space-y-6">
+    <div className="mx-auto py-6 space-y-6">
       <StudentInformationForm mode="create" />
     </div>
   );

@@ -45,6 +45,7 @@ import { CalendarIcon, Upload, X, Plus, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
 import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+import { saveFile } from "@/supabase/actions/save-file";
 
 // Enhanced form validation schema based on the images
 const formSchema = z.object({
@@ -113,8 +114,15 @@ export default function StudentInformationForm({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [documents, setDocuments] = useState<
-    Array<{ attachment_type: string; file: File | null }>
-  >([{ attachment_type: "", file: null }]);
+    Array<{
+      attachment_type: string;
+      file: File | null;
+      uploading: boolean;
+      url?: string;
+    }>
+  >([{ attachment_type: "", file: null, uploading: false }]);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string>("");
   const [dropdown] =
     useState<React.ComponentProps<typeof Calendar>["captionLayout"]>(
       "dropdown"
@@ -208,6 +216,15 @@ export default function StudentInformationForm({
     setIsLoading(true);
 
     try {
+      // Prepare documents data
+      const documentsData = documents
+        .filter((doc) => doc.attachment_type && doc.url)
+        .map((doc) => ({
+          type: doc.attachment_type,
+          url: doc.url,
+          filename: doc.file?.name || "",
+        }));
+
       const studentData = {
         first_name: values.first_name,
         last_name: values.last_name,
@@ -234,6 +251,8 @@ export default function StudentInformationForm({
         mother_name: values.mother_name,
         mother_mobile: values.mother_mobile,
         mother_job: values.mother_occupation,
+        photo_url: photoUrl,
+        documents: documentsData,
       };
 
       if (mode === "create") {
@@ -347,9 +366,46 @@ export default function StudentInformationForm({
     </Popover>
   );
 
+  // Handle photo upload
+  const handlePhotoUpload = async (file: File) => {
+    if (!file) return;
+
+    // Check file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Photo size must be less than 10MB");
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    setPhotoUploading(true);
+    try {
+      const url = await saveFile(file);
+      if (url) {
+        setPhotoUrl(url);
+        form.setValue("photo", url);
+        toast.success("Photo uploaded successfully");
+      } else {
+        toast.error("Failed to upload photo");
+      }
+    } catch (error) {
+      console.error("Photo upload error:", error);
+      toast.error("Failed to upload photo");
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
   // Add new document row
   const addDocumentRow = () => {
-    setDocuments([...documents, { attachment_type: "", file: null }]);
+    setDocuments([
+      ...documents,
+      { attachment_type: "", file: null, uploading: false },
+    ]);
   };
 
   // Remove document row
@@ -367,11 +423,56 @@ export default function StudentInformationForm({
     setDocuments(newDocs);
   };
 
-  // Handle file upload
-  const handleFileUpload = (index: number, file: File | null) => {
+  // Handle document file upload
+  const handleDocumentUpload = async (index: number, file: File | null) => {
+    if (!file) return;
+
+    // Check file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Document size must be less than 10MB");
+      return;
+    }
+
+    // Check file type
+    const allowedTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      toast.error(
+        "Please select a valid document file (PDF, DOC, DOCX, JPG, PNG)"
+      );
+      return;
+    }
+
     const newDocs = [...documents];
-    newDocs[index].file = file;
-    setDocuments(newDocs);
+    newDocs[index].uploading = true;
+    setDocuments([...newDocs]);
+
+    try {
+      const url = await saveFile(file);
+      if (url) {
+        newDocs[index].file = file;
+        newDocs[index].url = url;
+        newDocs[index].uploading = false;
+        setDocuments([...newDocs]);
+        toast.success(`${file.name} uploaded successfully`);
+      } else {
+        newDocs[index].uploading = false;
+        setDocuments([...newDocs]);
+        toast.error("Failed to upload document");
+      }
+    } catch (error) {
+      console.error("Document upload error:", error);
+      newDocs[index].uploading = false;
+      setDocuments([...newDocs]);
+      toast.error("Failed to upload document");
+    }
   };
 
   return (
@@ -379,7 +480,7 @@ export default function StudentInformationForm({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Student Basic Info Card */}
-          <Card>
+          <Card className="">
             <CardHeader>
               <CardTitle>Student Information</CardTitle>
             </CardHeader>
@@ -471,7 +572,7 @@ export default function StudentInformationForm({
           </Card>
 
           {/* Personal Details Card */}
-          <Card>
+          <Card className="">
             <CardHeader>
               <CardTitle>Personal Details</CardTitle>
             </CardHeader>
@@ -905,35 +1006,57 @@ export default function StudentInformationForm({
                 name="photo"
                 render={({ field }) => (
                   <FormItem>
-                    {/* <FormLabel>Student Photo</FormLabel> */}
                     <FormControl>
-                      <div className="border-2 border-dashed border-muted rounded-lg p-8 text-center hover:border-muted-foreground/50 transition-colors">
-                        <div className="flex flex-col items-center gap-4">
-                          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
-                            <Upload className="h-8 w-8 text-muted-foreground" />
+                      <div className="space-y-4">
+                        {photoUrl && (
+                          <div className="flex items-center justify-center">
+                            <img
+                              src={photoUrl}
+                              alt="Student photo"
+                              className="w-32 h-32 rounded-lg object-cover border"
+                            />
                           </div>
-                          <div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="flex items-center gap-2 w-[200px]"
-                            >
-                              Choose Image
-                              <Upload className="h-4 w-4" />
-                            </Button>
-                            <p className="text-sm text-muted-foreground mt-2">
-                              PNG, JPG, GIF up to 10MB
-                            </p>
+                        )}
+                        <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors">
+                          <div className="flex flex-col items-center gap-4">
+                            <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
+                              <Upload className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                disabled={photoUploading}
+                                className="flex items-center gap-2 w-[200px]"
+                                onClick={() => {
+                                  const input = document.createElement("input");
+                                  input.type = "file";
+                                  input.accept = "image/*";
+                                  input.onchange = (e) => {
+                                    const file = (e.target as HTMLInputElement)
+                                      .files?.[0];
+                                    if (file) handlePhotoUpload(file);
+                                  };
+                                  input.click();
+                                }}
+                              >
+                                {photoUploading ? (
+                                  <>
+                                    <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                                    Uploading...
+                                  </>
+                                ) : (
+                                  <>
+                                    Choose Image
+                                    <Upload className="h-4 w-4" />
+                                  </>
+                                )}
+                              </Button>
+                              <p className="text-sm text-muted-foreground mt-2">
+                                PNG, JPG, GIF up to 10MB
+                              </p>
+                            </div>
                           </div>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              field.onChange(file);
-                            }}
-                          />
                         </div>
                       </div>
                     </FormControl>
@@ -949,77 +1072,114 @@ export default function StudentInformationForm({
             <CardHeader>
               <CardTitle>Document Attachments</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {documents.map((doc, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center p-4 border rounded-lg"
-                >
-                  <div className="flex items-center gap-2">
-                    {index > 0 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeDocumentRow(index)}
-                        className="text-destructive hover:text-destructive/80"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                    <Select
-                      onValueChange={(value) =>
-                        handleDocumentTypeChange(index, value)
-                      }
-                      value={doc.attachment_type}
-                    >
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="Select document type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {attachmentTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                {documents.map((doc, index) => (
+                  <div
+                    key={index}
+                    className="p-4 border rounded-lg bg-muted/20 space-y-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-sm">
+                        Document {index + 1}
+                      </h4>
+                      {index > 0 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeDocumentRow(index)}
+                          className="text-destructive hover:text-destructive/80 h-8 w-8 p-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
 
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex items-center gap-2"
-                    >
-                      Choose File
-                      <Upload className="h-4 w-4" />
-                    </Button>
-                    <Input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        handleFileUpload(index, file);
-                      }}
-                    />
-                    {doc.file && (
-                      <span className="text-sm text-green-600 font-medium">
-                        ✓ {doc.file.name}
-                      </span>
-                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Select
+                          onValueChange={(value) =>
+                            handleDocumentTypeChange(index, value)
+                          }
+                          value={doc.attachment_type}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select document type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {attachmentTypes.map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {type}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={doc.uploading}
+                            className="flex items-center gap-2 w-[200px]"
+                            onClick={() => {
+                              const input = document.createElement("input");
+                              input.type = "file";
+                              input.accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png";
+                              input.onchange = (e) => {
+                                const file = (e.target as HTMLInputElement)
+                                  .files?.[0];
+                                if (file) handleDocumentUpload(index, file);
+                              };
+                              input.click();
+                            }}
+                          >
+                            {doc.uploading ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                                Uploading...
+                              </>
+                            ) : (
+                              <>
+                                Choose File
+                                <Upload className="h-4 w-4" />
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                        {doc.file && doc.url && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-green-700 font-medium truncate">
+                              {doc.file.name}
+                            </span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => window.open(doc.url, "_blank")}
+                              className="h-6 px-2 text-xs"
+                            >
+                              View
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 onClick={addDocumentRow}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 w-full"
               >
                 <Plus className="h-4 w-4" />
-                Add New
+                Add New Document
               </Button>
             </CardContent>
           </Card>
