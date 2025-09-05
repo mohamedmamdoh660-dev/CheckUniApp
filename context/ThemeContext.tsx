@@ -7,6 +7,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+import { useAuth } from "./AuthContext";
 
 export type Theme = "light" | "dark" | "system";
 
@@ -18,52 +19,38 @@ type ThemeContextType = {
   secondaryColor: string;
   setPrimaryColor: (color: string) => void;
   setSecondaryColor: (color: string) => void;
+  siteTitle: string;
+  setSiteTitle: (title: string) => void;
+  favicon: string;
+  setFavicon: (url: string) => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({
-  children,
-  initialSettings,
-}: {
-  children: ReactNode;
-  initialSettings: any;
-}) {
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const { settings } = useAuth();
   const [theme, setThemeState] = useState<Theme>(() => {
-    if (initialSettings?.appearance_theme) {
-      return initialSettings.appearance_theme as Theme;
-    }
-    // if (typeof window !== "undefined") {
-    //   const savedTheme = localStorage.getItem("theme") as Theme;
-    //   return (
-    //     savedTheme ||
-    //     (window.matchMedia("(prefers-color-scheme: dark)").matches
-    //       ? "dark"
-    //       : "light")
-    //   );
-    // }
     return "light";
   });
 
-  const [primaryColor, setPrimaryColorState] = useState<string>(() => {
-    if (initialSettings?.primary_color) {
-      return initialSettings.primary_color || "220 90% 56%";
-    }
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("primaryColor") || "220 90% 56%";
-    }
-    return "220 90% 56%";
-  });
+  const [primaryColor, setPrimaryColorState] = useState<string>("220 90% 56%");
 
-  const [secondaryColor, setSecondaryColorState] = useState<string>(() => {
-    if (initialSettings?.secondary_color) {
-      return initialSettings.secondary_color || "160 90% 44%";
+  const [secondaryColor, setSecondaryColorState] =
+    useState<string>("160 90% 44%");
+
+  const [siteTitle, setSiteTitleState] = useState<string>("Daxow Agent Portal");
+
+  const [favicon, setFaviconState] = useState<string>("/favicon.ico");
+
+  useEffect(() => {
+    if (settings) {
+      setThemeState(settings.appearance_theme as Theme);
+      setPrimaryColorState(settings.primary_color as string);
+      setSecondaryColorState(settings.secondary_color as string);
+      setSiteTitleState(settings.site_name as string);
+      setFaviconState(settings.favicon_url as string);
     }
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("secondaryColor") || "160 90% 44%";
-    }
-    return "160 90% 44%";
-  });
+  }, [settings]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -110,6 +97,32 @@ export function ThemeProvider({
     localStorage.setItem("secondaryColor", secondaryColor);
   }, [primaryColor, secondaryColor]);
 
+  useEffect(() => {
+    // Update document title when site title changes
+    if (typeof document !== "undefined") {
+      document.title = siteTitle;
+    }
+    localStorage.setItem("siteTitle", siteTitle);
+  }, [siteTitle]);
+
+  useEffect(() => {
+    // Update favicon when it changes
+    if (typeof document !== "undefined" && favicon) {
+      const faviconElement = document.querySelector(
+        "link[rel='icon']"
+      ) as HTMLLinkElement;
+      if (faviconElement) {
+        faviconElement.href = favicon;
+      } else {
+        const newFavicon = document.createElement("link");
+        newFavicon.rel = "icon";
+        newFavicon.href = favicon;
+        document.head.appendChild(newFavicon);
+      }
+    }
+    localStorage.setItem("favicon", favicon);
+  }, [favicon]);
+
   const toggleTheme = () => {
     setThemeState((prevTheme) => {
       switch (prevTheme) {
@@ -136,6 +149,14 @@ export function ThemeProvider({
     setSecondaryColorState(color);
   };
 
+  const setSiteTitle = (title: string) => {
+    setSiteTitleState(title);
+  };
+
+  const setFavicon = (url: string) => {
+    setFaviconState(url);
+  };
+
   return (
     <ThemeContext.Provider
       value={{
@@ -146,6 +167,10 @@ export function ThemeProvider({
         secondaryColor,
         setPrimaryColor,
         setSecondaryColor,
+        siteTitle,
+        setSiteTitle,
+        favicon,
+        setFavicon,
       }}
     >
       {children}

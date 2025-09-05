@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { requestPasswordReset } from "@/lib/actions/auth-actions";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -19,15 +20,7 @@ export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const router = useRouter();
-  const [settings, setSettings] = useState<Settings | null>(null);
-
-  useEffect(() => {
-    const getSettings = async () => {
-      const settings = await settingsService.getSettingsById();
-      setSettings(settings);
-    };
-    getSettings();
-  }, []);
+  const { settings } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

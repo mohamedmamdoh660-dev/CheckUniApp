@@ -21,15 +21,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const router = useRouter();
-  const { setUser } = useAuth();
-  const [settings, setSettings] = useState<Settings | null>(null);
-  useEffect(() => {
-    const getSettings = async () => {
-      const settings = await settingsService.getSettingsById();
-      setSettings(settings);
-    };
-    getSettings();
-  }, []);
+  const { settings, setUser } = useAuth();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

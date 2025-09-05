@@ -1,7 +1,7 @@
 
 export const GET_SETTINGS_BY_ID = `
-    query getSettingsById {
-        settingsCollection(filter: { id: { eq: 1 } }) {
+    query getSettingsById($filter: settingsFilter) {
+        settingsCollection(filter: $filter) {
         edges {
           node {
             id
@@ -20,6 +20,8 @@ export const GET_SETTINGS_BY_ID = `
             created_at
             logo_horizontal_url
             updated_at
+            type
+            agency_id
         }
       }
     }
@@ -27,8 +29,8 @@ export const GET_SETTINGS_BY_ID = `
 `;
 
 export const UPDATE_SETTINGS_BY_ID = `
-    mutation updateSettingsById($data: settingsUpdateInput!) {
-  updatesettingsCollection(filter: {id: {eq: 1}}, set: $data) {
+    mutation updateSettingsById($data: settingsUpdateInput!, $filter: settingsFilter) {
+  updatesettingsCollection(filter: $filter, set: $data) {
     affectedCount
     records {
         id
@@ -46,6 +48,8 @@ export const UPDATE_SETTINGS_BY_ID = `
         favicon_url
         primary_color
         secondary_color
+          type
+            agency_id
       }
     }
   }
@@ -70,6 +74,8 @@ export const INSERT_SETTINGS = `
         favicon_url
         primary_color
         secondary_color
+          type
+            agency_id
       }
         }
     }

@@ -177,10 +177,40 @@ export const getNavData = (user: { roles?: string }) => {
     },
   ];
 
+  const agencyNavMain = [
+    ...navMain,
+    {
+      title: "Other",
+      url: "#",
+      items: [
+        {
+          title: "Settings",
+          url: "/settings",
+          icon: RiSettings3Line,
+        },
+      ],
+    },
+    {
+      title: "Admin Area",
+      url: "#",
+      items: [
+        {
+          title: "Users",
+          url: "/users",
+          icon: RiTeamLine,
+          isActive: false,
+          resource: "users",
+        },
+      ],
+    },
+  ];
+
   const isAdmin =
     user.roles === UserRoles.ADMIN || user.roles?.includes(UserRoles.ADMIN);
+  const isAgency =
+    user.roles === UserRoles.AGENCY || user.roles?.includes(UserRoles.AGENCY);
 
   return {
-    navMain: isAdmin ? adminNavMain : navMain,
+    navMain: isAdmin ? adminNavMain : isAgency ? agencyNavMain : navMain,
   };
 };

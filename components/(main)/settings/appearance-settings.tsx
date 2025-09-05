@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAuth } from "@/context/AuthContext";
 
 export function AppearanceSettings({ settings }: { settings?: Settings }) {
   // Move all hooks to the top of the component
@@ -77,6 +78,7 @@ export function AppearanceSettings({ settings }: { settings?: Settings }) {
   const defaultSecondaryColor =
     settings?.secondary_color || colorOptions[0].value;
 
+  const { setSettings } = useAuth();
   // Replace with a properly typed initialization that handles undefined values
   const [settingAppearance, setSettingAppearance] = React.useState<Settings>(
     () => {
@@ -123,8 +125,12 @@ export function AppearanceSettings({ settings }: { settings?: Settings }) {
       primary_color: settingAppearance.primary_color,
       secondary_color: settingAppearance.secondary_color,
     };
-    const settings = await settingsService.updateSettingsById(payload);
-    setSettingAppearance(settings);
+    const updated_settings = await settingsService.updateSettingsById(
+      payload,
+      settings?.id
+    );
+    setSettingAppearance(updated_settings);
+    setSettings(updated_settings);
     toast.success("Settings updated successfully");
     setLoading(false);
   };
@@ -142,14 +148,6 @@ export function AppearanceSettings({ settings }: { settings?: Settings }) {
     setSettingAppearance((prev) => ({
       ...prev,
       primary_color: value,
-    }));
-  };
-
-  const handleSecondaryColorChange = (value: string) => {
-    setSecondaryColor(value);
-    setSettingAppearance((prev) => ({
-      ...prev,
-      secondary_color: value,
     }));
   };
 

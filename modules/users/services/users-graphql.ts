@@ -39,11 +39,9 @@ query GetUsersByEmail($filter: user_profileFilter) {
 `;
 
 export const GET_USERS_PAGINATION = `
-query GetUsers($search: String, $limit: Int = 10, $offset: Int = 0) {
+query GetUsers($filter: user_profileFilter, $limit: Int = 10, $offset: Int = 0) {
   user_profileCollection(
-    filter: {
-      email: { ilike: $search }
-    }
+    filter: $filter
     first: $limit
     offset: $offset
     orderBy: [{ created_at: DescNullsLast }]
@@ -60,6 +58,10 @@ query GetUsers($search: String, $limit: Int = 10, $offset: Int = 0) {
         profile
         created_at
         updated_at
+        agency_id
+        agency {
+          name
+        }
         roles {
           name
           description
@@ -78,9 +80,9 @@ query GetUsers($search: String, $limit: Int = 10, $offset: Int = 0) {
 }
 `;
 export const GET_USERS_COUNT = `
-query CountUsers($search: String) {
+query CountUsers($filter: user_profileFilter) {
   user_profileCollection(
-    filter: { email: { ilike: $search } }
+    filter: $filter
   ) {
     edges{
       node{
@@ -141,6 +143,7 @@ query GetUsersById($id: UUID!) {
        profile
        created_at
        updated_at
+       agency_id
        roles {
          name
          description

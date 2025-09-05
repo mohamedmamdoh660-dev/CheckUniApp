@@ -9,6 +9,7 @@ import { User } from "@/types/types";
 import { rolesService } from "@/modules/roles/services/roles-service";
 import { Role } from "@/modules/roles/models/role";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useAuth } from "@/context/AuthContext";
 
 export default function UserManagementPage({ type }: { type: string }) {
   const [listUsers, setListUsers] = useState<User[]>([]);
@@ -20,13 +21,18 @@ export default function UserManagementPage({ type }: { type: string }) {
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
 
+  const { userProfile } = useAuth();
+
   async function fetchUsers() {
     setIsRefetching(true);
     try {
       const usersResponse: any = await usersService.getUsersPagination(
         `%${debouncedSearchTerm}%`,
         pageSize,
-        currentPage
+        currentPage,
+        userProfile?.roles?.name || "",
+        userProfile?.id || "",
+        userProfile?.role_id || ""
       );
 
       setListUsers(usersResponse.users);

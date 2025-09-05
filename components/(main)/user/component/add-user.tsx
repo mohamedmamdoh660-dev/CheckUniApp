@@ -40,6 +40,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useAuth } from "@/context/AuthContext";
 
 // Default avatar image
 const initialAvatarImage = [
@@ -88,6 +89,7 @@ export default function AddUser({
   const [isFileLoading, setIsFileLoading] = useState(false);
   const [profile, setProfile] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { userProfile } = useAuth();
 
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -106,19 +108,15 @@ export default function AddUser({
   useEffect(() => {
     if (open) {
       form.reset();
+      form.setValue(
+        "role",
+        userProfile?.roles?.name === "agency"
+          ? listRoles?.find((role) => role.name === "agent")?.id || ""
+          : ""
+      );
       setProfile("");
     }
   }, [open, form]);
-
-  const initialBgImage = [
-    {
-      name: "profile-bg.jpg",
-      size: 1528737,
-      type: "image/jpeg",
-      url: "/images/profile.jpg",
-      id: "profile-bg-123456789",
-    },
-  ];
 
   // Handler for creating user
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -151,7 +149,12 @@ export default function AddUser({
         last_name: values.lastName,
         email: values.email,
         profile: profile || "",
-        role_id: values.role,
+        role_id:
+          userProfile?.roles?.name === "agency"
+            ? listRoles?.find((role) => role.name === "agent")?.id
+            : values.role,
+        agency_id:
+          userProfile?.roles?.name === "agency" ? userProfile.id : null,
       };
 
       await usersService.createUser(userData);
@@ -275,37 +278,39 @@ export default function AddUser({
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1  gap-1">
-                      <FormLabel>Role</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="uppercase">
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {listRoles?.map((role) => (
-                            <SelectItem
-                              key={role.id}
-                              value={role.id}
-                              className="uppercase"
-                            >
-                              {role.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {userProfile?.roles?.name === "admin" && (
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1  gap-1">
+                        <FormLabel>Role</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="uppercase">
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {listRoles?.map((role) => (
+                              <SelectItem
+                                key={role.id}
+                                value={role.id}
+                                className="uppercase"
+                              >
+                                {role.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <DialogFooter>
                   <Button

@@ -17,6 +17,8 @@ export const usersService = {
           last_name: data.last_name || null,
           is_active: true,
           profile: data.profile || null,
+          agency_id: data.agency_id || null,
+          
         }
       ]
     })
@@ -38,9 +40,25 @@ export const usersService = {
     const response = await executeGraphQLBackend(GET_USERS);
     return response.user_profileCollection.edges.map((edge: any) => edge.node);
   },
-  getUsersPagination: async (search: string, limit: number, offset: number) => {
-    const response = await executeGraphQLBackend(GET_USERS_PAGINATION, { search, limit, offset });
-    const countResponse = await executeGraphQLBackend(GET_USERS_COUNT, { search });
+  getUsersPagination: async (search: string, limit: number, offset: number, roleName: string, agency_id: string, role_id: string) => {
+    // Create a filter object based on role
+    const filter: any = { email: { ilike: search } };
+    
+    // Only apply role_id filter if the user is not an admin
+    if (roleName !== 'admin') {
+      filter.agency_id = { eq: agency_id };
+    }
+    
+    const response = await executeGraphQLBackend(GET_USERS_PAGINATION, { 
+      filter, 
+      limit, 
+      offset: offset * limit
+    });
+    
+    const countResponse = await executeGraphQLBackend(GET_USERS_COUNT, { 
+      filter 
+    });
+    
     return {
       users: response.user_profileCollection.edges.map((edge: any) => edge.node),
       totalCount: countResponse.user_profileCollection.edges.length

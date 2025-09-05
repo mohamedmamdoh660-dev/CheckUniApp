@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -110,6 +111,7 @@ export function ProfileSettings() {
       const file = new File([croppedBlob], "profile-image.jpg", {
         type: "image/jpeg",
       });
+      console.log("🚀 ~ handleApplyCrop ~ file:", file.size);
 
       // Upload the file to server/storage
       const fileUrl = await saveFile(file);
@@ -197,7 +199,7 @@ export function ProfileSettings() {
                 }
               >
                 {userProfile?.profile ? (
-                  <img
+                  <Image
                     className="h-full w-full object-cover"
                     src={userProfile?.profile}
                     alt="User avatar"
@@ -307,7 +309,7 @@ export function ProfileSettings() {
 
       {/* Image Cropper Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md pb-0">
           <DialogHeader>
             <DialogTitle>Crop Profile Picture</DialogTitle>
             <DialogDescription>

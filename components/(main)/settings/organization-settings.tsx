@@ -15,6 +15,7 @@ import { saveFile } from "@/supabase/actions/save-file";
 import { AvatarCropper } from "@/components/ui/avatar-cropper";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Building } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export type OrganizationSettings = {
   logo?: string;
@@ -28,7 +29,7 @@ export function OrganizationSettings({ settings }: { settings?: Settings }) {
   const [loading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingHorizontal, setIsUploadingHorizontal] = useState(false);
-
+  const { userProfile, setSettings } = useAuth();
   // Always initialize these hooks, even if settings is undefined
   const [settingOrganization, setSettingOrganization] = useState<
     Settings | undefined
@@ -57,8 +58,13 @@ export function OrganizationSettings({ settings }: { settings?: Settings }) {
       logo_setting: data.logo_setting,
       favicon_url: data.logo,
     };
-    const settings = await settingsService.updateSettingsById(payload);
-    setSettingOrganization(settings);
+    const updated_settings = await settingsService.updateSettingsById(
+      payload,
+      settings.id
+    );
+    console.log("🚀 ~ submitSettings ~ updated_settings:", updated_settings);
+    setSettingOrganization(updated_settings);
+    setSettings(updated_settings);
     toast.success("Settings updated successfully");
     window.dispatchEvent(new CustomEvent("settings-update"));
     setLoading(false);

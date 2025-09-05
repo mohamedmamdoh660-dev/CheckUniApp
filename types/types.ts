@@ -13,18 +13,22 @@ export interface User {
   updated_at?: string
   profile?: string
   status?: string
+  agency_id?: string
   roles?: {
     name: string
   }
   projects?: {
     name: string
   }
+  agency?: {
+    name: string
+  }
 } 
 
 export enum UserRoles {
   ADMIN = "admin",
-  MANAGER = "manager",
-  USER = "user"
+  AGENCY = "agency",
+  AGENT = "agent"
 }
 
 

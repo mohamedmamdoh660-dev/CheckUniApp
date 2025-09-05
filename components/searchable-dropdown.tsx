@@ -2,11 +2,23 @@
 
 import type React from "react";
 
-import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Search, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { ChevronDown, Search, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
 import { useDebounce } from "@/hooks/use-debounce";
 import { zohoApplicationsService } from "@/modules";
@@ -247,36 +259,37 @@ export function SearchableDropdown({
   const [selectedItem, setSelectedItem] = useState<DropdownItem | null>(null);
   const [initialLoaded, setInitialLoaded] = useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
 
   // Load initial data or search results
-  const loadData = async (currentPage = 0, search = "") => {
-    setLoading(true);
-    try {
-      const result = await fetchTableData(
-        table,
-        search,
-        searchField,
-        currentPage,
-        10,
-        dependsOn
-      );
+  const loadData = useCallback(
+    async (currentPage = 0, search = "") => {
+      setLoading(true);
+      try {
+        const result = await fetchTableData(
+          table,
+          search,
+          searchField,
+          currentPage,
+          10,
+          dependsOn
+        );
 
-      if (currentPage === 0) {
-        setItems(result.data);
-        setPage(0);
-      } else {
-        setItems((prev) => [...prev, ...result.data]);
+        if (currentPage === 0) {
+          setItems(result.data);
+          setPage(0);
+        } else {
+          setItems((prev) => [...prev, ...result.data]);
+        }
+
+        setHasMore(result.hasMore);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setLoading(false);
       }
-
-      setHasMore(result.hasMore);
-    } catch (error) {
-      console.error("Error loading data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [table, searchField, dependsOn]
+  );
 
   // Load more data when scrolling to bottom
   const loadMore = () => {
@@ -288,7 +301,7 @@ export function SearchableDropdown({
 
   useEffect(() => {
     loadData(0, debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, loadData]);
 
   // Handle initial value
   useEffect(() => {
@@ -327,7 +340,6 @@ export function SearchableDropdown({
         fetchInitialItem();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialValue, items, loading, initialLoaded, table]);
 
   // Handle scroll for pagination
@@ -338,21 +350,6 @@ export function SearchableDropdown({
     }
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const handleSelect = (item: DropdownItem) => {
     setSelectedItem(item);
     setIsOpen(false);
@@ -361,131 +358,132 @@ export function SearchableDropdown({
   };
 
   return (
-    <div ref={dropdownRef} className={cn("relative w-full", className)}>
-      <Button
-        variant="outline"
-        role="combobox"
-        aria-expanded={isOpen}
-        className="w-full justify-between text-left font-normal bg-transparent"
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          if (!disabled) setIsOpen(!isOpen);
-        }}
-        disabled={disabled}
-      >
-        <span className="truncate">
-          {selectedItem
-            ? selectedItem[displayField] +
-              " " +
-              (selectedItem[displayField2] || "")
-            : placeholder}
-        </span>
-        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-      </Button>
-
-      {isOpen && (
-        <div
-          className="absolute top-full z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="p-2 border-b border-border">
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={`Search ${table}...`}
-                value={searchTerm}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  setSearchTerm(e.target.value);
-                }}
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-                className="pl-8"
-                autoFocus
-              />
-            </div>
-          </div>
-
-          <div
-            ref={listRef}
-            className="max-h-60 overflow-y-auto"
-            onScroll={handleScroll}
-            onClick={(e) => e.stopPropagation()}
+    <div className={cn("w-full", className)}>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={isOpen}
+            className="w-full justify-between text-left font-normal bg-transparent"
+            disabled={disabled}
           >
-            {items.length === 0 && !loading ? (
-              <div className="p-4 text-center text-muted-foreground">
-                No results found
-              </div>
-            ) : (
-              <>
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="px-3 py-2 cursor-pointer hover:bg-accent hover:text-accent-foreground border-b border-border last:border-b-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSelect(item);
-                    }}
-                  >
-                    {renderItem ? (
-                      renderItem(item)
-                    ) : (
-                      <>
-                        <div className="font-medium">{item[displayField]}</div>
-                        {item.email && (
-                          <div className="text-sm text-muted-foreground">
-                            {item.email}
-                          </div>
-                        )}
-                        {item.category && (
-                          <div className="text-sm text-muted-foreground">
-                            {item.category}
-                          </div>
-                        )}
-                        {item.logo && (
-                          <div className="flex items-center gap-2 mt-1">
-                            <div className="w-5 h-5 relative overflow-hidden rounded-full bg-muted">
-                              {/* Using Next.js Image component */}
-                              <div className="w-full h-full">
-                                {/* We use a div wrapper to avoid the Next.js Image warning */}
-                                {typeof item.logo === "string" &&
-                                  item.logo.startsWith("http") && (
-                                    <div
-                                      className="w-full h-full bg-cover bg-center"
-                                      style={{
-                                        backgroundImage: `url(${item.logo})`,
-                                      }}
-                                    />
-                                  )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
+            <span className="truncate">
+              {selectedItem
+                ? selectedItem[displayField] +
+                  " " +
+                  (selectedItem[displayField2] || "")
+                : placeholder}
+            </span>
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="p-0"
+          align="start"
+          sideOffset={4}
+          style={{
+            width: "var(--radix-popover-trigger-width)",
+            pointerEvents: "auto",
+          }}
+        >
+          <Command className="w-full">
+            <CommandInput
+              placeholder={`Search ${table}...`}
+              value={searchTerm}
+              onValueChange={setSearchTerm}
+              className="h-9 pointer-events-auto"
+              autoFocus
+            />
+            <CommandList className="max-h-60" onScroll={handleScroll}>
+              <CommandEmpty>
+                {loading ? (
+                  <div className="flex items-center justify-center p-4">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <span className="text-sm text-muted-foreground">
+                      Loading...
+                    </span>
                   </div>
+                ) : (
+                  "No results found"
+                )}
+              </CommandEmpty>
+              <CommandGroup>
+                {items.map((item) => (
+                  <CommandItem
+                    key={item.id}
+                    value={item.id}
+                    onSelect={() => handleSelect(item)}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex items-center w-full">
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedItem?.id === item.id
+                            ? "opacity-100"
+                            : "opacity-0"
+                        )}
+                      />
+                      <div className="flex-1">
+                        {renderItem ? (
+                          renderItem(item)
+                        ) : (
+                          <>
+                            <div className="font-medium">
+                              {item[displayField]}
+                            </div>
+                            {item.email && (
+                              <div className="text-sm text-muted-foreground">
+                                {item.email}
+                              </div>
+                            )}
+                            {item.category && (
+                              <div className="text-sm text-muted-foreground">
+                                {item.category}
+                              </div>
+                            )}
+                            {item.logo && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <div className="w-5 h-5 relative overflow-hidden rounded-full bg-muted">
+                                  <div className="w-full h-full">
+                                    {typeof item.logo === "string" &&
+                                      item.logo.startsWith("http") && (
+                                        <div
+                                          className="w-full h-full bg-cover bg-center"
+                                          style={{
+                                            backgroundImage: `url(${item.logo})`,
+                                          }}
+                                        />
+                                      )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </CommandItem>
                 ))}
-
                 {loading && (
-                  <div className="p-4 flex items-center justify-center">
+                  <div className="flex items-center justify-center p-4">
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     <span className="text-sm text-muted-foreground">
                       Loading...
                     </span>
                   </div>
                 )}
-
                 {!hasMore && items.length > 0 && (
                   <div className="p-2 text-center text-sm text-muted-foreground">
                     No more results
                   </div>
                 )}
-              </>
-            )}
-          </div>
-        </div>
-      )}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }

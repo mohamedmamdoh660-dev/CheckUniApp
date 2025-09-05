@@ -16,4 +16,6 @@ export interface Settings {
     created_at?: string;
     updated_at?: string;
     logo_setting?: string;
+    type?: string;
+    agency_id?: string;
 } 
