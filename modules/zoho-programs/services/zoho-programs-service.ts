@@ -37,7 +37,7 @@ export const zohoProgramsService = {
    * Get programs with pagination
    */
   getProgramsPagination: async (search: string, limit: number, offset: number) => {
-    const response = await executeGraphQLBackend(GET_PROGRAMS_PAGINATION, { search, limit, offset });
+    const response = await executeGraphQLBackend(GET_PROGRAMS_PAGINATION, { search, limit, offset: limit * offset });
     const countResponse = await supabaseClient
     .from('zoho_programs')
     .select('id,name', { count: 'exact' })

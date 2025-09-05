@@ -11,6 +11,10 @@ import {
   RiCalendarLine,
   RiCalendar2Line,
   RiNotification3Line,
+  RiBookLine,
+  RiGraduationCapLine,
+  RiCommunityLine,
+  RiTranslate,
 } from "@remixicon/react";
 import { SearchIcon } from "lucide-react";
 
@@ -111,6 +115,38 @@ export const getNavData = (user: { roles?: string }) => {
           title: "Academic Years",
           url: "/academic-years",
           icon: RiCalendar2Line,
+          isActive: false,
+        },
+        {
+          title: "Faculties",
+          url: "/faculties",
+          icon: RiBookLine,
+          isActive: false,
+        },
+        {
+          title: "Specialities",
+          url: "/specialities",
+          icon: RiGraduationCapLine,
+          isActive: false,
+        },
+        {
+          title: "Cities",
+          url: "/cities",
+          icon: RiCommunityLine,
+          isActive: false,
+        },
+
+        {
+          title: "Degrees",
+          url: "/degrees",
+          icon: RiGraduationCapLine,
+          isActive: false,
+        },
+
+        {
+          title: "Languages",
+          url: "/languages",
+          icon: RiTranslate,
           isActive: false,
         },
       ],
