@@ -58,10 +58,9 @@ query GetUsers($filter: user_profileFilter, $limit: Int = 10, $offset: Int = 0) 
         profile
         created_at
         updated_at
-        agency_id
-        agency {
-          name
-        }
+         agency_id
+        agency:user_profile {
+full_name}
         roles {
           name
           description
