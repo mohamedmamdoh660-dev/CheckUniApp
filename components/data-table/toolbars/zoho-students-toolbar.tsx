@@ -6,7 +6,7 @@ import { DataTableViewOptions } from "@/components/data-table/data-table-view-op
 import { Download, Plus, RefreshCcw, X, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import AddZohoStudent from "@/components/(main)/zoho-students/component/add-zoho-student";
+import { useRouter } from "next/navigation";
 
 interface DataTableToolbarProps<TData> {
   table?: Table<TData>;
@@ -27,7 +27,7 @@ export function ZohoStudentsDataTableToolbar<TData>({
   fetchRecords,
   type,
 }: DataTableToolbarProps<TData>) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
   const [globalFilter, setGlobalFilter] = useState<string>("");
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,16 +93,11 @@ export function ZohoStudentsDataTableToolbar<TData>({
           variant="default"
           size="sm"
           className="ml-auto h-8"
-          onClick={() => setIsDialogOpen(true)}
+          onClick={() => router.push("/students/add")}
         >
           <Plus className="mr-1 h-4 w-4" /> Add Student
         </Button>
       </div>
-      <AddZohoStudent
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onRefresh={fetchRecords}
-      />
     </div>
   );
 }

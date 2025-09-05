@@ -15,7 +15,7 @@ import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
 import { deleteStudentViaWebhook } from "@/lib/actions/zoho-students-actions";
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
-import EditZohoStudent from "@/components/(main)/zoho-students/component/edit-zoho-student";
+import { useRouter } from "next/navigation";
 
 interface ZohoStudentsTableRowActionsProps {
   row: Row<ZohoStudent>;
@@ -26,7 +26,7 @@ export function ZohoStudentsTableRowActions({
   row,
   fetchStudents,
 }: ZohoStudentsTableRowActionsProps) {
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [confirmationDialog, setConfirmationDialog] = useState<{
     isOpen: boolean;
@@ -87,7 +87,7 @@ export function ZohoStudentsTableRowActions({
         <DropdownMenuContent align="end" className="w-max">
           <DropdownMenuItem
             onClick={() => {
-              setIsEditDialogOpen(true);
+              router.push(`/students/edit/${values.id}`);
             }}
             className="cursor-pointer flex items-center"
           >
@@ -104,15 +104,6 @@ export function ZohoStudentsTableRowActions({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      {isEditDialogOpen && (
-        <EditZohoStudent
-          open={isEditDialogOpen}
-          onOpenChange={setIsEditDialogOpen}
-          studentData={values}
-          fetchStudents={fetchStudents}
-        />
-      )}
 
       <ConfirmationDialogBox
         title="Are you sure you want to delete this student?"
