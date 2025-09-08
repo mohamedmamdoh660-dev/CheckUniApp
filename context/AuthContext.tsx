@@ -97,7 +97,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSettings(settingsData);
     } else if (userProfile?.roles.name === "agency") {
       const createdSettings = await settingsService.insertSettings({
-        site_name: "Agency Name",
+        site_name:
+          userProfile?.full_name ||
+          userProfile?.first_name + " " + userProfile?.last_name ||
+          "Agency Name",
         appearance_theme: "dark",
         logo_setting: "square",
         site_description: "",

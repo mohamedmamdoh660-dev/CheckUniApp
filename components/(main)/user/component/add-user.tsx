@@ -295,15 +295,17 @@ export default function AddUser({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {listRoles?.map((role) => (
-                              <SelectItem
-                                key={role.id}
-                                value={role.id}
-                                className="uppercase"
-                              >
-                                {role.name}
-                              </SelectItem>
-                            ))}
+                            {listRoles
+                              ?.filter((role) => role.name !== "agent")
+                              .map((role) => (
+                                <SelectItem
+                                  key={role.id}
+                                  value={role.id}
+                                  className="uppercase"
+                                >
+                                  {role.name}
+                                </SelectItem>
+                              ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 import { Settings } from "@/modules/settings/models/setting";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export function TeamSwitcher({
   teams,
@@ -85,11 +86,29 @@ export function TeamSwitcher({
 
           {/* Fallback: Show organization name if no logo */}
           {settings && !settings.logo_url && !settings.logo_horizontal_url && (
-            <div className="grid flex-1 text-left text-base leading-tight">
-              <span className="truncate font-medium">
-                {settings?.site_name ?? process.env.NEXT_PUBLIC_SITE_NAME}
-              </span>
-            </div>
+            <>
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden bg-primary/10 text-sidebar-primary-foreground">
+                <Image
+                  src={
+                    process.env.NEXT_PUBLIC_SITE_LOGO ||
+                    generateNameAvatar("Agency Name")
+                  }
+                  width={32}
+                  height={32}
+                  alt={
+                    settings.site_name ??
+                    process.env.NEXT_PUBLIC_SITE_NAME ??
+                    ""
+                  }
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <div className="grid flex-1 text-left text-base leading-tight">
+                <span className="truncate font-medium">
+                  {settings?.site_name ?? process.env.NEXT_PUBLIC_SITE_NAME}
+                </span>
+              </div>
+            </>
           )}
         </SidebarMenuButton>
       </SidebarMenuItem>

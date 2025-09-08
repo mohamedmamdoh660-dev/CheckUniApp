@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckIcon, ImagePlusIcon, XIcon } from "lucide-react";
-import { useFileUpload } from "@/hooks/use-file-upload";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import type { User } from "@/types/types";
 import { saveFile } from "@/supabase/actions/save-file";
 import { usersService } from "@/modules/users/services/users-service";
@@ -38,6 +36,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 // Pretend we have initial image files
 const initialBgImage = [
@@ -88,6 +87,7 @@ export default function EditUser({
   const [profile, setProfile] = useState(userData?.profile || "");
   const [isLoading, setIsLoading] = useState(false);
 
+  const { userProfile } = useAuth();
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -214,38 +214,43 @@ export default function EditUser({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2  gap-1 ">
-                      <FormLabel>Role</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="uppercase">
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {listRoles?.map((role) => (
-                            <SelectItem
-                              className="uppercase"
-                              key={role.id}
-                              value={role.id}
-                            >
-                              {role.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                {userProfile?.roles?.name === "admin" &&
+                  userData?.roles?.name !== "agent" && (
+                    <FormField
+                      control={form.control}
+                      name="role"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2  gap-1 ">
+                          <FormLabel>Role</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="uppercase">
+                                <SelectValue placeholder="Select role" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {listRoles
+                                ?.filter((role) => role.name !== "agent")
+                                .map((role) => (
+                                  <SelectItem
+                                    className="uppercase "
+                                    key={role.id}
+                                    value={role.id}
+                                  >
+                                    {role.name}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
-                />
 
                 <DialogFooter>
                   <Button
