@@ -6,7 +6,7 @@ import { ZohoFacultyDataTableToolbar } from "@/components/data-table/toolbars/zo
 import { DataTable } from "@/components/data-table/data-table";
 
 import { useDebounce } from "@/hooks/use-debounce";
-import { ZohoFaculty } from "@/modules/zoho-faculty/models/zoho-faculty";
+import { ZohoFaculty } from "@/types/types";
 import { zohoFacultyService } from "@/modules/zoho-faculty/services/zoho-faculty-service";
 
 export default function ZohoFacultyManagementPage({ type }: { type: string }) {

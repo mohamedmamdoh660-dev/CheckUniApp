@@ -6,7 +6,7 @@ import { ZohoCitiesDataTableToolbar } from "@/components/data-table/toolbars/zoh
 import { DataTable } from "@/components/data-table/data-table";
 
 import { useDebounce } from "@/hooks/use-debounce";
-import { ZohoCity } from "@/modules/zoho-cities/models/zoho-city";
+import { ZohoCity } from "@/types/types";
 import { zohoCitiesService } from "@/modules/zoho-cities/services/zoho-cities-service";
 
 export default function ZohoCitiesManagementPage({ type }: { type: string }) {

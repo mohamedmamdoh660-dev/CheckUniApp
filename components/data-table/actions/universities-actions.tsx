@@ -22,12 +22,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { University } from "@/modules/universities/models/university";
+import { ZohoUniversity } from "@/types/types";
 import { universitiesService } from "@/modules/universities/services/universities-service";
 import EditUniversity from "@/components/(main)/universities/component/edit-university";
 
 interface UniversitiesActionsProps {
-  university: University;
+  university: ZohoUniversity;
 }
 
 export function UniversitiesActions({ university }: UniversitiesActionsProps) {

@@ -6,8 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -28,12 +26,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Semester } from "@/modules/semesters/models/semester";
+import { ZohoSemester } from "@/types/types";
 import { semestersService } from "@/modules/semesters/services/semesters-service";
 import EditSemester from "@/components/(main)/semesters/component/edit-semester";
 
 interface SemestersActionsProps {
-  semester: Semester;
+  semester: ZohoSemester;
 }
 
 export function SemestersActions({ semester }: SemestersActionsProps) {

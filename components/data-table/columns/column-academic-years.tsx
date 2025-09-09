@@ -1,15 +1,13 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { AcademicYear } from "@/modules/academic-years/models/academic-year";
+import { ZohoAcademicYear } from "@/types/types";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle } from "lucide-react";
-import { format } from "date-fns";
 import { AcademicYearsActions } from "../actions/academic-years-actions";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { currentTimezone } from "@/lib/helper/current-timezone";
 
-export const columnsAcademicYears: ColumnDef<AcademicYear>[] = [
+export const columnsAcademicYears: ColumnDef<ZohoAcademicYear>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -57,9 +55,7 @@ export const columnsAcademicYears: ColumnDef<AcademicYear>[] = [
       if (!created_at) return null;
 
       return (
-        <div className="flex items-center">
-          {format(new Date(created_at), "MMM d, yyyy")}
-        </div>
+        <div className="flex items-center">{currentTimezone(created_at)}</div>
       );
     },
   },

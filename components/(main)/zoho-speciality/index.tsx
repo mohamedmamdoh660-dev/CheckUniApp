@@ -5,7 +5,7 @@ import { getZohoSpecialityColumns } from "@/components/data-table/columns/column
 import { DataTable } from "@/components/data-table/data-table";
 
 import { useDebounce } from "@/hooks/use-debounce";
-import { ZohoSpeciality } from "@/modules/zoho-speciality/models/zoho-speciality";
+import { ZohoSpeciality } from "@/types/types";
 import { zohoSpecialityService } from "@/modules/zoho-speciality/services/zoho-speciality-service";
 import { ZohoSpecialityDataTableToolbar } from "@/components/data-table/toolbars/zoho-speciality-toolbar";
 

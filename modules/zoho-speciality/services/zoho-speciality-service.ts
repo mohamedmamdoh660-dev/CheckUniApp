@@ -7,11 +7,11 @@ import {
   INSERT_SPECIALITY,
   UPDATE_SPECIALITY
 } from "./zoho-speciality-graphql";
-import { ZohoSpeciality } from "../models/zoho-speciality";
+import { ZohoSpeciality } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export const zohoSpecialityService = {
-  /**
+  /** 
    * Get all specialities
    */
   getSpecialities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null) => {

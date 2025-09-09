@@ -5,8 +5,9 @@ import { getZohoProgramsColumns } from "@/components/data-table/columns/column-z
 import { ZohoProgramsDataTableToolbar } from "@/components/data-table/toolbars/zoho-programs-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
-import { ZohoProgram } from "@/modules/zoho-programs/models/zoho-program";
+import { ZohoProgram } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ZohoProgramsManagementPage({ type }: { type: string }) {
   const [listPrograms, setListPrograms] = useState<ZohoProgram[]>([]);
@@ -16,6 +17,7 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const { userProfile } = useAuth();
 
   async function fetchPrograms() {
     setIsRefetching(true);
@@ -24,7 +26,10 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
         await zohoProgramsService.getProgramsPagination(
           `%${debouncedSearchTerm}%`,
           pageSize,
-          currentPage
+          currentPage,
+          userProfile?.id || "",
+          userProfile?.roles?.name || "",
+          userProfile?.agency_id || ""
         );
 
       setListPrograms(programsResponse.programs);

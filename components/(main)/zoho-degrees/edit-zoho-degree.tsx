@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { ZohoDegree } from "@/modules/zoho-degrees/models/zoho-degree";
+import { ZohoDegree } from "@/types/types";
 
 // Define form validation schema
 const formSchema = z.object({

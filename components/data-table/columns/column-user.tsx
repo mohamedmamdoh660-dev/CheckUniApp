@@ -5,12 +5,12 @@ import { DataTableColumnHeader } from "../data-table-column-header";
 import { UserTableRowActions } from "../actions/user-actions";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { currentTimezone } from "@/lib/helper/current-timezone";
-import { CircleCheck, CircleX } from "lucide-react";
+
 import { User } from "@/types/types";
-import { Role } from "@/modules/roles/models/role";
+import { Role } from "@/types/types";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { currentTimezone } from "@/lib/helper/current-timezone";
 
 export function getUserColumns(
   fetchUsers: () => void,
@@ -96,9 +96,7 @@ export function getUserColumns(
         const created = row.original.created_at;
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
-            {created
-              ? currentTimezone(created)?.toLocaleString()?.replace("GMT", "")
-              : "-"}
+            {currentTimezone(created)}
           </div>
         );
       },

@@ -9,7 +9,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Announcement } from "@/modules/announcements/models/announcement";
+import { ZohoAnnouncement } from "@/types/types";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
@@ -18,7 +18,6 @@ import {
   CalendarDays,
   GraduationCap,
   Pencil,
-  School,
   Trash,
 } from "lucide-react";
 import { announcementsService } from "@/modules/announcements/services/announcements-service";
@@ -28,7 +27,7 @@ import EditAnnouncementDialog from "./edit-announcement";
 interface AnnouncementDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  announcement: Announcement | null;
+  announcement: ZohoAnnouncement | null;
   onRefresh?: () => void;
 }
 
@@ -41,7 +40,7 @@ export default function AnnouncementDetailDialog({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentAnnouncement, setCurrentAnnouncement] =
-    useState<Announcement | null>(null);
+    useState<ZohoAnnouncement | null>(null);
 
   // Set current announcement when the prop changes
   useEffect(() => {
@@ -116,7 +115,7 @@ export default function AnnouncementDetailDialog({
 
   const universityInitials = universityName
     .split(" ")
-    .map((word) => word[0])
+    .map((word: string) => word[0])
     .join("")
     .substring(0, 2)
     .toUpperCase();

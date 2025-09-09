@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { announcementsService } from "@/modules/announcements/services/announcements-service";
-import { Announcement } from "@/modules/announcements/models/announcement";
+import { ZohoAnnouncement } from "@/types/types";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import Loader from "@/components/loader";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function AnnouncementList() {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState<ZohoAnnouncement[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,7 +28,7 @@ export default function AnnouncementList() {
   const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] =
-    useState<Announcement | null>(null);
+    useState<ZohoAnnouncement | null>(null);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
 
   // Fetch announcements
@@ -136,7 +136,7 @@ export default function AnnouncementList() {
   };
 
   // Handle view announcement
-  const handleViewAnnouncement = (announcement: Announcement) => {
+  const handleViewAnnouncement = (announcement: ZohoAnnouncement) => {
     setSelectedAnnouncement(announcement);
   };
 

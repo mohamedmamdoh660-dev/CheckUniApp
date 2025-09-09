@@ -9,48 +9,26 @@ export const dashboardService = {
   /**
    * Get dashboard statistics
    */
-  getDashboardStats: async () => {
+  getDashboardStats: async (role: string | undefined, agencyId: string | undefined, userId: string | undefined) => {
     try {
-      // Get total students count
-      const { count: totalStudents, error: studentsError } = await supabase
-        .from('zoho_students')
-        .select('*', { count: 'exact', head: true });
+      const { data, error } = await supabase
+      .rpc('get_dashboard_stats', {
+        p_role: role,          // 'admin' | 'agency' | 'agent'
+        p_agency_id: agencyId, // required if role = 'agency'
+        p_user_id: userId      // required if role = 'agent'
+      });
 
-      if (studentsError) throw studentsError;
+    if (error) {
+      console.error(error);
+      throw error;
+    } else {
+      console.log(data); 
+            // { totalStudents, totalApplications, totalUniversities, successRate }
 
-      // Get total applications count
-      const { count: totalApplications, error: applicationsError } = await supabase
-        .from('zoho_applications')
-        .select('*', { count: 'exact', head: true });
+      return data;
 
-      if (applicationsError) throw applicationsError;
-
-      // Get total universities count
-      const { count: totalUniversities, error: universitiesError } = await supabase
-        .from('zoho_universities')
-        .select('*', { count: 'exact', head: true });
-
-      if (universitiesError) throw universitiesError;
-
-      // Get completed applications count
-      const { count: completedApplications, error: completedError } = await supabase
-        .from('zoho_applications')
-        .select('*', { count: 'exact', head: true })
-        .eq('stage', 'completed');
-
-      if (completedError) throw completedError;
-
-      // Calculate success rate
-      const successRate = totalApplications && totalApplications > 0
-        ? ((completedApplications || 0) / totalApplications * 100).toFixed(1)
-        : "0.0";
-
-      return {
-        totalStudents: totalStudents || 0,
-        totalApplications: totalApplications || 0,
-        totalUniversities: totalUniversities || 0,
-        successRate
-      };
+    }
+    
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
       throw error;
@@ -109,17 +87,25 @@ export const dashboardService = {
   /**
    * Get university distribution
    */
-  getUniversityDistribution: async () => {
+  getUniversityDistribution: async (userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
     try {
-        const { data, error } = await supabase
+        const query = supabase
         .from('zoho_applications')
         .select('university::text, zoho_universities(id::text, name)')
         .not('university', 'is', null);
 
+      if (role === 'agency') {
+         query.eq('agency_id', userId);
+      } else if (role === 'admin') {
+        query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
 
       // Count applications per university
-      const universityCounts = data.reduce((acc: Record<string, any>, item: any) => {
+      const universityCounts = data?.reduce((acc: Record<string, any>, item: any) => {
         const universityId = item.university;
         const universityName = item.zoho_universities?.name || `University ${universityId}`;
         
@@ -135,7 +121,7 @@ export const dashboardService = {
       }, {});
 
       // Transform to array for chart
-      const chartData = Object.values(universityCounts).map((item: any, index: number) => ({
+      const chartData = Object.values(universityCounts || {}).map((item: any, index: number) => ({
         ...item,
         fill: `var(--chart-${(index % 5) + 1})`
       }));
@@ -150,18 +136,25 @@ export const dashboardService = {
   /**
    * Get gender distribution
    */
-  getGenderDistribution: async () => {
+  getGenderDistribution: async (userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
     try {
       // Get students grouped by gender
-      const { data, error } = await supabase
+      const query =  supabase
         .from('zoho_students')
         .select('gender')
         .not('gender', 'is', null);
 
-      if (error) throw error;
+      if (role === 'agency') {
+         query.eq('agency_id', userId);
+      } else if (role === 'admin') {
+        query.eq('user_id', userId);
+      }
+
+
+      const { data, error } = await query;
 
       // Count students per gender
-      const genderCounts = data.reduce((acc: Record<string, any>, item: any) => {
+      const genderCounts = data?.reduce((acc: Record<string, any>, item: any) => {
         const gender = item.gender.charAt(0).toUpperCase() + item.gender.slice(1);
         
         if (!acc[gender]) {
@@ -176,7 +169,7 @@ export const dashboardService = {
       }, {});
 
       // Transform to array for chart
-      const chartData = Object.values(genderCounts).map((item: any, index: number) => ({
+      const chartData = Object.values(genderCounts || {}).map((item: any, index: number) => ({
         ...item,
         fill: `var(--chart-${(index % 5) + 1})`
       }));
@@ -191,9 +184,9 @@ export const dashboardService = {
   /**
    * Get recent applications
    */
-  getRecentApplications: async (limit = 10) => {
+  getRecentApplications: async (limit = 10, userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
     try {
-      const { data, error } = await supabase
+      const query = supabase
         .from('zoho_applications')
         .select(`
           id,
@@ -227,6 +220,14 @@ export const dashboardService = {
         .order('created_at', { ascending: false })
         .limit(limit);
 
+      if (role === 'agency') {
+         query.eq('agency_id', userId);
+      } else if (role === 'admin') {
+        query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
       return data;
     } catch (error) {
@@ -238,7 +239,7 @@ export const dashboardService = {
   /**
    * Get application timeline data
    */
-  getApplicationTimeline: async (days = 30) => {
+  getApplicationTimeline: async (days = 30, userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
     try {
       // Calculate the date range
       const endDate = new Date();
@@ -246,11 +247,19 @@ export const dashboardService = {
       startDate.setDate(startDate.getDate() - days);
 
       // Fetch applications within the date range
-      const { data, error } = await supabase
+      const query = supabase
         .from('zoho_applications')
         .select('created_at, stage')
         .gte('created_at', startDate.toISOString())
         .lte('created_at', endDate.toISOString());
+
+      if (role === 'agency') {
+         query.eq('agency_id', userId);
+      } else if (role === 'admin') {
+        query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 

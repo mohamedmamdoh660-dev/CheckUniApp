@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { ZohoDegree } from "@/modules/zoho-degrees/models/zoho-degree";
+import { ZohoDegree } from "@/types/types";
 import { zohoDegreesService } from "@/modules/zoho-degrees/services/zoho-degrees-service";
 import EditZohoDegree from "@/components/(main)/zoho-degrees/edit-zoho-degree";
 import DeleteZohoDegree from "@/components/(main)/zoho-degrees/delete-zoho-degree";

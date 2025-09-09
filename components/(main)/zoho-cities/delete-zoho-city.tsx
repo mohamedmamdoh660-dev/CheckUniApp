@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ZohoCity } from "@/modules/zoho-cities/models/zoho-city";
+import { ZohoCity } from "@/types/types";
 import { zohoCitiesService } from "@/modules/zoho-cities/services/zoho-cities-service";
 
 interface DeleteZohoCityProps {

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { Ellipsis, Edit, Trash, Ban, CheckCircle } from "lucide-react";
-import { ZohoProgram } from "@/modules/zoho-programs/models/zoho-program";
+import { ZohoProgram } from "@/types/types";
 import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
 import EditZohoProgram from "@/components/(main)/zoho-programs/component/edit-zoho-program";

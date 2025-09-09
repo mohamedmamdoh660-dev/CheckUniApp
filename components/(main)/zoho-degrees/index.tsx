@@ -6,7 +6,7 @@ import { ZohoDegreesDataTableToolbar } from "@/components/data-table/toolbars/zo
 import { DataTable } from "@/components/data-table/data-table";
 import { zohoDegreesService } from "@/modules/zoho-degrees/services/zoho-degrees-service";
 import { useDebounce } from "@/hooks/use-debounce";
-import { ZohoDegree } from "@/modules/zoho-degrees/models/zoho-degree";
+import { ZohoDegree } from "@/types/types";
 
 export default function ZohoDegreesManagementPage({ type }: { type: string }) {
   const [listDegrees, setListDegrees] = useState<ZohoDegree[]>([]);

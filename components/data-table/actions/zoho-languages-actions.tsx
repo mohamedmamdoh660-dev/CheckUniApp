@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { ZohoLanguage } from "@/modules/zoho-languages/models/zoho-language";
+import { ZohoLanguage } from "@/types/types";
 import { zohoLanguagesService } from "@/modules/zoho-languages/services/zoho-languages-service";
 import EditZohoLanguage from "@/components/(main)/zoho-languages/edit-zoho-language";
 import DeleteZohoLanguage from "@/components/(main)/zoho-languages/delete-zoho-language";

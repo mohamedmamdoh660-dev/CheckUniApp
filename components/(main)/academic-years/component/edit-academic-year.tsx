@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { AcademicYear } from "@/modules/academic-years/models/academic-year";
+import { ZohoAcademicYear } from "@/types/types";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -38,7 +38,7 @@ interface EditAcademicYearProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onRefresh?: () => void;
-  academicYear: AcademicYear;
+  academicYear: ZohoAcademicYear;
 }
 
 export default function EditAcademicYear({

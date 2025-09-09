@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 // Fixed color palette - similar to admin-stage-funnel.tsx
 const COLORS = [
@@ -72,10 +73,15 @@ export function UniversityDistributionChart() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [colors, setColors] = useState<string[]>([]);
+  const { userProfile } = useAuth();
 
   const fetchData = async () => {
     try {
-      const data = await dashboardService.getUniversityDistribution();
+      const data = await dashboardService.getUniversityDistribution(
+        userProfile?.id,
+        userProfile?.agency_id,
+        userProfile?.roles?.name
+      );
 
       // Limit to top universities for better visualization
       const sortedData = [...data].sort(

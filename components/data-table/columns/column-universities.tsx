@@ -1,14 +1,13 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { University } from "@/modules/universities/models/university";
+import { ZohoUniversity } from "@/types/types";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-import { format } from "date-fns";
 import { UniversitiesActions } from "../actions/universities-actions";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Globe } from "lucide-react";
+import { currentTimezone } from "@/lib/helper/current-timezone";
 
-export const columnsUniversities: ColumnDef<University>[] = [
+export const columnsUniversities: ColumnDef<ZohoUniversity>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -102,9 +101,7 @@ export const columnsUniversities: ColumnDef<University>[] = [
       if (!created_at) return null;
 
       return (
-        <div className="flex items-center">
-          {format(new Date(created_at), "MMM d, yyyy")}
-        </div>
+        <div className="flex items-center">{currentTimezone(created_at)}</div>
       );
     },
   },

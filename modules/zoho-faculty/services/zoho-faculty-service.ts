@@ -7,7 +7,7 @@ import {
   INSERT_FACULTY,
   UPDATE_FACULTY
 } from "./zoho-faculty-graphql";
-import { ZohoFaculty } from "../models/zoho-faculty";
+import { ZohoFaculty } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export const zohoFacultyService = {

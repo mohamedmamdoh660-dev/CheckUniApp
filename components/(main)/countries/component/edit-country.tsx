@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { Country } from "@/modules/countries/models/country";
+import { ZohoCountry } from "@/types/types";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -40,7 +40,7 @@ interface EditCountryProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onRefresh?: () => void;
-  country: Country;
+  country: ZohoCountry;
 }
 
 export default function EditCountry({

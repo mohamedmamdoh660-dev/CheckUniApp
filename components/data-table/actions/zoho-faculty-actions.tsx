@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { ZohoFaculty } from "@/modules/zoho-faculty/models/zoho-faculty";
+import { ZohoFaculty } from "@/types/types";
 import DeleteZohoFaculty from "@/components/(main)/zoho-faculty/delete-zoho-faculty";
 import EditZohoFaculty from "@/components/(main)/zoho-faculty/edit-zoho-faculty";
 import { Edit, Ellipsis, Trash } from "lucide-react";

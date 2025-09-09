@@ -7,7 +7,7 @@ import { Download, Plus, RefreshCcw, X, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import AddUser from "@/components/(main)/user/component/add-user";
-import type { Role } from "@/modules/roles/models/role";
+import type { Role } from "@/types/types";
 // import UserSettingsDialogBox from "@/components/dashboard/user-management/manage-user-settings";
 
 interface DataTableToolbarProps<TData> {

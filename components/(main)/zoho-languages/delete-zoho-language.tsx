@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ZohoLanguage } from "@/modules/zoho-languages/models/zoho-language";
+import { ZohoLanguage } from "@/types/types";
 import { zohoLanguagesService } from "@/modules/zoho-languages/services/zoho-languages-service";
 
 interface DeleteZohoLanguageProps {

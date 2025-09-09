@@ -5,7 +5,7 @@ import { getZohoLanguagesColumns } from "@/components/data-table/columns/column-
 import { ZohoLanguagesDataTableToolbar } from "@/components/data-table/toolbars/zoho-languages-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { zohoLanguagesService } from "@/modules/zoho-languages/services/zoho-languages-service";
-import { ZohoLanguage } from "@/modules/zoho-languages/models/zoho-language";
+import { ZohoLanguage } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function ZohoLanguagesManagementPage({

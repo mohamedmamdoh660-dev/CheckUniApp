@@ -137,7 +137,7 @@ export function AppearanceSettings({ settings }: { settings?: Settings }) {
 
   const handleThemeChange = (value: Theme) => {
     setTheme(value);
-    setSettingAppearance((prev) => ({
+    setSettingAppearance((prev: Settings) => ({
       ...prev,
       appearance_theme: value,
     }));
@@ -145,7 +145,7 @@ export function AppearanceSettings({ settings }: { settings?: Settings }) {
 
   const handlePrimaryColorChange = (value: string) => {
     setPrimaryColor(value);
-    setSettingAppearance((prev) => ({
+    setSettingAppearance((prev: Settings) => ({
       ...prev,
       primary_color: value,
     }));

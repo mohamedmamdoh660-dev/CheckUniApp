@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 // Custom legend component that shows both color and value
 const CustomLegend = (props: any) => {
@@ -54,9 +55,15 @@ export function GenderDistributionChart() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [colors, setColors] = useState<string[]>([]);
 
+  const { userProfile } = useAuth();
+
   const fetchData = async () => {
     try {
-      const data = await dashboardService.getGenderDistribution();
+      const data = await dashboardService.getGenderDistribution(
+        userProfile?.id,
+        userProfile?.agency_id,
+        userProfile?.roles?.name
+      );
       setChartData(data);
 
       // Generate colors for the chart

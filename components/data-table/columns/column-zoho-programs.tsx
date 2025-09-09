@@ -5,10 +5,8 @@ import { DataTableColumnHeader } from "../data-table-column-header";
 import { ZohoProgramsTableRowActions } from "../actions/zoho-programs-actions";
 import { Badge } from "@/components/ui/badge";
 import { currentTimezone } from "@/lib/helper/current-timezone";
-import { ZohoProgram } from "@/modules/zoho-programs/models/zoho-program";
+import { ZohoProgram } from "@/types/types";
 import { StatusBadge } from "@/components/ui/status-badge";
-import Image from "next/image";
-import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export function getZohoProgramsColumns(
   fetchPrograms: () => void
@@ -211,9 +209,7 @@ export function getZohoProgramsColumns(
         const created = row.original.created_at;
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
-            {created
-              ? currentTimezone(created)?.toLocaleString()?.replace("GMT", "")
-              : "-"}
+            {currentTimezone(created)}
           </div>
         );
       },
@@ -221,20 +217,20 @@ export function getZohoProgramsColumns(
       enableHiding: true,
     },
 
-    {
-      id: "actions",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actions" />
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">
-          <ZohoProgramsTableRowActions
-            row={row}
-            fetchPrograms={fetchPrograms}
-          />
-        </div>
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Actions" />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-center">
+    //       <ZohoProgramsTableRowActions
+    //         row={row}
+    //         fetchPrograms={fetchPrograms}
+    //       />
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;

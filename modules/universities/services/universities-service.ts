@@ -8,7 +8,7 @@ import {
   GET_UNIVERSITY_BY_ID,
   UPDATE_UNIVERSITY,
 } from "./universities-graphql";
-import { University } from "../models/university";
+import { ZohoUniversity } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 class UniversitiesService {
@@ -87,7 +87,7 @@ class UniversitiesService {
   }
 
   // Create a new university
-  async createUniversity(universityData: Partial<University>) {
+  async createUniversity(universityData: Partial<ZohoUniversity>) {
     try {
       const response = await executeGraphQLBackend(CREATE_UNIVERSITY, {
         objects: [universityData]
@@ -105,7 +105,7 @@ class UniversitiesService {
   }
 
   // Update an existing university
-  async updateUniversity(id: string, universityData: Partial<University>) {
+  async updateUniversity(id: string, universityData: Partial<ZohoUniversity>) {
     try {
       const response = await executeGraphQLBackend(UPDATE_UNIVERSITY, {
         id,

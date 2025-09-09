@@ -8,7 +8,7 @@ import {
   GET_ANNOUNCEMENTS,
   UPDATE_ANNOUNCEMENT,
 } from "./announcements-graphql";
-import { Announcement } from "../models/announcement";
+import { ZohoAnnouncement } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 class AnnouncementsService {
@@ -88,7 +88,7 @@ class AnnouncementsService {
   }
 
   // Create a new announcement
-  async createAnnouncement(announcementData: Partial<Announcement>) {
+  async createAnnouncement(announcementData: Partial<ZohoAnnouncement>) {
     try {
       const response = await executeGraphQLBackend(CREATE_ANNOUNCEMENT, {
         objects: [announcementData]
@@ -106,7 +106,7 @@ class AnnouncementsService {
   }
 
   // Update an existing announcement
-  async updateAnnouncement(id: string, announcementData: Partial<Announcement>) {
+  async updateAnnouncement(id: string, announcementData: Partial<ZohoAnnouncement>) {
     try {
       const response = await executeGraphQLBackend(UPDATE_ANNOUNCEMENT, {
         id,

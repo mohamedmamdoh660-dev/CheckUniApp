@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { Ellipsis, Edit, Trash } from "lucide-react";
-import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+import { ZohoStudent } from "@/types/types";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
 import { deleteStudentViaWebhook } from "@/lib/actions/zoho-students-actions";
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";

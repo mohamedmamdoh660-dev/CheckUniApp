@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ZohoFaculty } from "@/modules/zoho-faculty/models/zoho-faculty";
+import { ZohoFaculty } from "@/types/types";
 import { zohoFacultyService } from "@/modules/zoho-faculty/services/zoho-faculty-service";
 
 interface DeleteZohoFacultyProps {

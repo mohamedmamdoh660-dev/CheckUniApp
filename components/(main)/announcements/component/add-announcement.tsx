@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
-import { ANNOUNCEMENT_CATEGORIES } from "@/modules/announcements/models/announcement";
+import { ANNOUNCEMENT_CATEGORIES, ZohoAnnouncement } from "@/types/types";
 import {
   Select,
   SelectContent,

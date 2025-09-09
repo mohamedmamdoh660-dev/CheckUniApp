@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../data-table-column-header";
 import { ZohoCitiesTableRowActions } from "../actions/zoho-cities-actions";
 import { currentTimezone } from "@/lib/helper/current-timezone";
-import { ZohoCity } from "@/modules/zoho-cities/models/zoho-city";
+import { ZohoCity } from "@/types/types";
 
 export function getZohoCitiesColumns(
   fetchCities: () => void
@@ -51,9 +51,7 @@ export function getZohoCitiesColumns(
         const created = row.original.created_at;
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
-            {created
-              ? currentTimezone(created)?.toLocaleString()?.replace("GMT", "")
-              : "-"}
+            {currentTimezone(created)}
           </div>
         );
       },

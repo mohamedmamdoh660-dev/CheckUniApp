@@ -30,13 +30,9 @@ export const GET_STUDENTS = `
 `;
 
 export const GET_STUDENTS_PAGINATION = `
-  query GetStudentsPagination($search: String!, $limit: Int!, $offset: Int!) {
+  query GetStudentsPagination($search: String!, $limit: Int!, $offset: Int!, $filter: zoho_studentsFilter) {
     zoho_studentsCollection(
-      filter: { or: [
-        { first_name: { like: $search } },
-        { last_name: { like: $search } },
-        { email: { like: $search } }
-      ] }
+      filter: $filter
       first: $limit
       offset: $offset
     ) {

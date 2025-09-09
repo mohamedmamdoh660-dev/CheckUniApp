@@ -6,8 +6,7 @@ import { Table } from "@tanstack/react-table";
 import { X, Plus, FileDown, RefreshCcw, Search } from "lucide-react";
 import { useState } from "react";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
-import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter";
-import { Semester } from "@/modules/semesters/models/semester";
+
 import AddSemester from "@/components/(main)/semesters/component/add-semester";
 
 interface SemestersToolbarProps<TData> {

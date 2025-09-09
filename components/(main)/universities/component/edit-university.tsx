@@ -26,7 +26,7 @@ import {
 import { SearchableDropdown } from "@/components/searchable-dropdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { University } from "@/modules/universities/models/university";
+import { ZohoUniversity } from "@/types/types";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -48,7 +48,7 @@ interface EditUniversityProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onRefresh?: () => void;
-  university: University;
+  university: ZohoUniversity;
 }
 
 export default function EditUniversity({

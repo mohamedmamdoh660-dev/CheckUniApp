@@ -7,7 +7,7 @@ import { DataTable } from "@/components/data-table/data-table";
 import { usersService } from "@/modules/users/services/users-service";
 import { User } from "@/types/types";
 import { rolesService } from "@/modules/roles/services/roles-service";
-import { Role } from "@/modules/roles/models/role";
+import { Role } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/context/AuthContext";
 

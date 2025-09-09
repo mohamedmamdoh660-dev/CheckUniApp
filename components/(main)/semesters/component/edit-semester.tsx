@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { Semester } from "@/modules/semesters/models/semester";
+import { ZohoSemester } from "@/types/types";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -38,7 +38,7 @@ interface EditSemesterProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onRefresh?: () => void;
-  semester: Semester;
+  semester: ZohoSemester;
 }
 
 export default function EditSemester({

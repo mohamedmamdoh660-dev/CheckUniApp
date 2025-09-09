@@ -8,7 +8,7 @@ import type { User } from "@/types/types";
 import { saveFile } from "@/supabase/actions/save-file";
 import { usersService } from "@/modules/users/services/users-service";
 import Image from "next/image";
-import type { Role } from "@/modules/roles/models/role";
+import type { Role } from "@/types/types";
 import {
   Select,
   SelectItem,

@@ -2,11 +2,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "sonner";
-import settingsService from "@/modules/settings/services/setting-service";
 import { ThemeProviderWrapper } from "@/context/theme-provider-wrapper";
 import PointerEventsFix from "@/utils/pointer-events";
-import { usersService } from "@/modules";
-import { checkAuthentication } from "@/utils/check-authentication";
 
 const fontSans = Inter({
   subsets: ["latin"],

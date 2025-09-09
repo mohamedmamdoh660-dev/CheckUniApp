@@ -6,19 +6,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  MoreHorizontal,
-  Pencil,
-  Trash,
-  CheckCircle,
-  XCircle,
-  Globe,
-  User,
-} from "lucide-react";
+import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,12 +20,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Country } from "@/modules/countries/models/country";
+import { ZohoCountry } from "@/types/types";
 import { countriesService } from "@/modules/countries/services/countries-service";
 import EditCountry from "@/components/(main)/countries/component/edit-country";
 
 interface CountriesActionsProps {
-  country: Country;
+  country: ZohoCountry;
 }
 
 export function CountriesActions({ country }: CountriesActionsProps) {

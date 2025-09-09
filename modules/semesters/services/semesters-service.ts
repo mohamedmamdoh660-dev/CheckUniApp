@@ -6,7 +6,7 @@ import {
   GET_SEMESTER_BY_ID,
   UPDATE_SEMESTER,
 } from "./semesters-graphql";
-import { Semester } from "../models/semester";
+import { ZohoSemester } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 class SemestersService {
@@ -62,7 +62,7 @@ class SemestersService {
   }
 
   // Create a new semester
-  async createSemester(semesterData: Partial<Semester>) {
+  async createSemester(semesterData: Partial<ZohoSemester>) {
     try {
       const response = await executeGraphQLBackend(CREATE_SEMESTER, {
         objects: [semesterData]
@@ -80,7 +80,7 @@ class SemestersService {
   }
 
   // Update an existing semester
-  async updateSemester(id: string, semesterData: Partial<Semester>) {
+  async updateSemester(id: string, semesterData: Partial<ZohoSemester>) {
     try {
       const response = await executeGraphQLBackend(UPDATE_SEMESTER, {
         id,

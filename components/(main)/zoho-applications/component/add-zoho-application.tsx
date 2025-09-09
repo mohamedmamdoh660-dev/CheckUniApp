@@ -32,21 +32,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ZohoAcademicYear,
-  ZohoSemester,
-} from "@/modules/zoho-applications/models/zoho-application";
-import {
-  ZohoCountry,
-  ZohoDegree,
-  ZohoProgram,
-  ZohoUniversity,
-} from "@/modules/zoho-programs/models/zoho-program";
-import Image from "next/image";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
+import { useAuth } from "@/context/AuthContext";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -74,6 +64,7 @@ export default function AddZohoApplication({
   onRefresh,
 }: AddZohoApplicationProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { userProfile } = useAuth();
 
   // Initialize form
   const form = useForm<FormSchema>({
@@ -116,6 +107,13 @@ export default function AddZohoApplication({
         const applicationDataWithId = {
           ...applicationData,
           id: webhookResponse.id,
+          user_id: userProfile?.id,
+          agency_id:
+            userProfile?.roles?.name === "agency"
+              ? userProfile?.id
+              : userProfile?.roles?.name === "admin"
+                ? null
+                : userProfile?.agency_id,
         };
 
         // @ts-ignore

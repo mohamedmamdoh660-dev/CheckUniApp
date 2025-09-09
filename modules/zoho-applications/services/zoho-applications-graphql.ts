@@ -69,13 +69,9 @@ export const GET_APPLICATIONS = `
 `;
 
 export const GET_APPLICATIONS_PAGINATION = `
-  query GetApplicationsPagination($search: String!, $limit: Int!, $offset: Int!) {
+  query GetApplicationsPagination($search: String!, $limit: Int!, $offset: Int!, $filter: zoho_applicationsFilter) {
     zoho_applicationsCollection(
-      filter: { 
-        or: [
-          { stage: { like: $search } }
-        ]
-      }
+      filter: $filter
       first: $limit
       offset: $offset
     ) {

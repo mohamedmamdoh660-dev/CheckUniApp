@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { ZohoCity } from "@/modules/zoho-cities/models/zoho-city";
+import { ZohoCity } from "@/types/types";
 import { zohoCitiesService } from "@/modules/zoho-cities/services/zoho-cities-service";
 import EditZohoCity from "@/components/(main)/zoho-cities/edit-zoho-city";
 import DeleteZohoCity from "@/components/(main)/zoho-cities/delete-zoho-city";

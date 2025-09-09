@@ -5,11 +5,13 @@ import { columnsUniversities } from "@/components/data-table/columns/column-univ
 import { UniversitiesToolbar } from "@/components/data-table/toolbars/universities-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { universitiesService } from "@/modules/universities/services/universities-service";
-import { University } from "@/modules/universities/models/university";
+import { ZohoUniversity } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function UniversitiesManagementPage({ type }: { type: string }) {
-  const [listUniversities, setListUniversities] = useState<University[]>([]);
+  const [listUniversities, setListUniversities] = useState<ZohoUniversity[]>(
+    []
+  );
   const [recordCount, setRecordCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);

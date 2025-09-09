@@ -1,18 +1,7 @@
-export const currentTimezone = (inputDate?: Date | string) => {
+export const currentTimezone = (inputDate?: Date | string | undefined) => {
   // If no date is provided, use the current date and time
-  const date = inputDate
-    ? typeof inputDate === "string"
-      ? new Date(inputDate)
-      : inputDate
-    : new Date();
-
-  // Get the user's local timezone offset in minutes
-  const timezoneOffset = new Date().getTimezoneOffset();
-
-  // Calculate the date adjusted for the user's timezone
-  const userTimezoneDate = new Date(
-    date.getTime() - timezoneOffset * 60 * 1000
-  );
-
-  return userTimezoneDate;
+  
+  return inputDate ? new Date(inputDate).toLocaleString("en-US", {
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, // current timezone
+  }) : "";
 };

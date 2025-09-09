@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
-import { ZohoCity, ZohoCountry } from "@/modules/zoho-cities/models/zoho-city";
+import { ZohoCity, ZohoCountry } from "@/types/types";
 
 // Define form validation schema
 const formSchema = z.object({

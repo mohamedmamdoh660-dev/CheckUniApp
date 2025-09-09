@@ -6,7 +6,7 @@ import {
   GET_COUNTRY_BY_ID,
   UPDATE_COUNTRY,
 } from "./countries-graphql";
-import { Country } from "../models/country";
+import { ZohoCountry } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 class CountriesService {
@@ -67,7 +67,7 @@ class CountriesService {
   }
 
   // Create a new country
-  async createCountry(countryData: Partial<Country>) {
+  async createCountry(countryData: Partial<ZohoCountry>) {
     try {
       const response = await executeGraphQLBackend(CREATE_COUNTRY, {
         objects: [countryData]
@@ -85,7 +85,7 @@ class CountriesService {
   }
 
   // Update an existing country
-  async updateCountry(id: string, countryData: Partial<Country>) {
+  async updateCountry(id: string, countryData: Partial<ZohoCountry>) {
     try {
       const response = await executeGraphQLBackend(UPDATE_COUNTRY, {
         id,

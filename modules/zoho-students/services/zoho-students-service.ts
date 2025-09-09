@@ -8,7 +8,7 @@ import {
   INSERT_STUDENT,
   UPDATE_STUDENT
 } from "./zoho-students-graphql";
-import { ZohoStudent } from "../models/zoho-student";
+import { ZohoStudent } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export const zohoStudentsService = {
@@ -23,12 +23,34 @@ export const zohoStudentsService = {
   /**
    * Get students with pagination
    */
-  getStudentsPagination: async (search: string, limit: number, offset: number) => {
-    const response = await executeGraphQLBackend(GET_STUDENTS_PAGINATION, { search, limit, offset });
-    const countResponse = await supabaseClient
+  getStudentsPagination: async (search: string, limit: number, offset: number, user_id: string, userRole: string, agency_id: string) => {
+    let filterConditions: any = [
+      { first_name: { ilike: search } },
+      { last_name: { ilike: search } },
+      { email: { ilike: search } }
+    ];
+    
+    // Add user filtering based on role
+    if (userRole === 'agency') {
+      filterConditions.push({ agency_id: { eq: user_id } });
+    } else if (userRole !== 'admin') {
+      filterConditions.push({ user_id: { eq: user_id } });
+    }
+    
+    const response = await executeGraphQLBackend(GET_STUDENTS_PAGINATION, { search, limit, offset, filter: { and: filterConditions } });
+    let countQuery = supabaseClient
     .from('zoho_students')
     .select('id', { count: 'exact' })
-    .or(`first_name.ilike.${search},last_name.ilike.${search},email.ilike.${search}`);
+    .or(`first_name.ilike.${search},last_name.ilike.${search},email.ilike.${search}`)
+    
+    // Apply role-based filtering to count query
+    if (userRole === 'agency') {
+      countQuery = countQuery.eq('agency_id', user_id);
+    } else if (userRole !== 'admin') {
+      countQuery = countQuery.eq('user_id', user_id);
+    }
+    
+    const countResponse = await countQuery;
     return {
       students: response.zoho_studentsCollection.edges.map((edge: any) => edge.node),
       totalCount: countResponse.count
@@ -72,7 +94,9 @@ export const zohoStudentsService = {
           father_job: data.father_job,
           mother_name: data.mother_name,
           mother_mobile: data.mother_mobile,
-          mother_job: data.mother_job
+          mother_job: data.mother_job,
+          agency_id: data.agency_id,
+          user_id: data.user_id
         }]
       });
 

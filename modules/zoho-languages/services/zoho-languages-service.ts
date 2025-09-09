@@ -7,7 +7,7 @@ import {
   INSERT_LANGUAGE,
   UPDATE_LANGUAGE
 } from "./zoho-languages-graphql";
-import { ZohoLanguage } from "../models/zoho-language";
+import { ZohoLanguage } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export const zohoLanguagesService = {

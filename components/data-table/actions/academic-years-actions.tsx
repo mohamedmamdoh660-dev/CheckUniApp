@@ -6,8 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -28,12 +26,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { AcademicYear } from "@/modules/academic-years/models/academic-year";
+import { ZohoAcademicYear } from "@/types/types";
 import { academicYearsService } from "@/modules/academic-years/services/academic-years-service";
 import EditAcademicYear from "@/components/(main)/academic-years/component/edit-academic-year";
 
 interface AcademicYearsActionsProps {
-  academicYear: AcademicYear;
+  academicYear: ZohoAcademicYear;
 }
 
 export function AcademicYearsActions({

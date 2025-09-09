@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
-import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
 import { updateApplicationViaWebhook } from "@/lib/actions/zoho-applications-actions";
 import { toast } from "sonner";
 import {
@@ -31,18 +30,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ZohoAcademicYear,
-  ZohoApplication,
-  ZohoSemester,
-} from "@/modules/zoho-applications/models/zoho-application";
-import {
-  ZohoCountry,
-  ZohoDegree,
-  ZohoProgram,
-  ZohoUniversity,
-} from "@/modules/zoho-programs/models/zoho-program";
-import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+import { ZohoApplication } from "@/types/types";
+
+import { ZohoStudent } from "@/types/types";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";

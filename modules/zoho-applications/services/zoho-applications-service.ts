@@ -11,8 +11,8 @@ import {
   GET_ZOHO_STUDENTS,
   GET_ZOHO_STUDENTS_SEARCH
 } from "./zoho-applications-graphql";
-import { ZohoAcademicYear, ZohoApplication, ZohoSemester } from "../models/zoho-application";
-import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+import { ZohoAcademicYear, ZohoApplication, ZohoSemester } from "@/types/types";
+import { ZohoStudent } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export const zohoApplicationsService = {
@@ -27,12 +27,35 @@ export const zohoApplicationsService = {
   /**
    * Get applications with pagination
    */
-  getApplicationsPagination: async (search: string, limit: number, offset: number) => {
-    const response = await executeGraphQLBackend(GET_APPLICATIONS_PAGINATION, { search, limit, offset });
-    const countResponse = await supabaseClient
+  getApplicationsPagination: async (search: string, limit: number, offset: number, user_id: string, userRole: string, agency_id: string) => {
+  console.log("🚀 ~ userRole:", userRole)
+
+    let filterConditions: any = [
+      { stage: { ilike: search } },
+    ];
+    
+    // Add user filtering based on role
+    if (userRole === 'agency') {
+      filterConditions.push({ agency_id: { eq: user_id } });
+    } else if (userRole !== 'admin') {
+      filterConditions.push({ user_id: { eq: user_id } });
+    }
+    
+    const response = await executeGraphQLBackend(GET_APPLICATIONS_PAGINATION, { search, limit, offset,filter: { and: filterConditions } });
+    let countQuery = supabaseClient
     .from('zoho_applications')
     .select('id', { count: 'exact' })
-    .ilike('stage', `${search}`);
+    .ilike('stage', `${search}`)
+
+    // Apply role-based filtering to count query
+    if (userRole === 'agency') {
+      countQuery = countQuery.eq('agency_id', user_id);
+    } else if (userRole !== 'admin') {
+      countQuery = countQuery.eq('user_id', user_id);
+    }
+    
+    const countResponse = await countQuery;
+    
     return {
       applications: response.zoho_applicationsCollection.edges.map((edge: any) => edge.node),
       totalCount: countResponse.count
@@ -67,7 +90,9 @@ export const zohoApplicationsService = {
           country: data.country,
           university: data.university,
           stage: data.stage,
-          degree: data.degree
+          degree: data.degree,
+          agency_id: data.agency_id,
+          user_id: data.user_id
         }]
       });
 

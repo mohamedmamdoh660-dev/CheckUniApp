@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { ZohoSpeciality } from "@/modules/zoho-speciality/models/zoho-speciality";
+import { ZohoSpeciality } from "@/types/types";
 import { zohoSpecialityService } from "@/modules/zoho-speciality/services/zoho-speciality-service";
 import { Edit, Ellipsis, Trash } from "lucide-react";
 import EditZohoSpeciality from "@/components/(main)/zoho-speciality/edit-zoho-speciality";

@@ -5,8 +5,9 @@ import { getZohoApplicationsColumns } from "@/components/data-table/columns/colu
 import { ZohoApplicationsDataTableToolbar } from "@/components/data-table/toolbars/zoho-applications-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
-import { ZohoApplication } from "@/modules/zoho-applications/models/zoho-application";
+import { ZohoApplication } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ZohoApplicationsManagementPage({
   type,
@@ -22,7 +23,7 @@ export default function ZohoApplicationsManagementPage({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
-
+  const { userProfile } = useAuth();
   async function fetchApplications() {
     setIsRefetching(true);
     try {
@@ -30,7 +31,10 @@ export default function ZohoApplicationsManagementPage({
         await zohoApplicationsService.getApplicationsPagination(
           `%${debouncedSearchTerm}%`,
           pageSize,
-          currentPage
+          currentPage,
+          userProfile?.id || "",
+          userProfile?.roles?.name || "",
+          userProfile?.agency_id || ""
         );
 
       setListApplications(applicationsResponse.applications);

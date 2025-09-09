@@ -5,8 +5,9 @@ import { getZohoStudentsColumns } from "@/components/data-table/columns/column-z
 import { ZohoStudentsDataTableToolbar } from "@/components/data-table/toolbars/zoho-students-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
-import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+import { ZohoStudent } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [listStudents, setListStudents] = useState<ZohoStudent[]>([]);
@@ -16,7 +17,7 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
-
+  const { userProfile } = useAuth();
   async function fetchStudents() {
     setIsRefetching(true);
     try {
@@ -24,7 +25,10 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
         await zohoStudentsService.getStudentsPagination(
           `%${debouncedSearchTerm}%`,
           pageSize,
-          currentPage
+          currentPage,
+          userProfile?.id || "",
+          userProfile?.roles?.name || "",
+          userProfile?.agency_id || ""
         );
 
       setListStudents(studentsResponse.students);

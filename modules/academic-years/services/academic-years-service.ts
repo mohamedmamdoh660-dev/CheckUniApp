@@ -6,8 +6,8 @@ import {
   GET_ACADEMIC_YEAR_BY_ID,
   UPDATE_ACADEMIC_YEAR,
 } from "./academic-years-graphql";
-import { AcademicYear } from "../models/academic-year";
 import { supabaseClient } from "@/lib/supabase-auth-client";
+import { ZohoAcademicYear } from "@/types/types";
 
 class AcademicYearsService {
   // Get academic years with pagination, search, and sorting
@@ -62,7 +62,7 @@ class AcademicYearsService {
   }
 
   // Create a new academic year
-  async createAcademicYear(academicYearData: Partial<AcademicYear>) {
+  async createAcademicYear(academicYearData: Partial<ZohoAcademicYear>) {
     try {
       const response = await executeGraphQLBackend(CREATE_ACADEMIC_YEAR, {
         objects: [academicYearData]
@@ -80,7 +80,7 @@ class AcademicYearsService {
   }
 
   // Update an existing academic year
-  async updateAcademicYear(id: string, academicYearData: Partial<AcademicYear>) {
+  async updateAcademicYear(id: string, academicYearData: Partial<ZohoAcademicYear>) {
     try {
       const response = await executeGraphQLBackend(UPDATE_ACADEMIC_YEAR, {
         id,

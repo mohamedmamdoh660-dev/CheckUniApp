@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 // Custom legend component that shows both color and value
 const CustomLegend = (props: any) => {
@@ -65,9 +66,15 @@ export function AdminUniversityReport() {
   const [selectedDegree, setSelectedDegree] = useState("All");
   const [degrees, setDegrees] = useState<string[]>(["All"]);
 
+  const { userProfile } = useAuth();
+
   const fetchData = async () => {
     try {
-      const data = await dashboardService.getUniversityDistribution();
+      const data = await dashboardService.getUniversityDistribution(
+        userProfile?.id,
+        userProfile?.agency_id,
+        userProfile?.roles?.name
+      );
 
       // Limit to top universities for better visualization
       const sortedData = [...data].sort(

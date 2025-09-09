@@ -24,7 +24,7 @@ import {
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ZohoLanguage } from "@/modules/zoho-languages/models/zoho-language";
+import { ZohoLanguage } from "@/types/types";
 
 // Define form validation schema
 const formSchema = z.object({

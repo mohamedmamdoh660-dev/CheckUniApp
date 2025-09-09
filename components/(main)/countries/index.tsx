@@ -5,11 +5,11 @@ import { columnsCountries } from "@/components/data-table/columns/column-countri
 import { CountriesToolbar } from "@/components/data-table/toolbars/countries-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { countriesService } from "@/modules/countries/services/countries-service";
-import { Country } from "@/modules/countries/models/country";
+import { ZohoCountry } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function CountriesManagementPage({ type }: { type: string }) {
-  const [listCountries, setListCountries] = useState<Country[]>([]);
+  const [listCountries, setListCountries] = useState<ZohoCountry[]>([]);
   const [recordCount, setRecordCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);

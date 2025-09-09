@@ -1,6 +1,6 @@
 "use client";
 
-import { Announcement } from "@/modules/announcements/models/announcement";
+import { ZohoAnnouncement } from "@/types/types";
 import {
   Card,
   CardContent,
@@ -30,9 +30,9 @@ import EditAnnouncementDialog from "./component/edit-announcement";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 interface AnnouncementCardProps {
-  announcement: Announcement;
+  announcement: ZohoAnnouncement;
   onRefresh?: () => void;
-  onView?: (announcement: Announcement) => void;
+  onView?: (announcement: ZohoAnnouncement) => void;
 }
 
 export default function AnnouncementCard({

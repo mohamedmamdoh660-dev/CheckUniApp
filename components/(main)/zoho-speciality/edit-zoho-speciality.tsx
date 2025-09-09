@@ -25,9 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
-import { ZohoSpeciality } from "@/modules/zoho-speciality/models/zoho-speciality";
-import { zohoFacultyService } from "@/modules/zoho-faculty/services/zoho-faculty-service";
-import { ZohoFaculty } from "@/modules/zoho-faculty/models/zoho-faculty";
+import { ZohoSpeciality } from "@/types/types";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -52,8 +50,6 @@ export default function EditZohoSpeciality({
   onRefresh,
 }: EditZohoSpecialityProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [faculties, setFaculties] = useState<ZohoFaculty[]>([]);
-  const [isLoadingFaculties, setIsLoadingFaculties] = useState(false);
 
   // Initialize form
   const form = useForm<FormSchema>({

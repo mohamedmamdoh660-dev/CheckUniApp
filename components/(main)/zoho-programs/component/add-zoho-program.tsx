@@ -33,6 +33,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 import { SearchableDropdown } from "@/components/searchable-dropdown";
+import { useAuth } from "@/context/AuthContext";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -66,6 +67,7 @@ export default function AddZohoProgram({
   onRefresh,
 }: AddZohoProgramProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { userProfile } = useAuth();
 
   // Initialize form
   const form = useForm<FormSchema>({
@@ -109,6 +111,7 @@ export default function AddZohoProgram({
         active: values.active,
         active_applications: values.active_applications,
         study_years: values.study_years,
+        user_id: userProfile?.id,
       };
 
       await zohoProgramsService.createProgram(programData);

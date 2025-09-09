@@ -27,17 +27,28 @@ import { dashboardService } from "@/modules/dashboard/services/dashboard-service
 import Image from "next/image";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export function RecentApplications() {
   const [isReloading, setIsReloading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState<any[]>([]);
   const router = useRouter();
+  const { userProfile } = useAuth();
 
-  const fetchApplications = async () => {
+  const fetchApplications = async (
+    userId: string | undefined,
+    agencyId: string | undefined,
+    role: string | undefined
+  ) => {
     try {
       setLoading(true);
-      const data = await dashboardService.getRecentApplications(10);
+      const data = await dashboardService.getRecentApplications(
+        10,
+        userId,
+        agencyId,
+        role
+      );
       setApplications(data);
     } catch (error) {
       console.error("Error fetching recent applications:", error);
@@ -48,13 +59,21 @@ export function RecentApplications() {
   };
 
   useEffect(() => {
-    fetchApplications();
+    fetchApplications(
+      userProfile?.id,
+      userProfile?.agency_id,
+      userProfile?.roles?.name
+    );
   }, []);
 
   const handleReload = async () => {
     setIsReloading(true);
     try {
-      await fetchApplications();
+      await fetchApplications(
+        userProfile?.id,
+        userProfile?.agency_id,
+        userProfile?.roles?.name
+      );
     } catch (error) {
       console.error("Error reloading applications:", error);
       toast.error("Failed to reload applications");

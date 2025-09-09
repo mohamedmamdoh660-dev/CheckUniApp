@@ -8,7 +8,7 @@ import {
   UPDATE_CITY,
   GET_COUNTRIES
 } from "./zoho-cities-graphql";
-import { ZohoCity, ZohoCountry } from "../models/zoho-city";
+import { ZohoCity, ZohoCountry } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export const zohoCitiesService = {

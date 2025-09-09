@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../data-table-column-header";
 import { ZohoDegreesTableRowActions } from "../actions/zoho-degrees-actions";
 import { currentTimezone } from "@/lib/helper/current-timezone";
-import { ZohoDegree } from "@/modules/zoho-degrees/models/zoho-degree";
+import { ZohoDegree } from "@/types/types";
 import { StatusBadge } from "@/components/ui/status-badge";
 
 export function getZohoDegreesColumns(
@@ -64,9 +64,7 @@ export function getZohoDegreesColumns(
         const created = row.original.created_at;
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
-            {created
-              ? currentTimezone(created)?.toLocaleString()?.replace("GMT", "")
-              : "-"}
+            {currentTimezone(created)}
           </div>
         );
       },

@@ -7,14 +7,6 @@ import { ChevronDown, Search, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -66,7 +58,6 @@ const fetchTableData = async (
     // Fetch data based on table type
     switch (table) {
       case "zoho-universities":
-        // Fetch universities and filter client-side for now
         const allUniversities = await zohoProgramsService.getUniversities(
           searchTerm,
           page,
@@ -80,7 +71,6 @@ const fetchTableData = async (
         break;
 
       case "zoho-countries":
-        // Fetch countries and filter client-side for now
         const allCountries = await zohoProgramsService.getCountries(
           searchTerm,
           page,
@@ -94,7 +84,6 @@ const fetchTableData = async (
         break;
 
       case "zoho-cities":
-        // Fetch cities and filter client-side for now
         const allCities = await zohoProgramsService.getCities(
           searchTerm,
           page,
@@ -108,8 +97,6 @@ const fetchTableData = async (
         break;
 
       case "zoho-degrees":
-        // For now, we'll use the regular getDegrees method and filter client-side
-        // This can be updated when a paginated version is available
         const allDegrees = await zohoProgramsService.getDegrees(
           searchTerm,
           page,
@@ -123,7 +110,6 @@ const fetchTableData = async (
         break;
 
       case "zoho-languages":
-        // For now, we'll use the regular getLanguages method and filter client-side
         const allLanguages = await zohoProgramsService.getLanguages(
           searchTerm,
           page,
@@ -137,7 +123,6 @@ const fetchTableData = async (
         break;
 
       case "zoho-specialities":
-        // For now, we'll use the regular getSpecialities method and filter client-side
         const allSpecialities = await zohoProgramsService.getSpecialities(
           searchTerm,
           page,
@@ -151,7 +136,6 @@ const fetchTableData = async (
         break;
 
       case "zoho-faculties":
-        // For now, we'll use the regular getFacilities method and filter client-side
         const allFaculties = await zohoProgramsService.getFacilities(
           searchTerm,
           page,
@@ -213,7 +197,6 @@ const fetchTableData = async (
         break;
 
       default:
-        // Fallback to mock data for testing or unknown tables
         console.warn(
           `No service method defined for table: ${table}, using mock data`
         );
@@ -258,6 +241,10 @@ export function SearchableDropdown({
   const [page, setPage] = useState(0);
   const [selectedItem, setSelectedItem] = useState<DropdownItem | null>(null);
   const [initialLoaded, setInitialLoaded] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // Load initial data or search results
@@ -301,29 +288,26 @@ export function SearchableDropdown({
 
   useEffect(() => {
     loadData(0, debouncedSearchTerm);
+    setHighlightedIndex(-1);
   }, [debouncedSearchTerm, loadData]);
 
   // Handle initial value
   useEffect(() => {
     if (initialValue && initialLoaded === false) {
-      // Find the item with the matching id in the loaded items
       const found = items.find((item) => item.id === initialValue);
 
       if (found) {
         setSelectedItem(found);
         setInitialLoaded(true);
       } else {
-        // If we've loaded items but didn't find a match, try to fetch the specific item
         const fetchInitialItem = async () => {
           try {
-            // This is a simplified approach - in a real app, you might need a specific API call
-            // to fetch a single item by ID
             const result = await fetchTableData(
               table,
-              "", // No search term
-              "id", // Search by ID
-              0, // First page
-              1, // Just need one item
+              "",
+              "id",
+              0,
+              1,
               { field: "id", value: initialValue },
               initialValue as string
             );
@@ -350,71 +334,177 @@ export function SearchableDropdown({
     }
   };
 
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isOpen) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev < items.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (highlightedIndex >= 0 && highlightedIndex < items.length) {
+          handleSelect(items[highlightedIndex]);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setIsOpen(false);
+        setSearchTerm("");
+        break;
+    }
+  };
+
   const handleSelect = (item: DropdownItem) => {
     setSelectedItem(item);
     setIsOpen(false);
     setSearchTerm("");
+    setHighlightedIndex(-1);
     onSelect(item);
   };
 
+  // Focus search input when dropdown opens
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
+
+  // Custom outside click handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node) &&
+        isOpen
+      ) {
+        setIsOpen(false);
+        setSearchTerm("");
+      }
+    };
+
+    if (isOpen) {
+      // Add delay to avoid immediate closing
+      setTimeout(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+      }, 100);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <div className={cn("w-full", className)}>
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={isOpen}
-            className="w-full justify-between text-left font-normal bg-transparent"
-            disabled={disabled}
-          >
-            <span className="truncate">
-              {selectedItem
-                ? selectedItem[displayField] +
-                  " " +
-                  (selectedItem[displayField2] || "")
-                : placeholder}
-            </span>
-            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          className="p-0"
-          align="start"
-          sideOffset={4}
+    <div className={cn("w-full relative", className)} ref={containerRef}>
+      <Button
+        type="button"
+        variant="outline"
+        role="combobox"
+        aria-expanded={isOpen}
+        className="w-full justify-between text-left font-normal bg-transparent"
+        disabled={disabled}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+      >
+        <span className="truncate">
+          {selectedItem
+            ? selectedItem[displayField] +
+              " " +
+              (selectedItem[displayField2] || "")
+            : placeholder}
+        </span>
+        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      </Button>
+
+      {isOpen && (
+        <div
+          className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground rounded-md border shadow-md"
           style={{
-            width: "var(--radix-popover-trigger-width)",
-            pointerEvents: "auto",
+            minWidth: "var(--radix-popover-trigger-width)",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
           }}
         >
-          <Command className="w-full">
-            <CommandInput
-              placeholder={`Search ${table}...`}
-              value={searchTerm}
-              onValueChange={setSearchTerm}
-              className="h-9 pointer-events-auto"
-              autoFocus
-            />
-            <CommandList className="max-h-60" onScroll={handleScroll}>
-              <CommandEmpty>
-                {loading ? (
-                  <div className="flex items-center justify-center p-4">
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    <span className="text-sm text-muted-foreground">
-                      Loading...
-                    </span>
-                  </div>
-                ) : (
-                  "No results found"
-                )}
-              </CommandEmpty>
-              <CommandGroup>
-                {items.map((item) => (
-                  <CommandItem
+          <div className="flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground">
+            {/* Search Input */}
+            <div className="flex h-9 items-center gap-2 border-b px-3">
+              <Search className="h-4 w-4 shrink-0 opacity-50" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder={`Search ${table}...`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                }}
+                className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                autoComplete="off"
+              />
+            </div>
+
+            {/* Items List */}
+            <div
+              ref={listRef}
+              className="max-h-60 scroll-py-1 overflow-x-hidden overflow-y-auto"
+              onScroll={handleScroll}
+            >
+              {/* Empty State */}
+              {!loading && items.length === 0 && (
+                <div className="py-6 text-center text-sm">No results found</div>
+              )}
+
+              {/* Loading State */}
+              {loading && items.length === 0 && (
+                <div className="flex items-center justify-center p-4">
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  <span className="text-sm text-muted-foreground">
+                    Loading...
+                  </span>
+                </div>
+              )}
+
+              {/* Items */}
+              <div className="overflow-hidden p-1">
+                {items.map((item, index) => (
+                  <div
                     key={item.id}
-                    value={item.id}
-                    onSelect={() => handleSelect(item)}
-                    className="cursor-pointer"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleSelect(item);
+                    }}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    className={cn(
+                      "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none cursor-pointer",
+                      highlightedIndex === index
+                        ? "bg-accent text-accent-foreground"
+                        : "hover:bg-accent hover:text-accent-foreground"
+                    )}
                   >
                     <div className="flex items-center w-full">
                       <Check
@@ -464,9 +554,11 @@ export function SearchableDropdown({
                         )}
                       </div>
                     </div>
-                  </CommandItem>
+                  </div>
                 ))}
-                {loading && (
+
+                {/* Loading More */}
+                {loading && items.length > 0 && (
                   <div className="flex items-center justify-center p-4">
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     <span className="text-sm text-muted-foreground">
@@ -474,16 +566,18 @@ export function SearchableDropdown({
                     </span>
                   </div>
                 )}
+
+                {/* No More Results */}
                 {!hasMore && items.length > 0 && (
                   <div className="p-2 text-center text-sm text-muted-foreground">
                     No more results
                   </div>
                 )}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

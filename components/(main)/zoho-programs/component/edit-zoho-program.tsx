@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { ZohoProgram } from "@/modules/zoho-programs/models/zoho-program";
+import { ZohoProgram } from "@/types/types";
 import Image from "next/image";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
 

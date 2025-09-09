@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../data-table-column-header";
 import { currentTimezone } from "@/lib/helper/current-timezone";
-import { ZohoSpeciality } from "@/modules/zoho-speciality/models/zoho-speciality";
+import { ZohoSpeciality } from "@/types/types";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ZohoSpecialityTableRowActions } from "../actions/zoho-speciality-actions";
 
@@ -68,9 +68,7 @@ export function getZohoSpecialityColumns(
         const created = row.original.created_at;
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
-            {created
-              ? currentTimezone(created)?.toLocaleString()?.replace("GMT", "")
-              : "-"}
+            {currentTimezone(created)}
           </div>
         );
       },

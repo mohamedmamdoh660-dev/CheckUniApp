@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
 import {
@@ -44,8 +43,8 @@ import { format } from "date-fns";
 import { CalendarIcon, Upload, X, Plus, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
-import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
 import { saveFile } from "@/supabase/actions/save-file";
+import { useAuth } from "@/context/AuthContext";
 
 // Enhanced form validation schema based on the images
 const formSchema = z.object({
@@ -127,7 +126,7 @@ export default function StudentInformationForm({
     useState<React.ComponentProps<typeof Calendar>["captionLayout"]>(
       "dropdown"
     );
-
+  const { userProfile } = useAuth();
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -216,7 +215,7 @@ export default function StudentInformationForm({
     setIsLoading(true);
 
     try {
-      // Prepare documents data
+      // Prepare documents data - passing URLs instead of file objects
       const documentsData = documents
         .filter((doc) => doc.attachment_type && doc.url)
         .map((doc) => ({
@@ -225,7 +224,70 @@ export default function StudentInformationForm({
           filename: doc.file?.name || "",
         }));
 
-      const studentData = {
+      // Data for webhook - include ALL fields and files from every section
+      const webhookStudentData = {
+        // Student Basic Info Card
+        transfer_student: values.transfer_student,
+        have_tc: values.have_tc,
+        blue_card: values.blue_card,
+
+        // Personal Details
+        first_name: values.first_name,
+        last_name: values.last_name,
+        gender: values.gender,
+        date_of_birth: values.date_of_birth?.toISOString().split("T")[0],
+        nationality: values.nationality
+          ? values.nationality.toString()
+          : undefined,
+        passport_number: values.passport_number,
+        passport_issue_date: values.passport_issue_date
+          ?.toISOString()
+          .split("T")[0],
+        passport_expiry_date: values.passport_expiry_date
+          ?.toISOString()
+          .split("T")[0],
+        country_of_residence: values.country_of_residence
+          ? values.country_of_residence.toString()
+          : undefined,
+        student_id: values.student_id,
+
+        // Contact & Address Information
+        email: values.email,
+        mobile: values.mobile,
+        address_line_1: values.address_line_1,
+        city_district: values.city_district,
+        state_province: values.state_province,
+        postal_code: values.postal_code,
+        address_country: values.address_country,
+
+        // Family Information
+        father_name: values.father_name,
+        father_mobile: values.father_mobile,
+        father_job: values.father_occupation,
+        mother_name: values.mother_name,
+        mother_mobile: values.mother_mobile,
+        mother_job: values.mother_occupation,
+
+        // Academic Information
+        education_level: values.education_level,
+
+        // Photo Upload
+        photo_url: values.photo, // Pass the URL instead of file
+
+        // Documents
+        documents: documentsData,
+        user_id: userProfile?.id,
+        agency_id:
+          userProfile?.roles?.name === "agency"
+            ? userProfile?.id
+            : userProfile?.roles?.name === "admin"
+              ? null
+              : userProfile?.agency_id,
+      };
+      console.log("🚀 ~ onSubmit ~ webhookStudentData:", webhookStudentData);
+
+      // Data for database - only include the fields we're already passing
+      const dbStudentData = {
         first_name: values.first_name,
         last_name: values.last_name,
         gender: values.gender,
@@ -251,18 +313,24 @@ export default function StudentInformationForm({
         mother_name: values.mother_name,
         mother_mobile: values.mother_mobile,
         mother_job: values.mother_occupation,
-        photo_url: photoUrl,
-        documents: documentsData,
       };
 
       if (mode === "create") {
         // Create new student
-        const webhookResponse = await createStudentViaWebhook(studentData);
+        const webhookResponse =
+          await createStudentViaWebhook(webhookStudentData);
 
         if (webhookResponse.status) {
           const studentDataWithId = {
-            ...studentData,
+            ...dbStudentData,
             id: webhookResponse.id,
+            user_id: userProfile?.id,
+            agency_id:
+              userProfile?.roles?.name === "agency"
+                ? userProfile?.id
+                : userProfile?.roles?.name === "admin"
+                  ? null
+                  : userProfile?.agency_id,
           };
 
           await zohoStudentsService.createStudent(studentDataWithId);
@@ -277,13 +345,13 @@ export default function StudentInformationForm({
         // Update existing student
         const webhookResponse = await updateStudentViaWebhook({
           id: studentId,
-          ...studentData,
+          ...webhookStudentData,
         });
 
         if (webhookResponse.status) {
           await zohoStudentsService.updateStudent({
             id: studentId,
-            ...studentData,
+            ...dbStudentData, // Only update the fields we're already passing
           });
           toast.success("Student updated successfully");
           router.push("/students");
@@ -384,10 +452,11 @@ export default function StudentInformationForm({
 
     setPhotoUploading(true);
     try {
+      // Upload file to Supabase and get URL
       const url = await saveFile(file);
       if (url) {
         setPhotoUrl(url);
-        form.setValue("photo", url);
+        form.setValue("photo", url); // Store URL instead of file
         toast.success("Photo uploaded successfully");
       } else {
         toast.error("Failed to upload photo");
@@ -455,10 +524,11 @@ export default function StudentInformationForm({
     setDocuments([...newDocs]);
 
     try {
+      // Upload file to Supabase and get URL
       const url = await saveFile(file);
       if (url) {
-        newDocs[index].file = file;
-        newDocs[index].url = url;
+        newDocs[index].file = file; // Keep file for reference
+        newDocs[index].url = url; // Store the actual Supabase URL
         newDocs[index].uploading = false;
         setDocuments([...newDocs]);
         toast.success(`${file.name} uploaded successfully`);
@@ -863,23 +933,16 @@ export default function StudentInformationForm({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Country</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="-Select-" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="ae">
-                              United Arab Emirates
-                            </SelectItem>
-                            <SelectItem value="us">United States</SelectItem>
-                            <SelectItem value="uk">United Kingdom</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <SearchableDropdown
+                          placeholder="-Select-"
+                          table="zoho-countries"
+                          searchField="name"
+                          displayField="name"
+                          initialValue={field.value}
+                          onSelect={(item: { id: string }) => {
+                            field.onChange(item.id);
+                          }}
+                        />
                         <FormMessage />
                       </FormItem>
                     )}

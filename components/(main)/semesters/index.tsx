@@ -5,11 +5,11 @@ import { columnsSemesters } from "@/components/data-table/columns/column-semeste
 import { SemestersToolbar } from "@/components/data-table/toolbars/semesters-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { semestersService } from "@/modules/semesters/services/semesters-service";
-import { Semester } from "@/modules/semesters/models/semester";
+import { ZohoSemester } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function SemestersManagementPage({ type }: { type: string }) {
-  const [listSemesters, setListSemesters] = useState<Semester[]>([]);
+  const [listSemesters, setListSemesters] = useState<ZohoSemester[]>([]);
   const [recordCount, setRecordCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);

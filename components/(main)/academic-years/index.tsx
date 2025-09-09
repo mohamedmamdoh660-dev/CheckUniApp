@@ -5,7 +5,7 @@ import { columnsAcademicYears } from "@/components/data-table/columns/column-aca
 import { AcademicYearsToolbar } from "@/components/data-table/toolbars/academic-years-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { academicYearsService } from "@/modules/academic-years/services/academic-years-service";
-import { AcademicYear } from "@/modules/academic-years/models/academic-year";
+import { ZohoAcademicYear } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function AcademicYearsManagementPage({
@@ -13,9 +13,9 @@ export default function AcademicYearsManagementPage({
 }: {
   type: string;
 }) {
-  const [listAcademicYears, setListAcademicYears] = useState<AcademicYear[]>(
-    []
-  );
+  const [listAcademicYears, setListAcademicYears] = useState<
+    ZohoAcademicYear[]
+  >([]);
   const [recordCount, setRecordCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);

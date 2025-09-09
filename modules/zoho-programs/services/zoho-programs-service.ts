@@ -18,7 +18,7 @@ import {
   GET_ZOHO_UNIVERSITIES_BY_CITY,
   GET_ZOHO_UNIVERSITIES_BY_COUNTRY
 } from "./zoho-programs-graphql";
-import { ZohoCity, ZohoCountry, ZohoDegree, Zohofaculty, ZohoLanguage, ZohoProgram, ZohoSpeciality, ZohoUniversity } from "../models/zoho-program";
+import { ZohoCity, ZohoCountry, ZohoDegree, ZohoFaculty, ZohoLanguage, ZohoProgram, ZohoSpeciality, ZohoUniversity } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export const zohoProgramsService = {
@@ -36,14 +36,43 @@ export const zohoProgramsService = {
   /**
    * Get programs with pagination
    */
-  getProgramsPagination: async (search: string, limit: number, offset: number) => {
-    const response = await executeGraphQLBackend(GET_PROGRAMS_PAGINATION, { search, limit, offset: limit * offset });
-    const countResponse = await supabaseClient
-    .from('zoho_programs')
-    .select('id,name', { count: 'exact' })
-    .eq('active', true)
-    .ilike('name', `${search}`);
-      return {
+  getProgramsPagination: async (search: string, limit: number, offset: number, user_id: string, userRole: string, agency_id: string) => {
+    let filterConditions: any = [
+      { name: { ilike: search } },
+      { active: { eq: true } }
+    ];
+    
+    // Add user filtering based on role
+    // if (userRole === 'agency') {
+    //   filterConditions.push({ agency_id: { eq: user_id } });
+    // } else if (userRole !== 'admin') {
+    //   filterConditions.push({ user_id: { eq: user_id } });
+    // }
+    
+    const response = await executeGraphQLBackend(GET_PROGRAMS_PAGINATION, { 
+      search, 
+      limit, 
+      offset: limit * offset, 
+      filter: { and: filterConditions } 
+    });
+    
+    // Build the count query
+    let countQuery = supabaseClient
+      .from('zoho_programs')
+      .select('id,name', { count: 'exact' })
+      .eq('active', true)
+      .ilike('name', `${search}`);
+    
+    // Apply role-based filtering to count query
+    // if (userRole === 'agency') {
+    //   countQuery = countQuery.eq('agency_id', agency_id);
+    // } else if (userRole !== 'admin') {
+    //   countQuery = countQuery.eq('user_id', user_id);
+    // }
+    
+    const countResponse = await countQuery;
+    
+    return {
       programs: response.zoho_programsCollection.edges.map((edge: any) => edge.node),
       totalCount: countResponse.count
     };
@@ -247,7 +276,7 @@ export const zohoProgramsService = {
   /**
    * Get all facilities
    */
-  getFacilities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<Zohofaculty[]> => {
+  getFacilities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoFaculty[]> => {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;

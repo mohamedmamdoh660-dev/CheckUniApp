@@ -18,7 +18,7 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
-import { ZohoApplication } from "@/modules/zoho-applications/models/zoho-application";
+import { ZohoApplication } from "@/types/types";
 import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
 import {
   deleteApplicationViaWebhook,

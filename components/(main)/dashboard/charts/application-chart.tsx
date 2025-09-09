@@ -36,6 +36,7 @@ import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
+import { useAuth } from "@/context/AuthContext";
 
 const chartConfig = {
   pending: {
@@ -63,6 +64,8 @@ export function ApplicationChart() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
 
+  const { userProfile } = useAuth();
+
   React.useEffect(() => {
     if (isMobile) {
       setTimeRange("10");
@@ -72,7 +75,12 @@ export function ApplicationChart() {
   const loadData = async (days: number) => {
     setIsLoading(true);
     try {
-      const data = await dashboardService.getApplicationTimeline(days);
+      const data = await dashboardService.getApplicationTimeline(
+        days,
+        userProfile?.id,
+        userProfile?.agency_id,
+        userProfile?.roles?.name
+      );
       setChartData(data);
     } catch (error) {
       console.error("Error loading application timeline data:", error);
@@ -212,12 +220,12 @@ export function ApplicationChart() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="var(--color-pending)"
+                        // stopColor="var(--color-pending)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        stopColor="var(--color-pending)"
+                        // stopColor="var(--color-pending)"
                         stopOpacity={0.1}
                       />
                     </linearGradient>
@@ -230,12 +238,12 @@ export function ApplicationChart() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="var(--color-processing)"
+                        // stopColor="var(--color-processing)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        stopColor="var(--color-processing)"
+                        // stopColor="var(--color-processing)"
                         stopOpacity={0.1}
                       />
                     </linearGradient>
@@ -248,24 +256,24 @@ export function ApplicationChart() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="var(--color-completed)"
+                        // stopColor="var(--color-completed)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        stopColor="var(--color-completed)"
+                        // stopColor="var(--color-completed)"
                         stopOpacity={0.1}
                       />
                     </linearGradient>
                     <linearGradient id="fillFailed" x1="0" y1="0" x2="0" y2="1">
                       <stop
                         offset="5%"
-                        stopColor="var(--color-failed)"
+                        // stopColor="var(--color-failed)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        stopColor="var(--color-failed)"
+                        // stopColor="var(--color-failed)"
                         stopOpacity={0.1}
                       />
                     </linearGradient>

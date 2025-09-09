@@ -18,9 +18,9 @@ export const GET_PROGRAMS = `
 `;
 
 export const GET_PROGRAMS_PAGINATION = `
-  query GetProgramsPagination($search: String!, $limit: Int!, $offset: Int!) {
+  query GetProgramsPagination($search: String!, $limit: Int!, $offset: Int!, $filter: zoho_programsFilter) {
     zoho_programsCollection(
-      filter: { and: [{ name: { ilike: $search } }, { active: { eq: true } }] }
+      filter: $filter
       first: $limit
       offset: $offset
     orderBy: [{ created_at: DescNullsLast }]

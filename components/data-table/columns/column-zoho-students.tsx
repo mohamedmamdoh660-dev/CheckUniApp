@@ -4,8 +4,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../data-table-column-header";
 import { ZohoStudentsTableRowActions } from "../actions/zoho-students-actions";
 import { currentTimezone } from "@/lib/helper/current-timezone";
-import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ZohoStudent } from "@/types/types";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export function getZohoStudentsColumns(
@@ -146,9 +146,7 @@ export function getZohoStudentsColumns(
         const created = row.original.created_at;
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
-            {created
-              ? currentTimezone(created)?.toLocaleString()?.replace("GMT", "")
-              : "-"}
+            {currentTimezone(created)}
           </div>
         );
       },

@@ -7,7 +7,7 @@ import {
   INSERT_DEGREE,
   UPDATE_DEGREE
 } from "./zoho-degrees-graphql";
-import { ZohoDegree } from "../models/zoho-degree";
+import { ZohoDegree } from "@/types/types";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export const zohoDegreesService = {

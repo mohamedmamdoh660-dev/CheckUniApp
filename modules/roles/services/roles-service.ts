@@ -1,5 +1,5 @@
 import { executeGraphQL } from "@/lib/graphql-client";
-import { Role } from "../models/role";
+import { Role } from "@/types/types";
 import { 
   GET_ALL_ROLES, 
   GET_ROLE_BY_ID, 

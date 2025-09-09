@@ -7,6 +7,7 @@ import { Download, Plus, RefreshCcw, X, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import AddZohoProgram from "@/components/(main)/zoho-programs/component/add-zoho-program";
+import { useAuth } from "@/context/AuthContext";
 
 interface DataTableToolbarProps<TData> {
   table?: Table<TData>;
@@ -29,6 +30,7 @@ export function ZohoProgramsDataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [globalFilter, setGlobalFilter] = useState<string>("");
+  const { userProfile } = useAuth();
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -88,16 +90,18 @@ export function ZohoProgramsDataTableToolbar<TData>({
         </Button>
       </div>
       {table && <DataTableViewOptions table={table} />}
-      <div className="pl-2">
-        <Button
-          variant="default"
-          size="sm"
-          className="ml-auto h-8"
-          onClick={() => setIsDialogOpen(true)}
-        >
-          <Plus className="mr-1 h-4 w-4" /> Add Program
-        </Button>
-      </div>
+      {/* {userProfile?.roles?.name === "admin" && (
+        <div className="pl-2">
+          <Button
+            variant="default"
+            size="sm"
+            className="ml-auto h-8"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Plus className="mr-1 h-4 w-4" /> Add Program
+          </Button>
+        </div>
+      )} */}
       <AddZohoProgram
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}

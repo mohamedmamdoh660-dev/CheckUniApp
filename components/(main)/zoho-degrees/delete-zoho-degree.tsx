@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ZohoDegree } from "@/modules/zoho-degrees/models/zoho-degree";
+import { ZohoDegree } from "@/types/types";
 import { zohoDegreesService } from "@/modules/zoho-degrees/services/zoho-degrees-service";
 
 interface DeleteZohoDegreeProps {

@@ -41,6 +41,7 @@ import { format } from "date-fns";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
+import { useAuth } from "@/context/AuthContext";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -75,6 +76,7 @@ export default function AddZohoStudent({
   onRefresh,
 }: AddZohoStudentProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { userProfile } = useAuth();
   const [dropdown] =
     useState<React.ComponentProps<typeof Calendar>["captionLayout"]>(
       "dropdown"
@@ -144,6 +146,13 @@ export default function AddZohoStudent({
         const studentDataWithId = {
           ...studentData,
           id: webhookResponse.id,
+          user_id: userProfile?.id,
+          agency_id:
+            userProfile?.roles?.name === "agency"
+              ? userProfile?.id
+              : userProfile?.roles?.name === "admin"
+                ? null
+                : userProfile?.agency_id,
         };
 
         await zohoStudentsService.createStudent(studentDataWithId);

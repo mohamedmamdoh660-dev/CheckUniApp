@@ -235,3 +235,11 @@ html {
   display: none; /* Safari and Chrome */
 }
 
+.searchable-dropdown-content {
+  pointer-events: auto !important;
+}
+
+/* Ensure popover has higher z-index than dialog */
+[data-radix-popover-content] {
+  z-index: 60 !important;
+}
