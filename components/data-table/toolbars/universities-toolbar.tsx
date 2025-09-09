@@ -6,7 +6,6 @@ import { Table } from "@tanstack/react-table";
 import { X, Plus, RefreshCcw, Search } from "lucide-react";
 import { useState } from "react";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
-import { University } from "@/modules/universities/models/university";
 import AddUniversity from "@/components/(main)/universities/component/add-university";
 
 interface UniversitiesToolbarProps<TData> {
