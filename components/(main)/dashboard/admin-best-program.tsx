@@ -24,20 +24,7 @@ import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
 import { supabase } from "@/lib/supabase-auth-client";
-
-// Fixed color palette
-const COLORS = [
-  "#2563eb", // blue
-  "#16a34a", // green
-  "#f59e0b", // amber
-  "#dc2626", // red
-  "#9333ea", // purple
-  "#0d9488", // teal
-  "#0891b2", // cyan
-  "#4f46e5", // indigo
-  "#db2777", // pink
-  "#65a30d", // lime
-];
+import { COLORS } from "@/utils/colors";
 
 // Custom tooltip
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -81,7 +68,7 @@ export function AdminBestProgram() {
       // Add colors to the data
       const coloredData = data.map((item: any, index: number) => ({
         ...item,
-        fill: COLORS[index % COLORS.length],
+        fill: COLORS[index],
         value: item.applications, // Ensure 'value' is set for the chart
       }));
 
@@ -153,15 +140,15 @@ export function AdminBestProgram() {
 
       <CardContent className="flex-1 pb-0 pl-0 relative left-[-20px]">
         {isLoading || isRefreshing ? (
-          <div className="flex items-center justify-center h-[300px]">
+          <div className="flex items-center justify-center h-[450px]">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : chartData.length === 0 ? (
-          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[450px] text-muted-foreground">
             No data available
           </div>
         ) : (
-          <div className="h-[300px] w-full">
+          <div className="h-[450px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}

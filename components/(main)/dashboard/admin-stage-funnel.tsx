@@ -22,16 +22,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
-
-// Fixed color palette
-const COLORS = [
-  "#2563eb", // blue
-  "#16a34a", // green
-  "#f59e0b", // amber
-  "#dc2626", // red
-  "#9333ea", // purple
-  "#0d9488", // teal
-];
+import { COLORS } from "@/utils/colors";
 
 // Custom tooltip
 const CustomTooltip = ({ active, payload }: any) => {
@@ -65,7 +56,7 @@ export function AdminStageFunnel() {
       // Assign fixed colors
       const coloredData = sortedData.map((item, index) => ({
         ...item,
-        fill: COLORS[index % COLORS.length],
+        fill: COLORS[index],
       }));
 
       setChartData(coloredData);
@@ -112,15 +103,15 @@ export function AdminStageFunnel() {
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         {isLoading ? (
-          <div className="flex items-center justify-center h-[400px]">
+          <div className="flex items-center justify-center h-[450px]">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : chartData.length === 0 ? (
-          <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[450px] text-muted-foreground">
             No data available
           </div>
         ) : (
-          <div className="h-[400px] w-full">
+          <div className="h-[450px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <FunnelChart>
                 <Tooltip content={<CustomTooltip />} />

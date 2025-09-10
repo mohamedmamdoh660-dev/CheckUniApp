@@ -16,16 +16,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
-
-// Fixed color palette - similar to admin-stage-funnel.tsx
-const COLORS = [
-  "#2563eb", // blue
-  "#16a34a", // green
-  "#f59e0b", // amber
-  "#dc2626", // red
-  "#9333ea", // purple
-  "#0d9488", // teal
-];
+import { COLORS } from "@/utils/colors";
 
 // Custom tooltip
 const CustomTooltip = ({ active, payload }: any) => {
@@ -59,7 +50,7 @@ const CustomLegend = (props: any) => {
             className="w-3 h-3 rounded-full"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-sm">
+          <span className="text-xs">
             {entry.value}: {entry.payload.applications}
           </span>
         </li>
@@ -105,7 +96,7 @@ export function UniversityDistributionChart() {
       // Add colors using our fixed color palette
       const coloredData = dataWithPercentage.map((item, index) => ({
         ...item,
-        fill: COLORS[index % COLORS.length],
+        fill: COLORS[index],
       }));
 
       setChartData(coloredData);
@@ -151,15 +142,15 @@ export function UniversityDistributionChart() {
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         {isLoading ? (
-          <div className="flex items-center justify-center h-[300px]">
+          <div className="flex items-center justify-center h-[450px]">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : chartData.length === 0 ? (
-          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[450px] text-muted-foreground">
             No data available
           </div>
         ) : (
-          <div className="h-[300px] w-full">
+          <div className="h-[450px] w-full">
             <PieChart
               width={400}
               height={300}
