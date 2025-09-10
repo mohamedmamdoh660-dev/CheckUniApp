@@ -35,6 +35,8 @@ export const GET_STUDENTS_PAGINATION = `
       filter: $filter
       first: $limit
       offset: $offset
+            orderBy: [{ created_at: DescNullsLast }]
+
     ) {
       edges {
         node {

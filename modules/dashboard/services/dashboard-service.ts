@@ -37,7 +37,7 @@ export const dashboardService = {
   /**
    * Get application stages count
    */
-  getApplicationStages: async () => {
+  getApplicationStagesCount: async () => {
     try {
       // Get pending applications count
       const { count: pending, error: pendingError } = await supabase
@@ -78,7 +78,7 @@ export const dashboardService = {
         failed: failed || 0
       };
     } catch (error) {
-      console.error("Error fetching application stages:", error);
+      console.error("Error fetching application stages count:", error);
       throw error;
     }
   },
@@ -236,6 +236,28 @@ export const dashboardService = {
   },
 
   /**
+   * Get all available application stages
+   */
+  getApplicationStages: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('zoho_applications')
+        .select('stage')
+        .not('stage', 'is', null)
+        .order('stage');
+      
+      if (error) throw error;
+      
+      // Extract unique stages
+      const uniqueStages = Array.from(new Set(data.map((item: any) => item.stage.toLowerCase())));
+      return uniqueStages;
+    } catch (error) {
+      console.error("Error fetching application stages:", error);
+      throw error;
+    }
+  },
+
+  /**
    * Get application timeline data
    */
   getApplicationTimeline: async (days = 30, userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
@@ -244,6 +266,9 @@ export const dashboardService = {
       const endDate = new Date();
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
+
+      // First get all possible stages
+      const stages = await dashboardService.getApplicationStages();
 
       // Fetch applications within the date range
       const query = supabase
@@ -268,13 +293,14 @@ export const dashboardService = {
         const date = new Date(endDate);
         date.setDate(date.getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
-        dateMap.set(dateStr, {
-          date: dateStr,
-          pending: 0,
-          processing: 0,
-          completed: 0,
-          failed: 0
+        
+        // Create empty entry with all stages initialized to 0
+        const entry: Record<string, any> = { date: dateStr };
+        stages.forEach(stage => {
+          entry[stage] = 0;
         });
+        
+        dateMap.set(dateStr, entry);
       }
 
       // Fill in the data
@@ -282,18 +308,19 @@ export const dashboardService = {
         const dateStr = new Date(app.created_at).toISOString().split('T')[0];
         if (dateMap.has(dateStr)) {
           const entry = dateMap.get(dateStr);
-          const stage = app.stage?.toLowerCase() || 'pending';
-          if (['pending', 'processing', 'completed', 'failed'].includes(stage)) {
+          const stage = app.stage?.toLowerCase();
+          if (stage && stages.includes(stage)) {
             entry[stage]++;
           }
         }
       });
 
-      // Convert map to array and sort by date
-      const result = Array.from(dateMap.values())
+      // Convert map to array and sort by date (ascending order)
+      let result = Array.from(dateMap.values())
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-      return result;
+      
+     
+      return { data: result, stages };
     } catch (error) {
       console.error("Error fetching application timeline:", error);
       throw error;

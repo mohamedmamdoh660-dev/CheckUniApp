@@ -148,7 +148,7 @@ export function RecentApplications() {
                     <TableHead>Academic Year/Semester</TableHead>
                     <TableHead>Created At</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="w-[70px]">Actions</TableHead>
+                    {/* <TableHead className="w-[70px]">Actions</TableHead> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -218,7 +218,7 @@ export function RecentApplications() {
                       <TableCell>
                         <StatusBadge status={application.stage || "pending"} />
                       </TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -235,7 +235,7 @@ export function RecentApplications() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>

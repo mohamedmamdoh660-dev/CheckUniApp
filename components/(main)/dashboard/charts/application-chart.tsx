@@ -37,30 +37,28 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
 import { useAuth } from "@/context/AuthContext";
+import { COLORS } from "@/utils/colors";
 
-const chartConfig = {
-  pending: {
-    label: "Pending",
-    color: "var(--chart-1)",
-  },
-  processing: {
-    label: "Processing",
-    color: "var(--chart-2)",
-  },
-  completed: {
-    label: "Completed",
-    color: "var(--chart-3)",
-  },
-  failed: {
-    label: "Failed",
-    color: "var(--chart-4)",
-  },
-} satisfies ChartConfig;
+// Dynamic chart config will be generated based on available stages
+const generateChartConfig = (stages: string[]): ChartConfig => {
+  const config: Record<string, { label: string; color: string }> = {};
+
+  stages.forEach((stage, index) => {
+    config[stage] = {
+      label: stage.charAt(0).toUpperCase() + stage.slice(1),
+      color: COLORS[index],
+    };
+  });
+
+  return config;
+};
 
 export function ApplicationChart() {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState("30");
   const [chartData, setChartData] = React.useState<any[]>([]);
+  const [stages, setStages] = React.useState<string[]>([]);
+  const [chartConfig, setChartConfig] = React.useState<ChartConfig>({});
   const [isLoading, setIsLoading] = React.useState(true);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
 
@@ -72,27 +70,37 @@ export function ApplicationChart() {
     }
   }, [isMobile]);
 
-  const loadData = async (days: number) => {
-    setIsLoading(true);
-    try {
-      const data = await dashboardService.getApplicationTimeline(
-        days,
-        userProfile?.id,
-        userProfile?.agency_id,
-        userProfile?.roles?.name
-      );
-      setChartData(data);
-    } catch (error) {
-      console.error("Error loading application timeline data:", error);
-      toast.error("Failed to load application timeline");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const loadData = React.useCallback(
+    async (days: number) => {
+      setIsLoading(true);
+      try {
+        const result = await dashboardService.getApplicationTimeline(
+          days,
+          userProfile?.id,
+          userProfile?.agency_id,
+          userProfile?.roles?.name
+        );
+
+        // Set chart data and stages
+        setChartData(result.data);
+        setStages(result.stages);
+
+        // Generate chart config based on stages
+        const config = generateChartConfig(result.stages);
+        setChartConfig(config);
+      } catch (error) {
+        console.error("Error loading application timeline data:", error);
+        toast.error("Failed to load application timeline");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [userProfile]
+  );
 
   React.useEffect(() => {
     loadData(parseInt(timeRange));
-  }, [timeRange]);
+  }, [timeRange, loadData]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -192,91 +200,46 @@ export function ApplicationChart() {
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         {isLoading ? (
-          <div className="flex items-center justify-center h-[250px]">
+          <div className="flex items-center justify-center h-[400px]">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : chartData.length === 0 ? (
-          <div className="flex items-center justify-center h-[250px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[400px] text-muted-foreground">
             No data available
           </div>
         ) : (
-          <div className="aspect-auto h-[250px] w-full">
+          <div className="aspect-auto h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <ChartContainer
                 config={chartConfig}
-                className="aspect-auto h-[250px] w-full"
+                className="aspect-auto h-[400px] w-full"
               >
                 <AreaChart
                   data={chartData}
                   margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                 >
                   <defs>
-                    <linearGradient
-                      id="fillPending"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor="var(--color-pending)"
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="var(--color-pending)"
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
-                    <linearGradient
-                      id="fillProcessing"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor="var(--color-processing)"
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="var(--color-processing)"
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
-                    <linearGradient
-                      id="fillCompleted"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor="var(--color-completed)"
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="var(--color-completed)"
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
-                    <linearGradient id="fillFailed" x1="0" y1="0" x2="0" y2="1">
-                      <stop
-                        offset="5%"
-                        stopColor="var(--color-failed)"
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="var(--color-failed)"
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
+                    {stages.map((stage, index) => (
+                      <linearGradient
+                        key={`fill-${stage}`}
+                        id={`fill${stage.charAt(0).toUpperCase() + stage.slice(1)}`}
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor={COLORS[index]}
+                          stopOpacity={0.3}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor={COLORS[index]}
+                          stopOpacity={0.05}
+                        />
+                      </linearGradient>
+                    ))}
                   </defs>
                   <CartesianGrid vertical={false} opacity={0.1} />
                   <XAxis
@@ -301,38 +264,18 @@ export function ApplicationChart() {
                   />
                   <Tooltip content={<CustomTooltip />} cursor={false} />
                   <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="pending"
-                    name="Pending"
-                    stroke="var(--color-pending)"
-                    fill="url(#fillPending)"
-                    stackId="a"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="processing"
-                    name="Processing"
-                    stroke="var(--color-processing)"
-                    fill="url(#fillProcessing)"
-                    stackId="a"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="completed"
-                    name="Completed"
-                    stroke="var(--color-completed)"
-                    fill="url(#fillCompleted)"
-                    stackId="a"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="failed"
-                    name="Failed"
-                    stroke="var(--color-failed)"
-                    fill="url(#fillFailed)"
-                    stackId="a"
-                  />
+                  {stages.map((stage, index) => (
+                    <Area
+                      key={`area-${stage}`}
+                      type="monotone"
+                      dataKey={stage}
+                      name={stage.charAt(0).toUpperCase() + stage.slice(1)}
+                      stroke={COLORS[index]}
+                      strokeWidth={2}
+                      fill={`url(#fill${stage.charAt(0).toUpperCase() + stage.slice(1)})`}
+                      isAnimationActive={true}
+                    />
+                  ))}
                 </AreaChart>
               </ChartContainer>
             </ResponsiveContainer>

@@ -74,6 +74,7 @@ export const GET_APPLICATIONS_PAGINATION = `
       filter: $filter
       first: $limit
       offset: $offset
+      orderBy: [{ created_at: DescNullsLast }]
     ) {
       edges {
         node {
