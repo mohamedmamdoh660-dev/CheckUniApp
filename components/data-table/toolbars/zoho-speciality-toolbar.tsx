@@ -88,7 +88,7 @@ export function ZohoSpecialityDataTableToolbar<TData>({
         </Button>
       </div>
       {table && <DataTableViewOptions table={table} />}
-      <div className="pl-2">
+      {/* <div className="pl-2">
         <Button
           variant="default"
           size="sm"
@@ -102,7 +102,7 @@ export function ZohoSpecialityDataTableToolbar<TData>({
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onRefresh={fetchRecords}
-      />
+      /> */}
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
-import { Settings } from "@/modules/settings/models/setting";
+import { Settings } from "@/types/types";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export function TeamSwitcher({

@@ -1,6 +1,6 @@
 "use server";
 
-import { ZohoStudent } from "@/modules/zoho-students/models/zoho-student";
+import { ZohoStudent } from "@/types/types";
 
 // N8n webhook URLs
 const CREATE_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/da599eaf-7f5e-45aa-9d53-33d1f185515a";

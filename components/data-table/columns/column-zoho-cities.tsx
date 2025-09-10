@@ -59,17 +59,17 @@ export function getZohoCitiesColumns(
       enableHiding: true,
     },
 
-    {
-      id: "actions",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actions" />
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">
-          <ZohoCitiesTableRowActions row={row} fetchCities={fetchCities} />
-        </div>
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Actions" />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-center">
+    //       <ZohoCitiesTableRowActions row={row} fetchCities={fetchCities} />
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;

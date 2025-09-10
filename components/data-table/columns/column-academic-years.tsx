@@ -59,12 +59,12 @@ export const columnsAcademicYears: ColumnDef<ZohoAcademicYear>[] = [
       );
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const academicYear = row.original;
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     const academicYear = row.original;
 
-      return <AcademicYearsActions academicYear={academicYear} />;
-    },
-  },
+  //     return <AcademicYearsActions academicYear={academicYear} />;
+  //   },
+  // },
 ];

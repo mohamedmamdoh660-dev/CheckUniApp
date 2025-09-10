@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import Image from "next/image"
-import { Settings } from "@/modules/settings/models/setting"
+import * as React from "react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import Image from "next/image";
+import { Settings } from "@/types/types";
 export function LogoTypeToggle({
   settings,
   value,
   onChange,
 }: {
-  settings: Settings
-  value: "square" | "horizontal"
-  onChange: (value: "square" | "horizontal") => void
+  settings: Settings;
+  value: "square" | "horizontal";
+  onChange: (value: "square" | "horizontal") => void;
 }) {
   return (
     <div className="space-y-2">
@@ -32,13 +32,19 @@ export function LogoTypeToggle({
               src={settings.logo_url || ""}
               width={settings.logo_setting === "square" ? 36 : 100}
               height={settings.logo_setting === "square" ? 36 : 100}
-              alt={settings.site_name ?? process.env.NEXT_PUBLIC_SITE_NAME ?? "Square Logo"}
+              alt={
+                settings.site_name ??
+                process.env.NEXT_PUBLIC_SITE_NAME ??
+                "Square Logo"
+              }
               className="object-cover"
             />
           </div>
           <div className="grid flex-1 text-left text-base leading-tight">
             <span className="truncate font-medium">
-              {settings.site_name ?? process.env.NEXT_PUBLIC_SITE_NAME ?? "Square Logo"}
+              {settings.site_name ??
+                process.env.NEXT_PUBLIC_SITE_NAME ??
+                "Square Logo"}
             </span>
           </div>
         </ToggleGroupItem>
@@ -54,11 +60,15 @@ export function LogoTypeToggle({
               width={100}
               height={100}
               className="w-full h-full object-cover"
-              alt={settings.site_name ?? process.env.NEXT_PUBLIC_SITE_NAME ?? "Horizontal Logo"}
+              alt={
+                settings.site_name ??
+                process.env.NEXT_PUBLIC_SITE_NAME ??
+                "Horizontal Logo"
+              }
             />
           </div>
         </ToggleGroupItem>
       </ToggleGroup>
     </div>
-  )
+  );
 }

@@ -5,7 +5,6 @@ import { DataTableColumnHeader } from "../data-table-column-header";
 import { currentTimezone } from "@/lib/helper/current-timezone";
 import { ZohoSpeciality } from "@/types/types";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { ZohoSpecialityTableRowActions } from "../actions/zoho-speciality-actions";
 
 export function getZohoSpecialityColumns(
   fetchSpecialities: () => void
@@ -76,20 +75,20 @@ export function getZohoSpecialityColumns(
       enableHiding: true,
     },
 
-    {
-      id: "actions",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actions" />
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">
-          <ZohoSpecialityTableRowActions
-            row={row}
-            fetchSpecialities={fetchSpecialities}
-          />
-        </div>
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Actions" />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-center">
+    //       <ZohoSpecialityTableRowActions
+    //         row={row}
+    //         fetchSpecialities={fetchSpecialities}
+    //       />
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;

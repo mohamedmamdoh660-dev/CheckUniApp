@@ -76,17 +76,17 @@ export function UniversitiesToolbar<TData>({
           </Button>
         </div>
         {table && <DataTableViewOptions table={table} />}{" "}
-        <Button size="sm" onClick={() => setIsDialogOpen(true)}>
+        {/* <Button size="sm" onClick={() => setIsDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add University
-        </Button>
+        </Button> */}
       </div>
 
       {/* Add university dialog */}
-      <AddUniversity
+      {/* <AddUniversity
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onRefresh={onRefresh}
-      />
+      /> */}
     </div>
   );
 }

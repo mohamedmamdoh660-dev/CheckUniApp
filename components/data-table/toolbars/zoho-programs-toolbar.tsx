@@ -102,11 +102,11 @@ export function ZohoProgramsDataTableToolbar<TData>({
           </Button>
         </div>
       )} */}
-      <AddZohoProgram
+      {/* <AddZohoProgram
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onRefresh={fetchRecords}
-      />
+      /> */}
     </div>
   );
 }

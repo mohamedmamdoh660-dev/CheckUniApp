@@ -105,12 +105,12 @@ export const columnsUniversities: ColumnDef<ZohoUniversity>[] = [
       );
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const university = row.original;
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     const university = row.original;
 
-      return <UniversitiesActions university={university} />;
-    },
-  },
+  //     return <UniversitiesActions university={university} />;
+  //   },
+  // },
 ];

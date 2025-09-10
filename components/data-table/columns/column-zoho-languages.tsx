@@ -43,20 +43,20 @@ export function getZohoLanguagesColumns(
       enableHiding: true,
     },
 
-    {
-      id: "actions",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actions" />
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">
-          <ZohoLanguagesTableRowActions
-            row={row}
-            fetchLanguages={fetchLanguages}
-          />
-        </div>
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Actions" />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-center">
+    //       <ZohoLanguagesTableRowActions
+    //         row={row}
+    //         fetchLanguages={fetchLanguages}
+    //       />
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;

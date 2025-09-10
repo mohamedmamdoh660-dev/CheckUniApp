@@ -96,12 +96,12 @@ export const columnsCountries: ColumnDef<ZohoCountry>[] = [
       );
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const country = row.original;
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     const country = row.original;
 
-      return <CountriesActions country={country} />;
-    },
-  },
+  //     return <CountriesActions country={country} />;
+  //   },
+  // },
 ];

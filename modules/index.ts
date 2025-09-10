@@ -7,5 +7,5 @@ export { zohoApplicationsService } from "./zoho-applications/services/zoho-appli
 export { dashboardService } from "./dashboard/services/dashboard-service";
 
 // Export all models
-export { type User } from "./users/models/user";
-export { type Role } from "./roles/models/role";
+export { type User } from "@/types/types";
+export { type Role } from "@/types/types";

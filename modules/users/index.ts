@@ -1,5 +1,5 @@
 import { usersService } from './services/users-service';
-import { User } from './models/user';
+import { User } from '@/types/types';
 
 export { usersService };
 export type { User }; 

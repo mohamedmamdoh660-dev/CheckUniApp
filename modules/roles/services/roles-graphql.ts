@@ -1,4 +1,3 @@
-import { Role } from "../models/role";
 
 // GraphQL query for fetching all roles
 export const GET_ALL_ROLES = `

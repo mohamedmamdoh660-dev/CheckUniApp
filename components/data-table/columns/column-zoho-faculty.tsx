@@ -60,20 +60,20 @@ export function getZohoFacultyColumns(
       enableHiding: true,
     },
 
-    {
-      id: "actions",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actions" />
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">
-          <ZohoFacultyTableRowActions
-            row={row}
-            fetchFaculties={fetchFaculties}
-          />
-        </div>
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Actions" />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-center">
+    //       <ZohoFacultyTableRowActions
+    //         row={row}
+    //         fetchFaculties={fetchFaculties}
+    //       />
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;

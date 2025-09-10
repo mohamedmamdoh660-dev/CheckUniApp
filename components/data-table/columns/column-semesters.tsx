@@ -59,12 +59,12 @@ export const columnsSemesters: ColumnDef<ZohoSemester>[] = [
       );
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const semester = row.original;
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     const semester = row.original;
 
-      return <SemestersActions semester={semester} />;
-    },
-  },
+  //     return <SemestersActions semester={semester} />;
+  //   },
+  // },
 ];

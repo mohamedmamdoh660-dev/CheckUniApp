@@ -1,5 +1,5 @@
 import { rolesService } from './services/roles-service';
-import { Role } from './models/role';
+import { Role } from '@/types/types';
 
 // Export GraphQL queries for direct use if needed
 import { 

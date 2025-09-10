@@ -76,17 +76,17 @@ export function CountriesToolbar<TData>({
           Refresh
         </Button>
         {table && <DataTableViewOptions table={table} />}{" "}
-        <Button size="sm" onClick={() => setIsDialogOpen(true)}>
+        {/* <Button size="sm" onClick={() => setIsDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Country
-        </Button>
+        </Button> */}
       </div>
 
       {/* Add country dialog */}
-      <AddCountry
+      {/* <AddCountry
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onRefresh={onRefresh}
-      />
+      /> */}
     </div>
   );
 }

@@ -72,17 +72,17 @@ export function getZohoDegreesColumns(
       enableHiding: true,
     },
 
-    {
-      id: "actions",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actions" />
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">
-          <ZohoDegreesTableRowActions row={row} fetchDegrees={fetchDegrees} />
-        </div>
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Actions" />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-center">
+    //       <ZohoDegreesTableRowActions row={row} fetchDegrees={fetchDegrees} />
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;

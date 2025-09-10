@@ -1,6 +1,6 @@
 "use server";
 
-import { ZohoApplication } from "@/modules/zoho-applications/models/zoho-application";
+import { ZohoApplication } from "@/types/types";
 
 // N8n webhook URLs
 const CREATE_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/4615d5ae-b3ba-413f-980e-a30a48be3c00";
