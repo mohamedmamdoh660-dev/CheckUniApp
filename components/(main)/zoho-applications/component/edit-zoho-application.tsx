@@ -231,6 +231,7 @@ export default function EditZohoApplication({
                         table="zoho-academic-years"
                         searchField="name"
                         displayField="name"
+                        bottom={false}
                         initialValue={field.value}
                         onSelect={(item) => {
                           field.onChange(item.id);
@@ -253,6 +254,7 @@ export default function EditZohoApplication({
                         table="zoho-semesters"
                         searchField="name"
                         displayField="name"
+                        bottom={false}
                         initialValue={field.value}
                         onSelect={(item) => {
                           field.onChange(item.id);
@@ -276,6 +278,7 @@ export default function EditZohoApplication({
                         table="zoho-countries"
                         searchField="name"
                         displayField="name"
+                        bottom={false}
                         initialValue={field.value}
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);
@@ -349,6 +352,7 @@ export default function EditZohoApplication({
                         table="zoho-degrees"
                         searchField="name"
                         displayField="name"
+                        bottom={false}
                         initialValue={field.value}
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);

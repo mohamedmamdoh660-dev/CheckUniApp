@@ -38,6 +38,7 @@ export interface SearchableDropdownProps {
   };
   renderItem?: (item: DropdownItem) => React.ReactNode;
   disabled?: boolean;
+  bottom?: boolean;
 }
 
 // Function to fetch data from services based on table name
@@ -232,6 +233,7 @@ export function SearchableDropdown({
   dependsOn,
   renderItem,
   disabled = false,
+  bottom = true,
 }: SearchableDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -432,7 +434,10 @@ export function SearchableDropdown({
 
       {isOpen && (
         <div
-          className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground rounded-md border shadow-md"
+          className={cn(
+            "absolute z-50 w-full mt-1 bg-popover text-popover-foreground rounded-md border shadow-md",
+            bottom === false && "bottom-[44px]"
+          )}
           style={{
             minWidth: "var(--radix-popover-trigger-width)",
           }}

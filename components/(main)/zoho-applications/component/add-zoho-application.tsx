@@ -225,6 +225,7 @@ export default function AddZohoApplication({
                         table="zoho-academic-years"
                         searchField="name"
                         displayField="name"
+                        bottom={false}
                         initialValue={field.value}
                         onSelect={(item) => {
                           field.onChange(item.id);
@@ -246,6 +247,7 @@ export default function AddZohoApplication({
                         table="zoho-semesters"
                         searchField="name"
                         displayField="name"
+                        bottom={false}
                         initialValue={field.value}
                         onSelect={(item) => {
                           field.onChange(item.id);
@@ -270,6 +272,7 @@ export default function AddZohoApplication({
                         searchField="name"
                         displayField="name"
                         initialValue={field.value}
+                        bottom={false}
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);
                           // Reset dependent fields
@@ -293,6 +296,7 @@ export default function AddZohoApplication({
                         searchField="name"
                         displayField="name"
                         initialValue={field.value}
+                        bottom={false}
                         // dependsOn={{
                         //   field: "country",
                         //   value: form.watch("country") || null
@@ -342,6 +346,7 @@ export default function AddZohoApplication({
                         table="zoho-degrees"
                         searchField="name"
                         displayField="name"
+                        bottom={false}
                         initialValue={field.value}
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);
