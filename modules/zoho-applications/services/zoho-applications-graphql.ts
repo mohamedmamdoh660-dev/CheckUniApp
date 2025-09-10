@@ -295,8 +295,12 @@ export const GET_ZOHO_ACADEMIC_YEARS = `
 `;
 
 export const GET_ZOHO_SEMESTERS = `
-  query GetZohoSemesters {
-    zoho_semestersCollection {
+  query GetZohoSemesters($filter: zoho_semestersFilter, $limit: Int!, $offset: Int!) {
+    zoho_semestersCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+    ) {
       edges {
         node {
           id
@@ -311,8 +315,12 @@ export const GET_ZOHO_SEMESTERS = `
 `;
 
 export const GET_ZOHO_STUDENTS = `
-  query GetZohoStudents {
-    zoho_studentsCollection {
+  query GetZohoStudents($filter: zoho_studentsFilter, $limit: Int!, $offset: Int!) {
+    zoho_studentsCollection(
+      filter: $filter
+      first: $limit
+      offset: $offset
+    ) {
       edges {
         node {
           id

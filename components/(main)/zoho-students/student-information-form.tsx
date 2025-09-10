@@ -45,6 +45,8 @@ import { cn } from "@/lib/utils";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
 import { saveFile } from "@/supabase/actions/save-file";
 import { useAuth } from "@/context/AuthContext";
+import { ZohoCountry } from "@/types/types";
+import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
 
 // Enhanced form validation schema based on the images
 const formSchema = z.object({
@@ -127,6 +129,7 @@ export default function StudentInformationForm({
       "dropdown"
     );
   const { userProfile } = useAuth();
+  const [contries, setContries] = useState<ZohoCountry[]>([]);
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -284,7 +287,6 @@ export default function StudentInformationForm({
               ? null
               : userProfile?.agency_id,
       };
-      console.log("🚀 ~ onSubmit ~ webhookStudentData:", webhookStudentData);
 
       // Data for database - only include the fields we're already passing
       const dbStudentData = {
@@ -323,7 +325,8 @@ export default function StudentInformationForm({
         if (webhookResponse.status) {
           const studentDataWithId = {
             ...dbStudentData,
-            id: webhookResponse.id,
+            id:
+              webhookResponse.id + Math.random().toString(36).substring(2, 15),
             user_id: userProfile?.id,
             agency_id:
               userProfile?.roles?.name === "agency"
@@ -367,9 +370,7 @@ export default function StudentInformationForm({
         error
       );
       toast.error(
-        error instanceof Error
-          ? error.message
-          : `Failed to ${mode === "create" ? "create" : "update"} student`
+        `Failed to ${mode === "create" ? "create" : "update"} student`
       );
     } finally {
       setIsLoading(false);
@@ -396,9 +397,11 @@ export default function StudentInformationForm({
   const DatePicker = ({
     field,
     placeholder,
+    label,
   }: {
     field: any;
     placeholder: string;
+    label: string;
   }) => (
     <Popover>
       <PopoverTrigger asChild>
@@ -424,11 +427,19 @@ export default function StudentInformationForm({
           mode="single"
           selected={field.value}
           onSelect={field.onChange}
-          captionLayout={dropdown}
-          disabled={(date) =>
-            date > new Date() || date < new Date("1900-01-01")
-          }
+          captionLayout="dropdown"
+          disabled={(date) => {
+            // Only apply date restrictions when it's not an expiry date field
+            if (label !== "Expiry Date") {
+              return date > new Date() || date < new Date("1900-01-01");
+            }
+            // For expiry dates, allow future dates
+            return date < new Date("1900-01-01");
+          }}
           initialFocus
+          defaultMonth={
+            label === "Date of Birth" ? new Date(2000, 0, 1) : undefined
+          }
         />
       </PopoverContent>
     </Popover>
@@ -544,6 +555,19 @@ export default function StudentInformationForm({
       toast.error("Failed to upload document");
     }
   };
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      const countries = await zohoProgramsService.getCountries(
+        "",
+        0,
+        1000,
+        null
+      );
+      setContries(countries);
+    };
+    fetchCountries();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -696,7 +720,11 @@ export default function StudentInformationForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Issue Date *</FormLabel>
-                      <DatePicker field={field} placeholder="yyyy-MM-dd" />
+                      <DatePicker
+                        field={field}
+                        placeholder="yyyy-MM-dd"
+                        label="Issue Date"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -736,7 +764,11 @@ export default function StudentInformationForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Expiry Date *</FormLabel>
-                      <DatePicker field={field} placeholder="yyyy-MM-dd" />
+                      <DatePicker
+                        field={field}
+                        placeholder="yyyy-MM-dd"
+                        label="Expiry Date"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -748,7 +780,11 @@ export default function StudentInformationForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Date of Birth *</FormLabel>
-                      <DatePicker field={field} placeholder="yyyy-MM-dd" />
+                      <DatePicker
+                        field={field}
+                        placeholder="yyyy-MM-dd"
+                        label="Date of Birth"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -760,16 +796,28 @@ export default function StudentInformationForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nationality *</FormLabel>
-                      <SearchableDropdown
-                        placeholder="-Select-"
-                        table="zoho-countries"
-                        searchField="name"
-                        displayField="name"
-                        initialValue={field.value}
-                        onSelect={(item: { id: string }) => {
-                          field.onChange(item.id);
-                        }}
-                      />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="-Select-" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {contries
+                            .filter(
+                              (country) =>
+                                country.active_on_nationalities === true
+                            )
+                            .map((country) => (
+                              <SelectItem key={country.id} value={country.id}>
+                                {country.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -781,16 +829,24 @@ export default function StudentInformationForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Country of Residence *</FormLabel>
-                      <SearchableDropdown
-                        placeholder="-Select-"
-                        table="zoho-countries"
-                        searchField="name"
-                        displayField="name"
-                        initialValue={field.value}
-                        onSelect={(item: { id: string }) => {
-                          field.onChange(item.id);
-                        }}
-                      />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="-Select-" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {contries.map((country) => (
+                            <SelectItem key={country.id} value={country.id}>
+                              {country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
                       <FormMessage />
                     </FormItem>
                   )}
@@ -933,16 +989,24 @@ export default function StudentInformationForm({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Country</FormLabel>
-                        <SearchableDropdown
-                          placeholder="-Select-"
-                          table="zoho-countries"
-                          searchField="name"
-                          displayField="name"
-                          initialValue={field.value}
-                          onSelect={(item: { id: string }) => {
-                            field.onChange(item.id);
-                          }}
-                        />
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="-Select-" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {contries.map((country) => (
+                              <SelectItem key={country.id} value={country.id}>
+                                {country.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
                         <FormMessage />
                       </FormItem>
                     )}

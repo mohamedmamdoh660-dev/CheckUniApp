@@ -111,7 +111,6 @@ export function ProfileSettings() {
       const file = new File([croppedBlob], "profile-image.jpg", {
         type: "image/jpeg",
       });
-      console.log("🚀 ~ handleApplyCrop ~ file:", file.size);
 
       // Upload the file to server/storage
       const fileUrl = await saveFile(file);

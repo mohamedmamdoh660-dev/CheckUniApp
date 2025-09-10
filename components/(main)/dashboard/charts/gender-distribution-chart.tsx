@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pie, PieChart, Cell, Legend } from "recharts";
+import { Pie, PieChart, Cell, Legend, Tooltip } from "recharts";
 
 import {
   Card,
@@ -89,6 +89,23 @@ export function GenderDistributionChart() {
     setIsRefreshing(false);
   };
 
+  // Custom tooltip
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const item = payload[0].payload;
+      return (
+        <div className="bg-white dark:bg-neutral-900 border rounded-lg p-3 shadow-md">
+          <p className="font-semibold">{item.gender}</p>
+          <p className="text-sm">Students: {item.students}</p>
+          <p className="text-sm text-muted-foreground">
+            {item.percentage ? `${item.percentage}%` : ""}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -122,6 +139,8 @@ export function GenderDistributionChart() {
         ) : (
           <div className="h-[300px] w-full">
             <PieChart width={400} height={300} className="mx-auto">
+              <Tooltip content={<CustomTooltip />} />
+
               <Pie
                 data={chartData}
                 dataKey="students"

@@ -173,11 +173,11 @@ export const zohoProgramsService = {
   /**
    * Get all countries
    */
-  getCountries: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoCountry[]> => {
+  getCountries: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, label?: string): Promise<ZohoCountry[]> => {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const filter = label === 'Nationality'? { name: { ilike: searchPattern }, active_on_nationalities: { eq: true }, ...(id ? { id: { eq: id } } : {}) } : label === 'Country of Residence'? { name: { ilike: searchPattern }, active_on_university: { eq: true }, ...(id ? { id: { eq: id } } : {}) } : { name: { ilike: searchPattern } };
       const response = await executeGraphQLBackend(GET_ZOHO_COUNTRIES, { filter, limit: pageSize, offset });
       return response.zoho_countriesCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
@@ -264,7 +264,7 @@ export const zohoProgramsService = {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
       const response = await executeGraphQLBackend(GET_ZOHO_DEGREES, { filter, limit: pageSize, offset });
       return response.zoho_degreesCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
@@ -280,7 +280,7 @@ export const zohoProgramsService = {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
       const response = await executeGraphQLBackend(GET_ZOHO_FACILITIES, { filter, limit: pageSize, offset });
       return response.zoho_facultyCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
@@ -296,7 +296,7 @@ export const zohoProgramsService = {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
       const response = await executeGraphQLBackend(GET_ZOHO_LANGUAGES, { filter, limit: pageSize, offset });
       return response.zoho_languagesCollection.edges.map((edge: any) => edge.node);
     } catch (error) {

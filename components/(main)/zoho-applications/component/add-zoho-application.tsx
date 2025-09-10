@@ -106,7 +106,7 @@ export default function AddZohoApplication({
         // If webhook was successful, then create in database with the ID from webhook
         const applicationDataWithId = {
           ...applicationData,
-          id: webhookResponse.id,
+          id: webhookResponse.id + Math.random().toString(36).substring(2, 15),
           user_id: userProfile?.id,
           agency_id:
             userProfile?.roles?.name === "agency"
@@ -130,9 +130,7 @@ export default function AddZohoApplication({
       }
     } catch (error) {
       console.error("Error creating application:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create application"
-      );
+      toast.error("Failed to create application");
     } finally {
       setIsLoading(false);
     }

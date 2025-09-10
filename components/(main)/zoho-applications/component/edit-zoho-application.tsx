@@ -136,9 +136,7 @@ export default function EditZohoApplication({
       }
     } catch (error) {
       console.error("Error saving application data:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update application"
-      );
+      toast.error("Failed to update application");
     } finally {
       setIsLoading(false);
     }
@@ -303,11 +301,12 @@ export default function EditZohoApplication({
                         searchField="name"
                         displayField="name"
                         initialValue={field.value}
+                        bottom={false}
                         // dependsOn={{
                         //   field: "country",
                         //   value: form.watch("country") || null
                         // }}
-                        disabled={!form.watch("country")}
+                        // disabled={!form.watch("country")}
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);
                         }}

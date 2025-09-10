@@ -28,6 +28,8 @@ import Image from "next/image";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
 export function RecentApplications() {
   const [isReloading, setIsReloading] = useState(false);
@@ -154,14 +156,25 @@ export function RecentApplications() {
                     <TableRow key={application.id}>
                       <TableCell className="font-medium">
                         {application.zoho_students ? (
-                          <div className="flex flex-col">
-                            <span>
-                              {application.zoho_students.first_name}{" "}
-                              {application.zoho_students.last_name}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {application.zoho_students.email}
-                            </span>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="border-foreground/10 border-[1px]">
+                              <AvatarImage
+                                src={generateNameAvatar(
+                                  application.zoho_students.first_name +
+                                    " " +
+                                    application.zoho_students.last_name
+                                )}
+                              />
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <span>
+                                {application.zoho_students.first_name}{" "}
+                                {application.zoho_students.last_name}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {application.zoho_students.email}
+                              </span>
+                            </div>
                           </div>
                         ) : (
                           "Unknown Student"

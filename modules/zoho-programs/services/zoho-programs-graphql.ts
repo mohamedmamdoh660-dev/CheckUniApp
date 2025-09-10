@@ -229,7 +229,8 @@ export const GET_ZOHO_COUNTRIES = `
         node {
           id
           name
-       
+       active_on_nationalities
+       active_on_university
         }
       }
     }

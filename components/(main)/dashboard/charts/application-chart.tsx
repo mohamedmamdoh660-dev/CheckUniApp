@@ -220,12 +220,12 @@ export function ApplicationChart() {
                     >
                       <stop
                         offset="5%"
-                        // stopColor="var(--color-pending)"
+                        stopColor="var(--color-pending)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        // stopColor="var(--color-pending)"
+                        stopColor="var(--color-pending)"
                         stopOpacity={0.1}
                       />
                     </linearGradient>
@@ -238,12 +238,12 @@ export function ApplicationChart() {
                     >
                       <stop
                         offset="5%"
-                        // stopColor="var(--color-processing)"
+                        stopColor="var(--color-processing)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        // stopColor="var(--color-processing)"
+                        stopColor="var(--color-processing)"
                         stopOpacity={0.1}
                       />
                     </linearGradient>
@@ -256,24 +256,24 @@ export function ApplicationChart() {
                     >
                       <stop
                         offset="5%"
-                        // stopColor="var(--color-completed)"
+                        stopColor="var(--color-completed)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        // stopColor="var(--color-completed)"
+                        stopColor="var(--color-completed)"
                         stopOpacity={0.1}
                       />
                     </linearGradient>
                     <linearGradient id="fillFailed" x1="0" y1="0" x2="0" y2="1">
                       <stop
                         offset="5%"
-                        // stopColor="var(--color-failed)"
+                        stopColor="var(--color-failed)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        // stopColor="var(--color-failed)"
+                        stopColor="var(--color-failed)"
                         stopOpacity={0.1}
                       />
                     </linearGradient>

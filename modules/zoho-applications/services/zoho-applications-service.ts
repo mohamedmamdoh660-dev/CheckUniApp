@@ -28,7 +28,6 @@ export const zohoApplicationsService = {
    * Get applications with pagination
    */
   getApplicationsPagination: async (search: string, limit: number, offset: number, user_id: string, userRole: string, agency_id: string) => {
-  console.log("🚀 ~ userRole:", userRole)
 
     let filterConditions: any = [
       { stage: { ilike: search } },
@@ -152,7 +151,7 @@ export const zohoApplicationsService = {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
       const response = await executeGraphQLBackend(GET_ZOHO_ACADEMIC_YEARS, { filter, limit: pageSize, offset });
       return response.zoho_academic_yearsCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
@@ -168,7 +167,7 @@ export const zohoApplicationsService = {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
       const response = await executeGraphQLBackend(GET_ZOHO_SEMESTERS, { filter, limit: pageSize, offset });
       return response.zoho_semestersCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
@@ -180,11 +179,12 @@ export const zohoApplicationsService = {
   /**
    * Get all students
    */
-  getStudents: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoStudent[]> => {
+  getStudents: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, userRole: string, user_id: string, agency_id: string): Promise<ZohoStudent[]> => {
+    
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      const filter =  { or: [ { first_name: { ilike: searchPattern } }, { last_name: { ilike: searchPattern } }, { email: { ilike: searchPattern } } ], ...(id ? { id: { eq: id } } : {}), ...(userRole === 'agency' ? { agency_id: { eq: agency_id } } : userRole === 'agent' ? { user_id: { eq: user_id } } : {}) };
       const response = await executeGraphQLBackend(GET_ZOHO_STUDENTS, { filter, limit: pageSize, offset });
       return response.zoho_studentsCollection.edges.map((edge: any) => edge.node);
     } catch (error) {

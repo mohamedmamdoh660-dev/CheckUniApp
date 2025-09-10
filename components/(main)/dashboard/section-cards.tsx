@@ -12,8 +12,7 @@ import {
 import { TrendingUp, RefreshCw, Users, Calendar } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 
@@ -34,7 +33,9 @@ export function SectionCards() {
     try {
       const data = await dashboardService.getDashboardStats(
         userProfile?.roles?.name,
-        userProfile?.agency_id,
+        userProfile?.roles?.name === "agency"
+          ? userProfile?.id
+          : userProfile?.agency_id,
         userProfile?.id
       );
       setStats(data);
@@ -79,28 +80,28 @@ export function SectionCards() {
         value: stats.todayStudents,
         description: "New students today",
         subtext: "Registered in the last 24 hours",
-        icon: <Calendar className="mr-1 h-4 w-4" />,
+        icon: <TrendingUp className="mr-1 h-4 w-4" />,
       },
       {
         title: "Today's Applications",
         value: stats.todayApplications,
         description: "New applications today",
         subtext: "Submitted in the last 24 hours",
-        icon: <Calendar className="mr-1 h-4 w-4" />,
+        icon: <TrendingUp className="mr-1 h-4 w-4" />,
       },
       {
         title: "This Week's Students",
         value: stats.thisWeekStudents,
         description: "New students this week",
         subtext: "Registered in the last 7 days",
-        icon: <Calendar className="mr-1 h-4 w-4" />,
+        icon: <TrendingUp className="mr-1 h-4 w-4" />,
       },
       {
         title: "This Week's Applications",
         value: stats.thisWeekApplications,
         description: "New applications this week",
         subtext: "Submitted in the last 7 days",
-        icon: <Calendar className="mr-1 h-4 w-4" />,
+        icon: <TrendingUp className="mr-1 h-4 w-4" />,
       },
     ],
     [stats]

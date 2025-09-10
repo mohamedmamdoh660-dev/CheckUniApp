@@ -62,7 +62,6 @@ export function OrganizationSettings({ settings }: { settings?: Settings }) {
       payload,
       settings.id
     );
-    console.log("🚀 ~ submitSettings ~ updated_settings:", updated_settings);
     setSettingOrganization(updated_settings);
     setSettings(updated_settings);
     toast.success("Settings updated successfully");

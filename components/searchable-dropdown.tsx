@@ -6,14 +6,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronDown, Search, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
 import { useDebounce } from "@/hooks/use-debounce";
-import { zohoApplicationsService } from "@/modules";
+import { User, zohoApplicationsService } from "@/modules";
+import { useAuth } from "@/context/AuthContext";
 
 export interface DropdownItem {
   id: string;
@@ -32,6 +29,7 @@ export interface SearchableDropdownProps {
   onSelect: (item: DropdownItem) => void;
   className?: string;
   initialValue?: string;
+  label?: string;
   dependsOn?: {
     field: string;
     value: string | number | null;
@@ -42,15 +40,27 @@ export interface SearchableDropdownProps {
 }
 
 // Function to fetch data from services based on table name
-const fetchTableData = async (
-  table: string,
-  searchTerm: string,
-  searchField: string,
-  page: number,
-  pageSize = 10,
-  dependsOn?: { field: string; value: string | number | null },
-  id?: string
-) => {
+const fetchTableData = async ({
+  table,
+  searchTerm,
+  searchField,
+  page,
+  pageSize,
+  dependsOn,
+  id,
+  label,
+  userProfile,
+}: {
+  table: string;
+  searchTerm: string;
+  searchField: string;
+  page: number;
+  pageSize: number;
+  dependsOn?: { field: string; value: string | number | null };
+  id?: string;
+  label?: string;
+  userProfile?: any;
+}) => {
   try {
     let data: any[] = [];
     let count = 0;
@@ -76,7 +86,8 @@ const fetchTableData = async (
           searchTerm,
           page,
           pageSize,
-          id
+          id,
+          label
         );
 
         data = allCountries;
@@ -190,7 +201,10 @@ const fetchTableData = async (
           searchTerm,
           page,
           pageSize,
-          id
+          id,
+          userProfile?.roles?.name || "",
+          userProfile?.id || "",
+          userProfile?.id || ""
         );
         data = allStudents;
         count = allStudents.length;
@@ -230,6 +244,7 @@ export function SearchableDropdown({
   onSelect,
   className,
   initialValue,
+  label,
   dependsOn,
   renderItem,
   disabled = false,
@@ -248,20 +263,22 @@ export function SearchableDropdown({
   const listRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
-
+  const { userProfile } = useAuth();
   // Load initial data or search results
   const loadData = useCallback(
     async (currentPage = 0, search = "") => {
       setLoading(true);
       try {
-        const result = await fetchTableData(
+        const result = await fetchTableData({
           table,
-          search,
-          searchField,
-          currentPage,
-          10,
-          dependsOn
-        );
+          searchTerm: search,
+          searchField: searchField,
+          page: currentPage,
+          pageSize: 10,
+          dependsOn,
+          label,
+          userProfile,
+        });
 
         if (currentPage === 0) {
           setItems(result.data);
@@ -304,15 +321,17 @@ export function SearchableDropdown({
       } else {
         const fetchInitialItem = async () => {
           try {
-            const result = await fetchTableData(
+            const result = await fetchTableData({
               table,
-              "",
-              "id",
-              0,
-              1,
-              { field: "id", value: initialValue },
-              initialValue as string
-            );
+              searchTerm: "",
+              searchField: "id",
+              page: 0,
+              pageSize: 1,
+              dependsOn: { field: "id", value: initialValue },
+              id: initialValue as string,
+              label: "",
+              userProfile,
+            });
 
             if (result.data.length > 0) {
               setSelectedItem(result.data[0]);
@@ -422,7 +441,7 @@ export function SearchableDropdown({
           setIsOpen(!isOpen);
         }}
       >
-        <span className="truncate">
+        <span className="truncate text-ellipsis overflow-hidden max-w-[198px]">
           {selectedItem
             ? selectedItem[displayField] +
               " " +

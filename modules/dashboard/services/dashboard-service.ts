@@ -22,7 +22,6 @@ export const dashboardService = {
       console.error(error);
       throw error;
     } else {
-      console.log(data); 
             // { totalStudents, totalApplications, totalUniversities, successRate }
 
       return data;
@@ -96,7 +95,7 @@ export const dashboardService = {
 
       if (role === 'agency') {
          query.eq('agency_id', userId);
-      } else if (role === 'admin') {
+      } else if (role === 'agent') {
         query.eq('user_id', userId);
       }
 
@@ -146,7 +145,7 @@ export const dashboardService = {
 
       if (role === 'agency') {
          query.eq('agency_id', userId);
-      } else if (role === 'admin') {
+      } else if (role === 'agent') {
         query.eq('user_id', userId);
       }
 
@@ -222,7 +221,7 @@ export const dashboardService = {
 
       if (role === 'agency') {
          query.eq('agency_id', userId);
-      } else if (role === 'admin') {
+      } else if (role === 'agent') {
         query.eq('user_id', userId);
       }
 
@@ -255,7 +254,7 @@ export const dashboardService = {
 
       if (role === 'agency') {
          query.eq('agency_id', userId);
-      } else if (role === 'admin') {
+        } else if (role === 'agent') {
         query.eq('user_id', userId);
       }
 
