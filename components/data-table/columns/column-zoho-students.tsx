@@ -29,8 +29,8 @@ export function getZohoStudentsColumns(
               <AvatarImage src={generateNameAvatar(fullName)} />
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
-              <span className="truncate font-semibold">{fullName || "-"}</span>
-              <span className="truncate text-xs">
+              <span className=" font-semibold">{fullName || "-"}</span>
+              <span className=" text-xs text-muted-foreground">
                 {row.original.email || "-"}
               </span>
             </div>

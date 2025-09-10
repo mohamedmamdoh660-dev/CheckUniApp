@@ -35,7 +35,9 @@ export function getZohoApplicationsColumns(
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
               <span className=" font-semibold">{fullName}</span>
-              <span className=" text-xs">{student?.email || "-"}</span>
+              <span className=" text-xs text-muted-foreground">
+                {student?.email || "-"}
+              </span>
             </div>
           </div>
         );
@@ -124,17 +126,7 @@ export function getZohoApplicationsColumns(
 
         return (
           <div className="text-left">
-            {academicYear && semester ? (
-              <span>
-                {academicYear} / {semester}
-              </span>
-            ) : academicYear ? (
-              <span>{academicYear}</span>
-            ) : semester ? (
-              <span>{semester}</span>
-            ) : (
-              <span>-</span>
-            )}
+            {academicYear || "-"} / {semester || "-"}
           </div>
         );
       },
@@ -182,7 +174,39 @@ export function getZohoApplicationsColumns(
       enableSorting: true,
       enableHiding: true,
     },
+    {
+      accessorKey: "agent",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Agent" />
+      ),
+      cell: ({ row }) => {
+        const agent = row.original.agent;
+        const fullName =
+          `${agent?.first_name || ""} ${agent?.last_name || ""}`.trim();
 
+        return (
+          <div className="flex items-center w-full">
+            <Avatar className="border-foreground/10 border-[1px]">
+              <AvatarImage
+                src={
+                  agent?.profile?.includes("http")
+                    ? agent.profile
+                    : generateNameAvatar(fullName)
+                }
+              />
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight ml-3">
+              <span className=" font-semibold">{fullName}</span>
+              <span className=" text-xs text-muted-foreground">
+                {agent?.email || "-"}
+              </span>
+            </div>
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
     {
       accessorKey: "created_at",
       header: ({ column }) => (

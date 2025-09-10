@@ -88,6 +88,12 @@ export const GET_APPLICATIONS_PAGINATION = `
           country
           university
           stage
+          agent:user_profile {
+          first_name
+          last_name
+          email
+          profile
+          }
           degree
           zoho_students {
             id

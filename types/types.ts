@@ -183,7 +183,7 @@ export interface ZohoApplication {
   university?: string | null;
   stage?: string;
   degree?: string | null;
-  
+  agent?: User;
   // Related entities
   zoho_students?: ZohoStudent;
   zoho_programs?: ZohoProgram;

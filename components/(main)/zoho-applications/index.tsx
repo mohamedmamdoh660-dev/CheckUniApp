@@ -29,7 +29,7 @@ export default function ZohoApplicationsManagementPage({
     try {
       const applicationsResponse: any =
         await zohoApplicationsService.getApplicationsPagination(
-          `%${debouncedSearchTerm}%`,
+          `${debouncedSearchTerm}`,
           pageSize,
           currentPage,
           userProfile?.id || "",

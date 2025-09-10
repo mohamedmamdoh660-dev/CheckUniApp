@@ -27,40 +27,143 @@ export const zohoApplicationsService = {
   /**
    * Get applications with pagination
    */
-  getApplicationsPagination: async (search: string, limit: number, offset: number, user_id: string, userRole: string, agency_id: string) => {
+  getApplicationsPagination: async (
+    search: string,
+    limit: number,
+    offset: number,
+    user_id: string,
+    userRole: string,
+    agency_id: string
+  ) => {
+    try {
+      // Build the base query
+      let query = supabaseClient
+        .from("zoho_applications")
+        .select(
+          `
+      id,
+      created_at,
+      updated_at,
+      student,
+      program,
+      acdamic_year,
+      semester,
+      country,
+      university,
+      stage,
+      degree,
 
-    let filterConditions: any = [
-      { stage: { ilike: search } },
-    ];
-    
-    // Add user filtering based on role
-    if (userRole === 'agency') {
-      filterConditions.push({ agency_id: { eq: user_id } });
-    } else if (userRole !== 'admin') {
-      filterConditions.push({ user_id: { eq: user_id } });
-    }
-    
-    const response = await executeGraphQLBackend(GET_APPLICATIONS_PAGINATION, { search, limit, offset,filter: { and: filterConditions } });
-    let countQuery = supabaseClient
-    .from('zoho_applications')
-    .select('id', { count: 'exact' })
-    .ilike('stage', `${search}`)
+      agent:user_profile!zoho_applications_user_id_fkey (
+        id,
+        first_name,
+        last_name,
+        email,
+        profile
+      ),
 
-    // Apply role-based filtering to count query
-    if (userRole === 'agency') {
-      countQuery = countQuery.eq('agency_id', user_id);
-    } else if (userRole !== 'admin') {
-      countQuery = countQuery.eq('user_id', user_id);
+      zoho_students (
+        id,
+        first_name,
+        last_name,
+        email,
+        mobile
+      ),
+
+      zoho_programs (
+        id,
+        name
+      ),
+
+      zoho_academic_years (
+        id,
+        name,
+        active
+      ),
+
+      zoho_semesters (
+        id,
+        name,
+        active
+      ),
+
+      zoho_countries (
+        id,
+        name,
+        country_code
+      ),
+
+      zoho_universities (
+        id,
+        name,
+        logo,
+        sector
+      ),
+
+      zoho_degrees (
+        id,
+        name,
+        code
+      )
+    `,
+          { count: "exact" }
+        );
+
+      // Apply search filter if provided
+      if (search && search.trim() !== "") {
+        const searchPattern = `%${search.trim()}%`;
+        // Filter on the stage column in the main table
+        query = query.ilike('stage', searchPattern);
+      }
+      
+      // Role-based filtering
+      if (userRole === "agency") {
+        query = query.eq("agency_id", user_id);
+      } else if (userRole !== "admin") {
+        query = query.eq("user_id", user_id);
+      }
+      
+      // Apply pagination and ordering
+      query = query
+        .order("created_at", { ascending: false })
+        .range(offset, offset + limit - 1);
+  
+      // Execute the query
+      const { data, error, count } = await query;
+  
+      if (error) throw error;
+      
+      // If search term is provided, we need to filter the results further
+      // to include matches in related tables (since we can't directly filter on them)
+      let filteredData = data;
+      if (search && search.trim() !== "") {
+        const searchLower = search.trim().toLowerCase();
+        filteredData = data.filter(app => {
+          // Check student first and last name
+          const studentFirstName = app.zoho_students && app.zoho_students[0]?.first_name?.toLowerCase() || '';
+          const studentLastName = app.zoho_students && app.zoho_students[0]?.last_name?.toLowerCase() || '';
+          
+          // Check program name
+          const programName = app.zoho_programs && app.zoho_programs[0]?.name?.toLowerCase() || '';
+          
+          return (
+            studentFirstName.includes(searchLower) ||
+            studentLastName.includes(searchLower) ||
+            programName.includes(searchLower)
+          );
+        });
+      }
+  
+      return {
+        applications: filteredData || [],
+        totalCount: count || 0,
+      };
+    } catch (err) {
+      console.error("Error fetching applications:", err);
+      throw err;
     }
-    
-    const countResponse = await countQuery;
-    
-    return {
-      applications: response.zoho_applicationsCollection.edges.map((edge: any) => edge.node),
-      totalCount: countResponse.count
-    };
   },
-
+  
+  
   /**
    * Get an application by ID
    */
