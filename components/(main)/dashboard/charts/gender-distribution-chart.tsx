@@ -40,7 +40,7 @@ const CustomLegend = (props: any) => {
             className="w-3 h-3 rounded-full"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-sm">
+          <span className="text-xs">
             {entry.value}: {entry.payload.students}
           </span>
         </li>
@@ -129,16 +129,20 @@ export function GenderDistributionChart() {
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         {isLoading ? (
-          <div className="flex items-center justify-center h-[300px]">
+          <div className="flex items-center justify-center h-[450px]">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : chartData.length === 0 ? (
-          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[450px] text-muted-foreground">
             No data available
           </div>
         ) : (
-          <div className="h-[300px] w-full">
-            <PieChart width={400} height={300} className="mx-auto">
+          <div className="h-[450px] w-full">
+            <PieChart
+              width={400}
+              height={300}
+              className="mx-auto !w-full !h-[413px]"
+            >
               <Tooltip content={<CustomTooltip />} />
 
               <Pie
