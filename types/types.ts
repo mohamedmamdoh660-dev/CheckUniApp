@@ -1,4 +1,3 @@
-import { UserProfile } from "@/components/(main)/settings/profile-settings"
 
 export interface User {
   id: string
@@ -14,15 +13,31 @@ export interface User {
   updated_at?: string
   profile?: string
   status?: string
+  agency?: {
+    settings: {
+      edges: {
+        node: {
+          site_name: string
+          logo_url: string
+        }
+      }[]
+    }
+  }
+  settings?: {
+    edges: {
+      node: {
+        site_name: string
+        logo_url: string
+      }
+    }[]
+  }
   agency_id?: string
   roles?: {
     name: string
     description?: string
   }
   
-  agency?: {
-    name: string
-  }
+ 
 } 
 
 export enum UserRoles {

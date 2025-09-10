@@ -84,7 +84,11 @@ export default function UserManagementPage({ type }: { type: string }) {
           />
         }
         // @ts-ignore
-        columns={getUserColumns(fetchUsers, listRoles as Role[])}
+        columns={getUserColumns(
+          fetchUsers,
+          listRoles as Role[],
+          userProfile?.roles?.name === "admin"
+        )}
         onGlobalFilterChange={handleGlobalFilterChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}

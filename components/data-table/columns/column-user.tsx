@@ -1,6 +1,6 @@
 "use client";
 
-import { ColumnDef, Row } from "@tanstack/react-table";
+import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../data-table-column-header";
 import { UserTableRowActions } from "../actions/user-actions";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -14,7 +14,8 @@ import { currentTimezone } from "@/lib/helper/current-timezone";
 
 export function getUserColumns(
   fetchUsers: () => void,
-  listRoles: Role[]
+  listRoles: Role[],
+  isAdmin: boolean
 ): ColumnDef<User>[] {
   const columns: ColumnDef<User, unknown>[] = [
     {
@@ -86,6 +87,51 @@ export function getUserColumns(
       enableSorting: true,
       enableHiding: true,
     },
+    ...(isAdmin
+      ? [
+          {
+            accessorKey: "agency",
+            header: ({ column }: { column: Column<User> }) => (
+              <DataTableColumnHeader column={column} title="Agency" />
+            ),
+            cell: ({ row }: { row: Row<User> }) => {
+              const agency =
+                row.original.agency?.settings?.edges[0]?.node.site_name ||
+                row.original.settings?.edges[0]?.node.site_name;
+
+              return agency ? (
+                <div>
+                  {" "}
+                  <div className="flex items-center w-full">
+                    <Avatar className="border-foreground/10 border-[1px]">
+                      <AvatarImage
+                        className=""
+                        src={
+                          row.original.agency?.settings?.edges[0]?.node
+                            .logo_url ||
+                          row.original.settings?.edges[0]?.node.logo_url
+                            ? row.original.agency?.settings?.edges[0]?.node
+                                .logo_url ||
+                              row.original.settings?.edges[0]?.node.logo_url
+                            : generateNameAvatar(agency || "")
+                        }
+                        alt={agency || ""}
+                      />
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight ml-3">
+                      <span className="truncate font-semibold">
+                        {agency || ""}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : null;
+            },
+            enableSorting: true,
+            enableHiding: true,
+          },
+        ]
+      : []),
 
     {
       accessorKey: "created_at",

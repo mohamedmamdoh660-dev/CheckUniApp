@@ -44,7 +44,7 @@ query GetUsers($filter: user_profileFilter, $limit: Int = 10, $offset: Int = 0) 
     filter: $filter
     first: $limit
     offset: $offset
-    orderBy: [{ created_at: DescNullsLast }]
+    orderBy: [{created_at: DescNullsLast}]
   ) {
     edges {
       node {
@@ -54,13 +54,32 @@ query GetUsers($filter: user_profileFilter, $limit: Int = 10, $offset: Int = 0) 
         first_name
         last_name
         is_active
+        agency: user_profile {
+          settings:settingsCollection {
+            edges {
+              node {
+                site_name
+                logo_url
+              }
+            }
+          }
+        }
+        settings: settingsCollection {
+          edges {
+            node {
+              site_name
+              logo_url
+            }
+          }
+        }
         last_login
         profile
         created_at
         updated_at
-         agency_id
-        agency:user_profile {
-full_name}
+        agency_id
+        agency: user_profile {
+          full_name
+        }
         roles {
           name
           description
