@@ -160,7 +160,11 @@ export function UniversityDistributionChart() {
           </div>
         ) : (
           <div className="h-[300px] w-full">
-            <PieChart width={400} height={300} className="mx-auto">
+            <PieChart
+              width={400}
+              height={300}
+              className="mx-auto !w-full !h-[413px]"
+            >
               <Tooltip content={<CustomTooltip />} />
               <Pie
                 data={chartData}
