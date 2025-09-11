@@ -274,7 +274,7 @@ export default function StudentInformationForm({
         // Contact & Address Information
         email: values.email,
         mobile: values.mobile,
-        address_line_1: values.address_line_1,
+        address_line_1: values.address_line_1?.replace(/\n/g, " "),
         city_district: values.city_district,
         state_province: values.state_province,
         postal_code: values.postal_code,
@@ -1174,26 +1174,17 @@ export default function StudentInformationForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Student will apply for</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full md:w-1/2">
-                          <SelectValue placeholder="-Select-" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SearchableDropdown
-                          placeholder="Select Education Level..."
-                          table="zoho-degrees"
-                          searchField="name"
-                          displayField="name"
-                          bottom={false}
-                          initialValue={field.value}
-                          onSelect={(item: { id: string }) => {
-                            field.onChange(item.id);
-                          }}
-                        />
-                      </SelectContent>
-                    </Select>
+                    <SearchableDropdown
+                      placeholder="Select Education Level..."
+                      table="zoho-degrees"
+                      searchField="name"
+                      displayField="name"
+                      bottom={false}
+                      initialValue={field.value}
+                      onSelect={(item: { id: string }) => {
+                        field.onChange(item.id);
+                      }}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

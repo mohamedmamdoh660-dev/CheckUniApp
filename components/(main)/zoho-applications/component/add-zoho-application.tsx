@@ -96,7 +96,6 @@ export default function AddZohoApplication({
         university: values.university || null,
         stage: values.stage,
         degree: values.degree || null,
-        // crm_id: userProfile?.roles?.name === "agency" ? userProfile?.crm_id : userProfile?.roles.name === 'agent' ? userProfile?.agency.profile.crm_id,
       };
 
       // First, call the n8n webhook
