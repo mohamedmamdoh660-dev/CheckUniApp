@@ -35,7 +35,7 @@ export const GET_STUDENTS_PAGINATION = `
       filter: $filter
       first: $limit
       offset: $offset
-            orderBy: [{ created_at: DescNullsLast }]
+      orderBy: [{ created_at: DescNullsLast }]
 
     ) {
       edges {
@@ -58,6 +58,12 @@ export const GET_STUDENTS_PAGINATION = `
           father_mobile
           father_job
           mother_name
+          agent: user_profile {
+            first_name
+            last_name
+            email
+            profile
+          }
           mother_mobile
           mother_job
          nationality_record:  zoho_countries  {

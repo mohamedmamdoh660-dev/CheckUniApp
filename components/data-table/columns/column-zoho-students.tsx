@@ -136,7 +136,39 @@ export function getZohoStudentsColumns(
       enableSorting: true,
       enableHiding: true,
     },
+    {
+      accessorKey: "agent",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Agent" />
+      ),
+      cell: ({ row }) => {
+        const agent = row.original.agent;
+        const fullName =
+          `${agent?.first_name || ""} ${agent?.last_name || ""}`.trim();
 
+        return (
+          <div className="flex items-center w-full">
+            <Avatar className="border-foreground/10 border-[1px]">
+              <AvatarImage
+                src={
+                  agent?.profile?.includes("http")
+                    ? agent.profile
+                    : generateNameAvatar(fullName)
+                }
+              />
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight ml-3">
+              <span className=" font-semibold">{fullName}</span>
+              <span className=" text-xs text-muted-foreground">
+                {agent?.email || "-"}
+              </span>
+            </div>
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
     {
       accessorKey: "created_at",
       header: ({ column }) => (

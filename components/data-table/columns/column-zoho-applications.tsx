@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { ZohoApplicationsTableRowActions } from "../actions/zoho-applications-actions";
+import { Badge } from "@/components/ui/badge";
 
 export function getZohoApplicationsColumns(
   fetchApplications: () => void
@@ -157,19 +158,9 @@ export function getZohoApplicationsColumns(
         <DataTableColumnHeader column={column} title="Stage" />
       ),
       cell: ({ row }) => {
-        const stage = row.original.stage?.toLowerCase() || "";
+        const stage = row.original.stage || "";
 
-        if (stage === "completed") {
-          return <StatusBadge status="completed" />;
-        } else if (stage === "pending") {
-          return <StatusBadge status="pending" />;
-        } else if (stage === "processing") {
-          return <StatusBadge status="processing" />;
-        } else if (stage === "failed") {
-          return <StatusBadge status="failed" />;
-        } else {
-          return <div className="text-left">{row.original.stage || "-"}</div>;
-        }
+        return <Badge variant="outline">{stage}</Badge>;
       },
       enableSorting: true,
       enableHiding: true,

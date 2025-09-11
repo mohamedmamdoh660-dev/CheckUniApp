@@ -186,7 +186,7 @@ export interface ZohoApplication {
   university?: string | null;
   stage?: string;
   degree?: string | null;
-  agent?: User;
+  agent?: User | null;
   // Related entities
   zoho_students?: ZohoStudent;
   zoho_programs?: ZohoProgram;
@@ -195,10 +195,10 @@ export interface ZohoApplication {
   zoho_countries?: ZohoCountry;
   zoho_universities?: ZohoUniversity;
   zoho_degrees?: ZohoDegree;
-  agency_id?: string;
-  user_id?: string;
-  agency?: User;
-  user?: User;
+  agency_id?: string | null;
+  user_id?: string | null;
+  agency?: User | null;
+  user?: User | null;
   crm_id?: string;
 }
 
@@ -328,5 +328,6 @@ export interface ZohoStudent {
   agency_id?: string | null;
   user_id?: string;
   agency?: User | null;
-  user?: User;
+  user?: User | null;
+  agent?: User | null;
 }

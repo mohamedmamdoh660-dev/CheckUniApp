@@ -27,6 +27,7 @@ export const zohoApplicationsService = {
   /**
    * Get applications with pagination
    */
+  // / Method 2: Pre-fetch IDs then use IN clause (More reliable)
   getApplicationsPagination: async (
     search: string,
     limit: number,
@@ -36,6 +37,36 @@ export const zohoApplicationsService = {
     agency_id: string
   ) => {
     try {
+      let studentIds = [];
+      let programIds = [];
+  
+      // If search is provided, get matching IDs first
+      if (search && search.trim() !== "") {
+        const searchPattern = `%${search.trim()}%`;
+        
+        // Get matching student IDs
+        const { data: students } = await supabaseClient
+          .from("zoho_students")
+          .select("id")
+          .or(`first_name.ilike.${searchPattern},last_name.ilike.${searchPattern},email.ilike.${searchPattern}`);
+        
+        studentIds = students?.map(s => s.id) || [];
+  
+        // Get matching program IDs  
+        const { data: programs } = await supabaseClient
+          .from("zoho_programs")
+          .select("id")
+          .ilike("name", searchPattern);
+        
+        programIds = programs?.map(p => p.id) || [];
+        
+        // If no matches found, return empty result
+        if (studentIds.length === 0 && programIds.length === 0) {
+          return { applications: [], totalCount: 0 };
+        }
+      }
+  
+      // Main query
       let query = supabaseClient
         .from("zoho_applications")
         .select(
@@ -107,22 +138,28 @@ export const zohoApplicationsService = {
           { count: "exact" }
         );
   
-      // Role-based filtering first
+      // Role-based filtering
       if (userRole === "agency") {
         query = query.eq("agency_id", user_id);
       } else if (userRole !== "admin") {
         query = query.eq("user_id", user_id);
       }
   
-      // Search with OR conditions using foreign key relationships
+      // Apply search filter using IN clause
       if (search && search.trim() !== "") {
-        const searchPattern = `%${search.trim()}%`;
+        const orConditions = [];
         
-        // This is the ninja way! Using foreign key IDs to search
-        query = query.or(`
-          student.in.(select id from zoho_students where first_name ilike '${searchPattern}' or last_name ilike '${searchPattern}' or email ilike '${searchPattern}'),
-          program.in.(select id from zoho_programs where name ilike '${searchPattern}')
-        `.replace(/\s+/g, ' ').trim());
+        if (studentIds.length > 0) {
+          orConditions.push(`student.in.(${studentIds.join(',')})`);
+        }
+        
+        if (programIds.length > 0) {
+          orConditions.push(`program.in.(${programIds.join(',')})`);
+        }
+        
+        if (orConditions.length > 0) {
+          query = query.or(orConditions.join(','));
+        }
       }
   
       // Apply pagination and ordering

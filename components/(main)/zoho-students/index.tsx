@@ -23,7 +23,7 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
     try {
       const studentsResponse: any =
         await zohoStudentsService.getStudentsPagination(
-          `%${debouncedSearchTerm}%`,
+          `${debouncedSearchTerm}`,
           pageSize,
           currentPage,
           userProfile?.id || "",

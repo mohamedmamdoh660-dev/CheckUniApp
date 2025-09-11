@@ -94,8 +94,14 @@ export default function AddZohoApplication({
         semester: values.semester || null,
         country: values.country || null,
         university: values.university || null,
-        stage: values.stage,
         degree: values.degree || null,
+        user_id: userProfile?.id,
+        agency_id:
+          userProfile?.roles?.name === "agency"
+            ? userProfile?.id
+            : userProfile?.roles?.name === "admin"
+              ? null
+              : userProfile?.agency_id,
       };
 
       // First, call the n8n webhook
@@ -114,13 +120,7 @@ export default function AddZohoApplication({
         const applicationDataWithId = {
           ...applicationData,
           id: webhookResponse.id,
-          user_id: userProfile?.id,
-          agency_id:
-            userProfile?.roles?.name === "agency"
-              ? userProfile?.id
-              : userProfile?.roles?.name === "admin"
-                ? null
-                : userProfile?.agency_id,
+          stage: "pending review",
         };
 
         // @ts-ignore
@@ -142,9 +142,6 @@ export default function AddZohoApplication({
       setIsLoading(false);
     }
   };
-
-  // Application stage options
-  const stageOptions = ["pending", "processing", "completed", "failed"];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -357,34 +354,6 @@ export default function AddZohoApplication({
                           field.onChange(item.id);
                         }}
                       />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="stage"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>Stage</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select stage" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {stageOptions.map((stage) => (
-                            <SelectItem key={stage} value={stage}>
-                              {stage.charAt(0).toUpperCase() + stage.slice(1)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

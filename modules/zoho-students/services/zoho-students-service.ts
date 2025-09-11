@@ -23,40 +23,126 @@ export const zohoStudentsService = {
   /**
    * Get students with pagination
    */
-  getStudentsPagination: async (search: string, limit: number, offset: number, user_id: string, userRole: string, agency_id: string) => {
-    let filterConditions: any = [
-      { first_name: { ilike: search } },
-      { last_name: { ilike: search } },
-      { email: { ilike: search } }
-    ];
-    
-    // Add user filtering based on role
-    if (userRole === 'agency') {
-      filterConditions.push({ agency_id: { eq: user_id } });
-    } else if (userRole !== 'admin') {
-      filterConditions.push({ user_id: { eq: user_id } });
-    }
-    
-    const response = await executeGraphQLBackend(GET_STUDENTS_PAGINATION, { search, limit, offset, filter: { and: filterConditions } });
-    let countQuery = supabaseClient
-    .from('zoho_students')
-    .select('id', { count: 'exact' })
-    .or(`first_name.ilike.${search},last_name.ilike.${search},email.ilike.${search}`)
-    
-    // Apply role-based filtering to count query
-    if (userRole === 'agency') {
-      countQuery = countQuery.eq('agency_id', user_id);
-    } else if (userRole !== 'admin') {
-      countQuery = countQuery.eq('user_id', user_id);
-    }
-    
-    const countResponse = await countQuery;
-    return {
-      students: response.zoho_studentsCollection.edges.map((edge: any) => edge.node),
-      totalCount: countResponse.count
-    };
-  },
+// Main function to get students with pagination and search
+getStudentsPagination: async (
+  search: string,
+  limit: number,
+  offset: number,
+  // filter: any = {}, // equivalent to zoho_studentsFilter
+  user_id: string,
+  userRole: string,
+  agency_id: string
+) => {
+  console.log("🚀 ~ userRole:", userRole)
+  console.log("🚀 ~ user_id:", user_id)
+  try {
+    // Build the base query with all the fields and relationships
+    let query = supabaseClient
+      .from("zoho_students")
+      .select(
+        `
+        id,
+        created_at,
+        updated_at,
+        first_name,
+        last_name,
+        gender,
+        date_of_birth,
+        nationality,
+        passport_number,
+        passport_issue_date,
+        passport_expiry_date,
+        country_of_residence,
+        email,
+        mobile,
+        father_name,
+        father_mobile,
+        father_job,
+        mother_name,
+        mother_mobile,
+        mother_job,
+        
+        agent:user_profile!zoho_students_user_id_fkey (
+          first_name,
+          last_name,
+          email,
+          profile
+        ),
+        
+    nationality_record:zoho_countries!zoho_students_nationality_fkey (
+      id,
+      name
+    )
+   
+        
+     
+        `,
+        { count: "exact" }
+      );
 
+    // Apply search filter if provided
+    if (search && search.trim() !== "") {
+      const searchPattern = `%${search.trim()}%`;
+      query = query.or(`
+        first_name.ilike.${searchPattern},
+        last_name.ilike.${searchPattern},
+        email.ilike.${searchPattern},
+        mobile.ilike.${searchPattern},
+        passport_number.ilike.${searchPattern}
+      `.replace(/\s+/g, ''));
+    }
+
+    // Apply additional filters (equivalent to GraphQL filter parameter)
+    // if (filter) {
+    //   // Example filter applications:
+    //   if (filter.gender) {
+    //     query = query.eq('gender', filter.gender);
+    //   }
+    //   if (filter.nationality) {
+    //     query = query.eq('nationality', filter.nationality);
+    //   }
+    //   if (filter.country_of_residence) {
+    //     query = query.eq('country_of_residence', filter.country_of_residence);
+    //   }
+    //   if (filter.created_at_gte) {
+    //     query = query.gte('created_at', filter.created_at_gte);
+    //   }
+    //   if (filter.created_at_lte) {
+    //     query = query.lte('created_at', filter.created_at_lte);
+    //   }
+    //   // Add more filter conditions as needed
+    // }
+
+    // Role-based filtering (if needed)
+    if (userRole === "agency") {
+      query = query.eq("agency_id", user_id);
+    } else if (userRole !== "admin") {
+      query = query.eq("user_id", user_id);
+    }
+
+    // Apply ordering and pagination
+    const { data, error, count } = await query
+      .order("created_at", { ascending: false }) // DescNullsLast equivalent
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+
+    // Format the response to match GraphQL structure
+    const students = data ;
+
+    return {
+      students,
+      totalCount: count || 0,
+      pageInfo: {
+        hasNextPage: (offset + limit) < (count || 0),
+        hasPreviousPage: offset > 0,
+      }
+    };
+  } catch (err) {
+    console.error("Error fetching students:", err);
+    throw err;
+  }
+},
   /**
    * Get a student by ID
    */
