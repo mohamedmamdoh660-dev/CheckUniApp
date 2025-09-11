@@ -10,10 +10,13 @@ export interface User {
   is_active?: boolean
   last_login?: string
   created_at?: string
+  crm_id?: string
+ 
   updated_at?: string
   profile?: string
   status?: string
   agency?: {
+    crm_id?: string
     settings: {
       edges: {
         node: {
@@ -196,6 +199,7 @@ export interface ZohoApplication {
   user_id?: string;
   agency?: User;
   user?: User;
+  crm_id?: string;
 }
 
 

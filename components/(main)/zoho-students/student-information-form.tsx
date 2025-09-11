@@ -145,6 +145,7 @@ export default function StudentInformationForm({
       "dropdown"
     );
   const { userProfile } = useAuth();
+
   const [contries, setContries] = useState<ZohoCountry[]>([]);
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -246,9 +247,9 @@ export default function StudentInformationForm({
       // Data for webhook - include ALL fields and files from every section
       const webhookStudentData = {
         // Student Basic Info Card
-        transfer_student: values.transfer_student,
-        have_tc: values.have_tc,
-        blue_card: values.blue_card,
+        transfer_student: values.transfer_student === "yes" ? "Yes" : "No",
+        have_tc: values.have_tc === "yes" ? "Yes" : "No",
+        blue_card: values.blue_card === "yes" ? "Yes" : "No",
 
         // Personal Details
         first_name: values.first_name,
@@ -302,6 +303,12 @@ export default function StudentInformationForm({
             : userProfile?.roles?.name === "admin"
               ? null
               : userProfile?.agency_id,
+        crm_id:
+          userProfile?.roles?.name === "agency"
+            ? userProfile?.crm_id
+            : userProfile?.roles?.name === "agent"
+              ? userProfile?.agency?.crm_id
+              : userProfile?.crm_id,
       };
 
       // Data for database - only include the fields we're already passing
@@ -870,7 +877,7 @@ export default function StudentInformationForm({
                         </FormControl>
                         <SelectContent>
                           {contries.map((country) => (
-                            <SelectItem key={country.id} value={country.id}>
+                            <SelectItem key={country.id} value={country.name}>
                               {country.name}
                             </SelectItem>
                           ))}
@@ -1174,11 +1181,17 @@ export default function StudentInformationForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {educationLevels.map((level) => (
-                          <SelectItem key={level} value={level}>
-                            {level}
-                          </SelectItem>
-                        ))}
+                        <SearchableDropdown
+                          placeholder="Select Education Level..."
+                          table="zoho-degrees"
+                          searchField="name"
+                          displayField="name"
+                          bottom={false}
+                          initialValue={field.value}
+                          onSelect={(item: { id: string }) => {
+                            field.onChange(item.id);
+                          }}
+                        />
                       </SelectContent>
                     </Select>
                     <FormMessage />

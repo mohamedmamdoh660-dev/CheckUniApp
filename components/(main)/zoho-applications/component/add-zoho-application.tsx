@@ -100,8 +100,15 @@ export default function AddZohoApplication({
       };
 
       // First, call the n8n webhook
-      const webhookResponse =
-        await createApplicationViaWebhook(applicationData);
+      const webhookResponse = await createApplicationViaWebhook({
+        ...applicationData,
+        crm_id:
+          userProfile?.roles?.name === "agency"
+            ? userProfile?.crm_id
+            : userProfile?.roles?.name === "agent"
+              ? userProfile?.agency?.crm_id
+              : userProfile?.crm_id,
+      });
 
       if (webhookResponse.status) {
         // If webhook was successful, then create in database with the ID from webhook

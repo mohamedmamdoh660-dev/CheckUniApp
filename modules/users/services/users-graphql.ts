@@ -161,6 +161,11 @@ query GetUsersById($id: UUID!) {
        profile
        created_at
        updated_at
+       crm_id
+       agency: user_profile {
+           crm_id
+         
+       }
        agency_id
        roles {
          name
