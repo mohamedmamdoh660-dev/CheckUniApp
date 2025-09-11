@@ -36,125 +36,104 @@ export const zohoApplicationsService = {
     agency_id: string
   ) => {
     try {
-      // Build the base query
       let query = supabaseClient
         .from("zoho_applications")
         .select(
           `
-      id,
-      created_at,
-      updated_at,
-      student,
-      program,
-      acdamic_year,
-      semester,
-      country,
-      university,
-      stage,
-      degree,
-
-      agent:user_profile!zoho_applications_user_id_fkey (
-        id,
-        first_name,
-        last_name,
-        email,
-        profile
-      ),
-
-      zoho_students (
-        id,
-        first_name,
-        last_name,
-        email,
-        mobile
-      ),
-
-      zoho_programs (
-        id,
-        name
-      ),
-
-      zoho_academic_years (
-        id,
-        name,
-        active
-      ),
-
-      zoho_semesters (
-        id,
-        name,
-        active
-      ),
-
-      zoho_countries (
-        id,
-        name,
-        country_code
-      ),
-
-      zoho_universities (
-        id,
-        name,
-        logo,
-        sector
-      ),
-
-      zoho_degrees (
-        id,
-        name,
-        code
-      )
-    `,
+          id,
+          created_at,
+          updated_at,
+          student,
+          program,
+          acdamic_year,
+          semester,
+          country,
+          university,
+          stage,
+          degree,
+  
+          agent:user_profile!zoho_applications_user_id_fkey (
+            id,
+            first_name,
+            last_name,
+            email,
+            profile
+          ),
+  
+          zoho_students (
+            id,
+            first_name,
+            last_name,
+            email,
+            mobile
+          ),
+  
+          zoho_programs (
+            id,
+            name
+          ),
+  
+          zoho_academic_years (
+            id,
+            name,
+            active
+          ),
+  
+          zoho_semesters (
+            id,
+            name,
+            active
+          ),
+  
+          zoho_countries (
+            id,
+            name,
+            country_code
+          ),
+  
+          zoho_universities (
+            id,
+            name,
+            logo,
+            sector
+          ),
+  
+          zoho_degrees (
+            id,
+            name,
+            code
+          )
+        `,
           { count: "exact" }
         );
-
-      // Apply search filter if provided
-      if (search && search.trim() !== "") {
-        const searchPattern = `%${search.trim()}%`;
-        // Filter on the stage column in the main table
-        query = query.ilike('stage', searchPattern);
-      }
-      
-      // Role-based filtering
+  
+      // Role-based filtering first
       if (userRole === "agency") {
         query = query.eq("agency_id", user_id);
       } else if (userRole !== "admin") {
         query = query.eq("user_id", user_id);
       }
-      
+  
+      // Search with OR conditions using foreign key relationships
+      if (search && search.trim() !== "") {
+        const searchPattern = `%${search.trim()}%`;
+        
+        // This is the ninja way! Using foreign key IDs to search
+        query = query.or(`
+          student.in.(select id from zoho_students where first_name ilike '${searchPattern}' or last_name ilike '${searchPattern}' or email ilike '${searchPattern}'),
+          program.in.(select id from zoho_programs where name ilike '${searchPattern}')
+        `.replace(/\s+/g, ' ').trim());
+      }
+  
       // Apply pagination and ordering
-      query = query
+      const { data, error, count } = await query
         .order("created_at", { ascending: false })
         .range(offset, offset + limit - 1);
   
-      // Execute the query
-      const { data, error, count } = await query;
-  
       if (error) throw error;
-      
-      // If search term is provided, we need to filter the results further
-      // to include matches in related tables (since we can't directly filter on them)
-      let filteredData = data;
-      if (search && search.trim() !== "") {
-        const searchLower = search.trim().toLowerCase();
-        filteredData = data.filter(app => {
-          // Check student first and last name
-          const studentFirstName = app.zoho_students && app.zoho_students[0]?.first_name?.toLowerCase() || '';
-          const studentLastName = app.zoho_students && app.zoho_students[0]?.last_name?.toLowerCase() || '';
-          
-          // Check program name
-          const programName = app.zoho_programs && app.zoho_programs[0]?.name?.toLowerCase() || '';
-          
-          return (
-            studentFirstName.includes(searchLower) ||
-            studentLastName.includes(searchLower) ||
-            programName.includes(searchLower)
-          );
-        });
-      }
   
       return {
-        applications: filteredData || [],
+        applications: data || [],
         totalCount: count || 0,
       };
     } catch (err) {
@@ -162,6 +141,7 @@ export const zohoApplicationsService = {
       throw err;
     }
   },
+  
   
   
   /**

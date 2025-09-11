@@ -8,7 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
+import "@/styles/phone-input.css";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
 import {
   createStudentViaWebhook,
@@ -40,7 +42,21 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, Upload, X, Plus, ArrowLeft } from "lucide-react";
+import {
+  CalendarIcon,
+  Upload,
+  X,
+  Plus,
+  ArrowLeft,
+  User,
+  IdCard,
+  Phone,
+  GraduationCap,
+  Image,
+  FileText,
+  Home,
+  Users,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
 import { saveFile } from "@/supabase/actions/save-file";
@@ -456,8 +472,17 @@ export default function StudentInformationForm({
     }
 
     // Check file type
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
+    const allowedPhotoTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/bmp",
+    ];
+    if (!allowedPhotoTypes.includes(file.type)) {
+      toast.error(
+        "Please select a valid image file (JPG, JPEG, PNG, GIF, BMP)"
+      );
       return;
     }
 
@@ -576,7 +601,10 @@ export default function StudentInformationForm({
           {/* Student Basic Info Card */}
           <Card className="">
             <CardHeader>
-              <CardTitle>Student Information</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <User size={20} className="text-primary" />
+                Student Information
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Radio button questions */}
@@ -640,7 +668,7 @@ export default function StudentInformationForm({
                   name="blue_card"
                   render={({ field }) => (
                     <FormItem className="gap-5">
-                      <FormLabel>Blue_Card *</FormLabel>
+                      <FormLabel>Blue Card *</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
@@ -668,7 +696,10 @@ export default function StudentInformationForm({
           {/* Personal Details Card */}
           <Card className="">
             <CardHeader>
-              <CardTitle>Personal Details</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <IdCard size={20} className="text-primary" />
+                Personal Details
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -872,10 +903,13 @@ export default function StudentInformationForm({
           {/* Contact & Address Card */}
           <Card>
             <CardHeader>
-              <CardTitle>Contact & Address Information</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Phone size={20} className="text-primary" />
+                Contact & Address Information
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="email"
@@ -901,14 +935,14 @@ export default function StudentInformationForm({
                     <FormItem>
                       <FormLabel>Mobile</FormLabel>
                       <FormControl>
-                        {/* <PhoneInput
+                        <PhoneInput
                           defaultCountry="ae"
                           value={field.value}
                           onChange={(phone: any) => field.onChange(phone)}
                           placeholder="Enter mobile number"
-                          inputClassName="h-11 rounded-md px-3 text-sm placeholder:text-dark-600 w-full"
-                        /> */}
-                        <Input placeholder="Mobile number" {...field} />
+                          inputClassName="h-11 rounded-md px-3 text-sm w-full"
+                        />
+                        {/* <Input placeholder="Mobile number" {...field} /> */}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -918,7 +952,10 @@ export default function StudentInformationForm({
 
               {/* Address Section */}
               <div className="space-y-4">
-                <h4 className="font-medium">Address</h4>
+                <h4 className="font-medium flex items-center gap-2">
+                  <Home size={16} className="text-muted-foreground" />
+                  Address
+                </h4>
 
                 <FormField
                   control={form.control}
@@ -938,7 +975,7 @@ export default function StudentInformationForm({
                   )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="city_district"
@@ -966,9 +1003,6 @@ export default function StudentInformationForm({
                       </FormItem>
                     )}
                   />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="postal_code"
@@ -1013,78 +1047,108 @@ export default function StudentInformationForm({
                   />
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Family Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Family Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="father_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Father_Name *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Father's name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="space-y-4">
+                <h4 className="font-medium flex items-center gap-2">
+                  <Users size={16} className="text-muted-foreground" />
+                  Family Information
+                </h4>
 
-                <FormField
-                  control={form.control}
-                  name="father_mobile"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Father Mobile</FormLabel>
-                      <FormControl>
-                        {/* <PhoneInput
-                          defaultCountry="ae"
-                          value={field.value}
-                          onChange={(phone: any) => field.onChange(phone)}
-                          placeholder="Enter mobile number"
-                          inputClassName="h-11 rounded-md px-3 text-sm placeholder:text-dark-600 w-full  bg-transparent"
-                        /> */}
-                        <Input placeholder="Father's mobile" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="father_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Father_Name *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Father's name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="father_occupation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Father Occupation</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Father's occupation" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="father_mobile"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Father Mobile</FormLabel>
+                        <FormControl>
+                          <PhoneInput
+                            defaultCountry="ae"
+                            value={field.value}
+                            onChange={(phone: any) => field.onChange(phone)}
+                            placeholder="Enter mobile number"
+                            inputClassName="h-11 rounded-md px-3 text-sm w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="mother_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mother_Name *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Mother's name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="father_occupation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Father Occupation</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Father's occupation" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="mother_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mother Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Mother's name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="mother_mobile"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mother Mobile</FormLabel>
+                        <FormControl>
+                          <PhoneInput
+                            defaultCountry="ae"
+                            value={field.value}
+                            onChange={(phone: any) => field.onChange(phone)}
+                            placeholder="Enter mobile number"
+                            inputClassName="h-11 rounded-md px-3 text-sm w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="mother_occupation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mother Occupation</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Mother's occupation" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -1092,7 +1156,10 @@ export default function StudentInformationForm({
           {/* Academic Information Card */}
           <Card>
             <CardHeader>
-              <CardTitle>Academic Information</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <GraduationCap size={20} className="text-primary" />
+                Academic Information
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <FormField
@@ -1125,7 +1192,10 @@ export default function StudentInformationForm({
           {/* Photo Upload Card */}
           <Card>
             <CardHeader>
-              <CardTitle>Photo Upload</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Image size={20} className="text-primary" />
+                Photo Upload
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <FormField
@@ -1144,7 +1214,20 @@ export default function StudentInformationForm({
                             />
                           </div>
                         )}
-                        <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors">
+                        <div
+                          className="border-2 border-dashed border-muted rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors w-full cursor-pointer"
+                          onClick={() => {
+                            const input = document.createElement("input");
+                            input.type = "file";
+                            input.accept = "image/*";
+                            input.onchange = (e) => {
+                              const file = (e.target as HTMLInputElement)
+                                .files?.[0];
+                              if (file) handlePhotoUpload(file);
+                            };
+                            input.click();
+                          }}
+                        >
                           <div className="flex flex-col items-center gap-4">
                             <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
                               <Upload className="h-6 w-6 text-muted-foreground" />
@@ -1155,17 +1238,6 @@ export default function StudentInformationForm({
                                 variant="outline"
                                 disabled={photoUploading}
                                 className="flex items-center gap-2 w-[200px]"
-                                onClick={() => {
-                                  const input = document.createElement("input");
-                                  input.type = "file";
-                                  input.accept = "image/*";
-                                  input.onchange = (e) => {
-                                    const file = (e.target as HTMLInputElement)
-                                      .files?.[0];
-                                    if (file) handlePhotoUpload(file);
-                                  };
-                                  input.click();
-                                }}
                               >
                                 {photoUploading ? (
                                   <>
@@ -1197,17 +1269,21 @@ export default function StudentInformationForm({
           {/* Document Attachments Card */}
           <Card>
             <CardHeader>
-              <CardTitle>Document Attachments</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <FileText size={20} className="text-primary" />
+                Document Attachments
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-4">
                 {documents.map((doc, index) => (
                   <div
                     key={index}
-                    className="p-4 border rounded-lg bg-muted/20 space-y-4"
+                    className="p-5 border-2 border-dashed rounded-lg bg-muted/10 space-y-4  transition-all shadow-sm"
                   >
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-sm">
+                    <div className="flex items-center justify-between ">
+                      <h4 className="font-medium text-sm flex items-center gap-2">
+                        <FileText size={16} className="text-primary" />
                         Document {index + 1}
                       </h4>
                       {index > 0 && (
@@ -1216,22 +1292,25 @@ export default function StudentInformationForm({
                           variant="ghost"
                           size="sm"
                           onClick={() => removeDocumentRow(index)}
-                          className="text-destructive hover:text-destructive/80 h-8 w-8 p-0"
+                          className="text-destructive hover:bg-destructive/10 h-8 w-8 p-0 rounded-full"
                         >
                           <X className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                    <div className="flex flex-col gap-4">
+                      <div className="w-full">
+                        {/* <label className="text-sm font-medium mb-1.5 block text-muted-foreground">
+                          Document Type
+                        </label> */}
                         <Select
                           onValueChange={(value) =>
                             handleDocumentTypeChange(index, value)
                           }
                           value={doc.attachment_type}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select document type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1244,55 +1323,137 @@ export default function StudentInformationForm({
                         </Select>
                       </div>
 
-                      <div className="space-y-2">
+                      <div className="w-full">
+                        {/* <label className="text-sm font-medium mb-1.5 block text-muted-foreground">
+                          Document File
+                        </label> */}
                         <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            disabled={doc.uploading}
-                            className="flex items-center gap-2 w-[200px]"
-                            onClick={() => {
-                              const input = document.createElement("input");
-                              input.type = "file";
-                              input.accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png";
-                              input.onchange = (e) => {
-                                const file = (e.target as HTMLInputElement)
-                                  .files?.[0];
-                                if (file) handleDocumentUpload(index, file);
-                              };
-                              input.click();
-                            }}
-                          >
-                            {doc.uploading ? (
-                              <>
-                                <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                                Uploading...
-                              </>
-                            ) : (
-                              <>
-                                Choose File
-                                <Upload className="h-4 w-4" />
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                        {doc.file && doc.url && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span className="text-green-700 font-medium truncate">
-                              {doc.file.name}
-                            </span>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => window.open(doc.url, "_blank")}
-                              className="h-6 px-2 text-xs"
+                          {doc.file && doc.url ? (
+                            <div className="flex flex-col w-full">
+                              <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-md border border-green-200 dark:border-green-900">
+                                <div className="w-10 h-10 rounded-md bg-green-100 dark:bg-green-800 flex items-center justify-center text-green-600 dark:text-green-300">
+                                  <FileText size={20} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-green-700 dark:text-green-300 truncate">
+                                    {doc.file.name}
+                                  </p>
+                                  <p className="text-xs text-green-600 dark:text-green-400">
+                                    {(doc.file.size / 1024).toFixed(1)} KB
+                                  </p>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => window.open(doc.url, "_blank")}
+                                  className="h-8 px-2 text-xs border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-800/50"
+                                >
+                                  View
+                                </Button>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="mt-2 text-xs self-end"
+                                onClick={() => {
+                                  const input = document.createElement("input");
+                                  input.type = "file";
+                                  input.accept =
+                                    ".pdf,.doc,.docx,.jpg,.jpeg,.png";
+                                  input.onchange = (e) => {
+                                    const file = (e.target as HTMLInputElement)
+                                      .files?.[0];
+                                    if (file) handleDocumentUpload(index, file);
+                                  };
+                                  input.click();
+                                }}
+                              >
+                                Replace file
+                              </Button>
+                            </div>
+                          ) : (
+                            // <div
+                            //   className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/5 hover:bg-muted/10 transition-colors hover:border-primary/50"
+                            //   onClick={() => {
+                            //     const input = document.createElement("input");
+                            //     input.type = "file";
+                            //     input.accept =
+                            //       ".pdf,.doc,.docx,.jpg,.jpeg,.png";
+                            //     input.onchange = (e) => {
+                            //       const file = (e.target as HTMLInputElement)
+                            //         .files?.[0];
+                            //       if (file) handleDocumentUpload(index, file);
+                            //     };
+                            //     input.click();
+                            //   }}
+                            // >
+                            //   {doc.uploading ? (
+                            //     <div className="flex flex-col items-center justify-center gap-2">
+                            //       <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+                            //       <p className="text-sm text-muted-foreground">
+                            //         Uploading...
+                            //       </p>
+                            //     </div>
+                            //   ) : (
+                            //     <div className="flex flex-col items-center justify-center gap-2">
+                            //       <Upload className="h-8 w-8 text-muted-foreground" />
+                            //       <p className="text-sm text-muted-foreground">
+                            //         Click to upload document
+                            //       </p>
+                            //       <p className="text-xs text-muted-foreground">
+                            //         PDF, DOC, DOCX, JPG, PNG (Max 10MB)
+                            //       </p>
+                            //     </div>
+                            //   )}
+                            // </div>
+                            <div
+                              className="border-2 border-dashed border-muted rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors w-full cursor-pointer"
+                              onClick={() => {
+                                const input = document.createElement("input");
+                                input.type = "file";
+                                input.accept =
+                                  ".pdf,.doc,.docx,.jpg,.jpeg,.png";
+                                input.onchange = (e) => {
+                                  const file = (e.target as HTMLInputElement)
+                                    .files?.[0];
+                                  if (file) handleDocumentUpload(index, file);
+                                };
+                                input.click();
+                              }}
                             >
-                              View
-                            </Button>
-                          </div>
-                        )}
+                              <div className="flex flex-col items-center gap-4">
+                                <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
+                                  <Upload className="h-6 w-6 text-muted-foreground" />
+                                </div>
+                                <div className="w-full flex flex-col items-center justify-center">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    disabled={doc.uploading}
+                                    className="flex items-center gap-2 w-[200px]"
+                                  >
+                                    {doc.uploading ? (
+                                      <>
+                                        <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                                        Uploading...
+                                      </>
+                                    ) : (
+                                      <>
+                                        Choose Document
+                                        <Upload className="h-4 w-4" />
+                                      </>
+                                    )}
+                                  </Button>
+                                  <p className="text-sm text-muted-foreground mt-2">
+                                    PDF, DOC, DOCX, JPG, PNG up to 10MB
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1303,16 +1464,16 @@ export default function StudentInformationForm({
                 type="button"
                 variant="outline"
                 onClick={addDocumentRow}
-                className="flex items-center gap-2 w-full"
+                className="flex items-center gap-2 w-full border-dashed border-2 py-6 hover:border-primary hover:text-primary transition-colors"
               >
-                <Plus className="h-4 w-4" />
-                Add New Document
+                <Plus className="h-5 w-5" />
+                <span className="font-medium">Add New Document</span>
               </Button>
             </CardContent>
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row justify-end items-center gap-4 pt-6">
+          <div className="flex flex-col sm:flex-row justify-end items-center gap-4 pt-2">
             <div className="flex gap-4">
               <Button
                 type="button"
