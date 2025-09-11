@@ -16,6 +16,7 @@ import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-stude
 import { deleteStudentViaWebhook } from "@/lib/actions/zoho-students-actions";
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 interface ZohoStudentsTableRowActionsProps {
   row: Row<ZohoStudent>;
@@ -38,6 +39,9 @@ export function ZohoStudentsTableRowActions({
   const handleConfirmation = (action: "delete") => {
     setConfirmationDialog({ isOpen: true, action });
   };
+
+  const { userProfile } = useAuth();
+  const isCrmId = userProfile?.crm_id || userProfile?.agency?.crm_id;
 
   const onConfirm = async () => {
     if (!values?.id) {
@@ -85,15 +89,17 @@ export function ZohoStudentsTableRowActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-max">
-          <DropdownMenuItem
-            onClick={() => {
-              router.push(`/students/edit/${values.id}`);
-            }}
-            className="cursor-pointer flex items-center"
-          >
-            <Edit className="mr-1 h-4 w-4" />
-            Edit
-          </DropdownMenuItem>
+          {isCrmId && (
+            <DropdownMenuItem
+              onClick={() => {
+                router.push(`/students/edit/${values.id}`);
+              }}
+              className="cursor-pointer flex items-center"
+            >
+              <Edit className="mr-1 h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem
             onClick={() => handleConfirmation("delete")}

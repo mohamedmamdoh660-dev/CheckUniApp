@@ -36,6 +36,7 @@ import { ZohoStudent } from "@/types/types";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { useAuth } from "@/context/AuthContext";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -66,7 +67,7 @@ export default function EditZohoApplication({
 }: EditZohoApplicationProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [students, setStudents] = useState<ZohoStudent[]>([]);
-
+  const { userProfile } = useAuth();
   // Initialize form
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -113,7 +114,7 @@ export default function EditZohoApplication({
         semester: values.semester || null,
         country: values.country || null,
         university: values.university || null,
-        stage: values.stage,
+        crm_id: userProfile?.crm_id || userProfile?.agency?.crm_id || "",
         degree: values.degree || null,
       };
 
@@ -141,9 +142,6 @@ export default function EditZohoApplication({
       setIsLoading(false);
     }
   };
-
-  // Application stage options
-  const stageOptions = ["pending", "processing", "completed", "failed"];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -281,7 +279,7 @@ export default function EditZohoApplication({
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);
                           // Reset dependent fields
-                          form.setValue("university", "");
+                          // form.setValue("university", "");
                         }}
                       />
                       <FormMessage />

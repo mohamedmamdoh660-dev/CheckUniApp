@@ -26,6 +26,7 @@ import {
 } from "@/lib/actions/zoho-applications-actions";
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
 import EditZohoApplication from "@/components/(main)/zoho-applications/component/edit-zoho-application";
+import { useAuth } from "@/context/AuthContext";
 // import EditZohoApplication from "@/components/(main)/zoho-applications/component/edit-zoho-application";
 
 interface ZohoApplicationsTableRowActionsProps {
@@ -140,6 +141,9 @@ export function ZohoApplicationsTableRowActions({
     }
   };
 
+  const { userProfile } = useAuth();
+  const isCrmId = userProfile?.crm_id || userProfile?.agency?.crm_id;
+
   return (
     <>
       <DropdownMenu>
@@ -153,15 +157,17 @@ export function ZohoApplicationsTableRowActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-max">
-          <DropdownMenuItem
-            onClick={() => {
-              setIsEditDialogOpen(true);
-            }}
-            className="cursor-pointer flex items-center"
-          >
-            <Edit className="mr-1 h-4 w-4" />
-            Edit
-          </DropdownMenuItem>
+          {isCrmId && (
+            <DropdownMenuItem
+              onClick={() => {
+                setIsEditDialogOpen(true);
+              }}
+              className="cursor-pointer flex items-center"
+            >
+              <Edit className="mr-1 h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem
             onClick={() => handleConfirmation("delete")}

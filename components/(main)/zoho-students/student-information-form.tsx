@@ -303,12 +303,7 @@ export default function StudentInformationForm({
             : userProfile?.roles?.name === "admin"
               ? null
               : userProfile?.agency_id,
-        crm_id:
-          userProfile?.roles?.name === "agency"
-            ? userProfile?.crm_id
-            : userProfile?.roles?.name === "agent"
-              ? userProfile?.agency?.crm_id
-              : userProfile?.crm_id,
+        crm_id: userProfile?.crm_id || userProfile?.agency?.crm_id || "",
       };
 
       // Data for database - only include the fields we're already passing

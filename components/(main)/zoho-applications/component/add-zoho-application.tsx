@@ -72,7 +72,7 @@ export default function AddZohoApplication({
     defaultValues: {
       student: "",
       program: "",
-      stage: "pending",
+      stage: "pending review",
       acdamic_year: "",
       semester: "",
       country: "",
@@ -107,12 +107,7 @@ export default function AddZohoApplication({
       // First, call the n8n webhook
       const webhookResponse = await createApplicationViaWebhook({
         ...applicationData,
-        crm_id:
-          userProfile?.roles?.name === "agency"
-            ? userProfile?.crm_id
-            : userProfile?.roles?.name === "agent"
-              ? userProfile?.agency?.crm_id
-              : userProfile?.crm_id,
+        crm_id: userProfile?.crm_id || userProfile?.agency?.crm_id || "",
       });
 
       if (webhookResponse.status) {
@@ -278,7 +273,7 @@ export default function AddZohoApplication({
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);
                           // Reset dependent fields
-                          form.setValue("university", "");
+                          // form.setValue("university", "");
                         }}
                       />
                       <FormMessage />

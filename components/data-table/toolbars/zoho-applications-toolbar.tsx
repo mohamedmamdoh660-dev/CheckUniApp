@@ -7,6 +7,7 @@ import { Download, Plus, RefreshCcw, X, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import AddZohoApplication from "@/components/(main)/zoho-applications/component/add-zoho-application";
+import { useAuth } from "@/context/AuthContext";
 
 interface DataTableToolbarProps<TData> {
   table?: Table<TData>;
@@ -35,6 +36,8 @@ export function ZohoApplicationsDataTableToolbar<TData>({
     setGlobalFilter(value);
     onGlobalFilterChange?.(value);
   };
+  const { userProfile } = useAuth();
+  const isCrmId = userProfile?.crm_id || userProfile?.agency?.crm_id;
 
   const isFiltered = globalFilter !== "";
 
@@ -88,21 +91,25 @@ export function ZohoApplicationsDataTableToolbar<TData>({
         </Button>
       </div>
       {table && <DataTableViewOptions table={table} />}
-      <div className="pl-2">
-        <Button
-          variant="default"
-          size="sm"
-          className="ml-auto h-8"
-          onClick={() => setIsDialogOpen(true)}
-        >
-          <Plus className="mr-1 h-4 w-4" /> Add Application
-        </Button>
-      </div>
-      <AddZohoApplication
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onRefresh={fetchRecords}
-      />
+      {isCrmId && (
+        <>
+          <div className="pl-2">
+            <Button
+              variant="default"
+              size="sm"
+              className="ml-auto h-8"
+              onClick={() => setIsDialogOpen(true)}
+            >
+              <Plus className="mr-1 h-4 w-4" /> Add Application
+            </Button>
+          </div>
+          <AddZohoApplication
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            onRefresh={fetchRecords}
+          />
+        </>
+      )}
     </div>
   );
 }
