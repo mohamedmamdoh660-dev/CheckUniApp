@@ -341,8 +341,7 @@ export default function StudentInformationForm({
         if (webhookResponse.status) {
           const studentDataWithId = {
             ...dbStudentData,
-            id:
-              webhookResponse.id + Math.random().toString(36).substring(2, 15),
+            id: webhookResponse.id,
             user_id: userProfile?.id,
             agency_id:
               userProfile?.roles?.name === "agency"
