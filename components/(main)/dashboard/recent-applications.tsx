@@ -9,23 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { RefreshCw, MoreHorizontal, InfoIcon, Eye } from "lucide-react";
-import InfoGraphic from "@/components/ui/info-graphic";
+import { RefreshCw } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
 import Image from "next/image";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
@@ -216,7 +210,12 @@ export function RecentApplications() {
                           : "-"}
                       </TableCell>
                       <TableCell>
-                        <StatusBadge status={application.stage || "pending"} />
+                        <Badge
+                          variant="outline"
+                          className="capitalize text-[12px]"
+                        >
+                          {application.stage || "pending"}
+                        </Badge>{" "}
                       </TableCell>
                       {/* <TableCell>
                         <DropdownMenu>

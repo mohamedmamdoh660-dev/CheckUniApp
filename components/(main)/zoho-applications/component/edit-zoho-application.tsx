@@ -361,35 +361,6 @@ export default function EditZohoApplication({
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="stage"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel>Stage</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select stage" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {stageOptions.map((stage) => (
-                            <SelectItem key={stage} value={stage}>
-                              {stage.charAt(0).toUpperCase() + stage.slice(1)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
 
               <DialogFooter>

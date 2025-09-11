@@ -1,3 +1,4 @@
+
 import { executeGraphQLBackend } from "@/lib/graphql-server";
 import {
   DELETE_STUDENT,
@@ -33,8 +34,7 @@ getStudentsPagination: async (
   userRole: string,
   agency_id: string
 ) => {
-  console.log("🚀 ~ userRole:", userRole)
-  console.log("🚀 ~ user_id:", user_id)
+
   try {
     // Build the base query with all the fields and relationships
     let query = supabaseClient

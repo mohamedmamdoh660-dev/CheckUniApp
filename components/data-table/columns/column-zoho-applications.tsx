@@ -160,7 +160,11 @@ export function getZohoApplicationsColumns(
       cell: ({ row }) => {
         const stage = row.original.stage || "";
 
-        return <Badge variant="outline">{stage}</Badge>;
+        return (
+          <Badge variant="outline" className="capitalize text-[12px]">
+            {stage}
+          </Badge>
+        );
       },
       enableSorting: true,
       enableHiding: true,

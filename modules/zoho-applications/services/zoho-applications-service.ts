@@ -1,3 +1,4 @@
+
 import { executeGraphQLBackend } from "@/lib/graphql-server";
 import {
   DELETE_APPLICATION,
