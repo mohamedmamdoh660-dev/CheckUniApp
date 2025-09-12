@@ -97,7 +97,7 @@ export default function AddZohoApplication({
         degree: values.degree || null,
         user_id: userProfile?.id,
         agency_id:
-          userProfile?.roles?.name === "agency"
+          userProfile?.roles?.name === "agent"
             ? userProfile?.id
             : userProfile?.roles?.name === "admin"
               ? null

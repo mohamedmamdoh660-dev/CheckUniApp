@@ -298,7 +298,7 @@ export default function StudentInformationForm({
         documents: documentsData,
         user_id: userProfile?.id,
         agency_id:
-          userProfile?.roles?.name === "agency"
+          userProfile?.roles?.name === "agent"
             ? userProfile?.id
             : userProfile?.roles?.name === "admin"
               ? null
@@ -346,7 +346,7 @@ export default function StudentInformationForm({
             id: webhookResponse.id,
             user_id: userProfile?.id,
             agency_id:
-              userProfile?.roles?.name === "agency"
+              userProfile?.roles?.name === "agent"
                 ? userProfile?.id
                 : userProfile?.roles?.name === "admin"
                   ? null

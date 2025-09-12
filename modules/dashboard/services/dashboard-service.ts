@@ -93,9 +93,9 @@ export const dashboardService = {
         .select('university::text, zoho_universities(id::text, name)')
         .not('university', 'is', null);
 
-      if (role === 'agency') {
+      if (role === 'agent') {
          query.eq('agency_id', userId);
-      } else if (role === 'agent') {
+      } else if (role === 'sub agent') {
         query.eq('user_id', userId);
       }
 
@@ -143,9 +143,9 @@ export const dashboardService = {
         .select('gender')
         .not('gender', 'is', null);
 
-      if (role === 'agency') {
+      if (role === 'agent') {
          query.eq('agency_id', userId);
-      } else if (role === 'agent') {
+      } else if (role === 'sub agent') {
         query.eq('user_id', userId);
       }
 
@@ -219,9 +219,9 @@ export const dashboardService = {
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (role === 'agency') {
+      if (role === 'agent') {
          query.eq('agency_id', userId);
-      } else if (role === 'agent') {
+      } else if (role === 'sub agent') {
         query.eq('user_id', userId);
       }
 
@@ -277,9 +277,9 @@ export const dashboardService = {
         .gte('created_at', startDate.toISOString())
         .lte('created_at', endDate.toISOString());
 
-      if (role === 'agency') {
+      if (role === 'agent') {
          query.eq('agency_id', userId);
-        } else if (role === 'agent') {
+        } else if (role === 'sub agent') {
         query.eq('user_id', userId);
       }
 

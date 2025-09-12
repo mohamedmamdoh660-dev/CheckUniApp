@@ -110,8 +110,8 @@ export default function AddUser({
       form.reset();
       form.setValue(
         "role",
-        userProfile?.roles?.name === "agency"
-          ? listRoles?.find((role) => role.name === "agent")?.id || ""
+        userProfile?.roles?.name === "agent"
+          ? listRoles?.find((role) => role.name === "sub agent")?.id || ""
           : ""
       );
       setProfile("");
@@ -150,11 +150,10 @@ export default function AddUser({
         email: values.email,
         profile: profile || "",
         role_id:
-          userProfile?.roles?.name === "agency"
-            ? listRoles?.find((role) => role.name === "agent")?.id
+          userProfile?.roles?.name === "agent"
+            ? listRoles?.find((role) => role.name === "sub agent")?.id
             : values.role,
-        agency_id:
-          userProfile?.roles?.name === "agency" ? userProfile.id : null,
+        agency_id: userProfile?.roles?.name === "agent" ? userProfile.id : null,
       };
 
       await usersService.createUser(userData);
@@ -296,7 +295,7 @@ export default function AddUser({
                           </FormControl>
                           <SelectContent>
                             {listRoles
-                              ?.filter((role) => role.name !== "agent")
+                              ?.filter((role) => role.name !== "sub agent")
                               .map((role) => (
                                 <SelectItem
                                   key={role.id}

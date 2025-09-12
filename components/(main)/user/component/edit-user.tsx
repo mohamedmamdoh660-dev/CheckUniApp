@@ -215,7 +215,7 @@ export default function EditUser({
                 />
 
                 {userProfile?.roles?.name === "admin" &&
-                  userData?.roles?.name !== "agent" && (
+                  userData?.roles?.name !== "sub agent" && (
                     <FormField
                       control={form.control}
                       name="role"
@@ -234,7 +234,7 @@ export default function EditUser({
                             </FormControl>
                             <SelectContent>
                               {listRoles
-                                ?.filter((role) => role.name !== "agent")
+                                ?.filter((role) => role.name !== "sub agent")
                                 .map((role) => (
                                   <SelectItem
                                     className="uppercase "

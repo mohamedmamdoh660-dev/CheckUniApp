@@ -90,16 +90,16 @@ export function getUserColumns(
     ...(isAdmin
       ? [
           {
-            accessorKey: "agency",
+            accessorKey: "agent",
             header: ({ column }: { column: Column<User> }) => (
-              <DataTableColumnHeader column={column} title="Agency" />
+              <DataTableColumnHeader column={column} title="Agent" />
             ),
             cell: ({ row }: { row: Row<User> }) => {
-              const agency =
+              const agent =
                 row.original.agency?.settings?.edges[0]?.node.site_name ||
                 row.original.settings?.edges[0]?.node.site_name;
 
-              return agency ? (
+              return agent ? (
                 <div>
                   {" "}
                   <div className="flex items-center w-full">
@@ -113,14 +113,14 @@ export function getUserColumns(
                             ? row.original.agency?.settings?.edges[0]?.node
                                 .logo_url ||
                               row.original.settings?.edges[0]?.node.logo_url
-                            : generateNameAvatar(agency || "")
+                            : generateNameAvatar(agent || "")
                         }
-                        alt={agency || ""}
+                        alt={agent || ""}
                       />
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight ml-3">
                       <span className="truncate font-semibold">
-                        {agency || ""}
+                        {agent || ""}
                       </span>
                     </div>
                   </div>

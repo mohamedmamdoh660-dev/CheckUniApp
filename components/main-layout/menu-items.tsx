@@ -208,7 +208,7 @@ export const getNavData = (user: { roles?: string }) => {
   const isAdmin =
     user.roles === UserRoles.ADMIN || user.roles?.includes(UserRoles.ADMIN);
   const isAgency =
-    user.roles === UserRoles.AGENCY || user.roles?.includes(UserRoles.AGENCY);
+    user.roles === UserRoles.AGENT || user.roles?.includes(UserRoles.AGENT);
 
   return {
     navMain: isAdmin ? adminNavMain : isAgency ? agencyNavMain : navMain,

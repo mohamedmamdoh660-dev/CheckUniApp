@@ -45,8 +45,8 @@ export interface User {
 
 export enum UserRoles {
   ADMIN = "admin",
-  AGENCY = "agency",
-  AGENT = "agent"
+  AGENT = "agent",
+  SUB_AGENT = "sub agent"
 }
 
 

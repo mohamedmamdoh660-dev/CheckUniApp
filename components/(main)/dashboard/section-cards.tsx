@@ -33,7 +33,7 @@ export function SectionCards() {
     try {
       const data = await dashboardService.getDashboardStats(
         userProfile?.roles?.name,
-        userProfile?.roles?.name === "agency"
+        userProfile?.roles?.name === "agent"
           ? userProfile?.id
           : userProfile?.agency_id,
         userProfile?.id

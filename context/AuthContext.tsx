@@ -95,18 +95,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
     if (settingsData) {
       setSettings(settingsData);
-    } else if (userProfile?.roles.name === "agency") {
+    } else if (userProfile?.roles.name === "agent") {
       const createdSettings = await settingsService.insertSettings({
         site_name:
           userProfile?.full_name ||
           userProfile?.first_name + " " + userProfile?.last_name ||
-          "Agency Name",
+          "Agent Name",
         appearance_theme: "dark",
         logo_setting: "square",
         site_description: "",
         primary_color: "#3B82F6",
         agency_id: userProfile?.id,
-        type: "AGENCY",
+        type: "AGENT",
       });
       setSettings(createdSettings);
       window.dispatchEvent(new CustomEvent("settings-update"));

@@ -114,9 +114,9 @@ getStudentsPagination: async (
     // }
 
     // Role-based filtering (if needed)
-    if (userRole === "agency") {
+    if (userRole === "agent") {
       query = query.eq("agency_id", user_id);
-    } else if (userRole !== "admin") {
+    } else if (userRole === "sub agent") {
       query = query.eq("user_id", user_id);
     }
 

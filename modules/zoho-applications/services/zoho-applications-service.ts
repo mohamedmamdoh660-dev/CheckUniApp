@@ -140,9 +140,9 @@ export const zohoApplicationsService = {
         );
   
       // Role-based filtering
-      if (userRole === "agency") {
+      if (userRole === "agent") {
         query = query.eq("agency_id", user_id);
-      } else if (userRole !== "admin") {
+      } else if (userRole === "sub agent") {
         query = query.eq("user_id", user_id);
       }
   
@@ -305,7 +305,7 @@ export const zohoApplicationsService = {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter =  { or: [ { first_name: { ilike: searchPattern } }, { last_name: { ilike: searchPattern } }, { email: { ilike: searchPattern } } ], ...(id ? { id: { eq: id } } : {}), ...(userRole === 'agency' ? { agency_id: { eq: agency_id } } : userRole === 'agent' ? { user_id: { eq: user_id } } : {}) };
+      const filter =  { or: [ { first_name: { ilike: searchPattern } }, { last_name: { ilike: searchPattern } }, { email: { ilike: searchPattern } } ], ...(id ? { id: { eq: id } } : {}), ...(userRole === 'agent' ? { agency_id: { eq: agency_id } } : userRole === 'sub agent' ? { user_id: { eq: user_id } } : {}) };
       const response = await executeGraphQLBackend(GET_ZOHO_STUDENTS, { filter, limit: pageSize, offset });
       return response.zoho_studentsCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
