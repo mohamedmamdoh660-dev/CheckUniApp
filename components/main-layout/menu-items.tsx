@@ -151,8 +151,9 @@ export const getNavData = (user: { roles?: string }) => {
         },
       ],
     },
+
     {
-      title: "Other",
+      title: "Admin Area",
       url: "#",
       items: [
         {
@@ -160,12 +161,6 @@ export const getNavData = (user: { roles?: string }) => {
           url: "/settings",
           icon: RiSettings3Line,
         },
-      ],
-    },
-    {
-      title: "Admin Area",
-      url: "#",
-      items: [
         {
           title: "Users",
           url: "/users",
@@ -179,8 +174,9 @@ export const getNavData = (user: { roles?: string }) => {
 
   const agencyNavMain = [
     ...navMain,
+
     {
-      title: "Other",
+      title: "Admin Area",
       url: "#",
       items: [
         {
@@ -188,12 +184,6 @@ export const getNavData = (user: { roles?: string }) => {
           url: "/settings",
           icon: RiSettings3Line,
         },
-      ],
-    },
-    {
-      title: "Admin Area",
-      url: "#",
-      items: [
         {
           title: "Users",
           url: "/users",
