@@ -33,7 +33,7 @@ export interface SearchableDropdownProps {
   dependsOn?: {
     field: string;
     value: string | number | null;
-  };
+  }[];
   renderItem?: (item: DropdownItem) => React.ReactNode;
   disabled?: boolean;
   bottom?: boolean;
@@ -56,7 +56,7 @@ const fetchTableData = async ({
   searchField: string;
   page: number;
   pageSize: number;
-  dependsOn?: { field: string; value: string | number | null };
+  dependsOn?: { field: string; value: string | number | null }[];
   id?: string;
   label?: string;
   userProfile?: any;
@@ -73,7 +73,8 @@ const fetchTableData = async ({
           searchTerm,
           page,
           pageSize,
-          id
+          id,
+          dependsOn?.[0]
         );
 
         data = allUniversities;
@@ -87,7 +88,8 @@ const fetchTableData = async ({
           page,
           pageSize,
           id,
-          label
+          label,
+          dependsOn?.[0]
         );
 
         data = allCountries;
@@ -100,7 +102,8 @@ const fetchTableData = async ({
           searchTerm,
           page,
           pageSize,
-          id
+          id,
+          dependsOn?.[0]
         );
 
         data = allCities;
@@ -113,7 +116,8 @@ const fetchTableData = async ({
           searchTerm,
           page,
           pageSize,
-          id
+          id,
+          dependsOn?.[0]
         );
 
         data = allDegrees;
@@ -139,7 +143,8 @@ const fetchTableData = async ({
           searchTerm,
           page,
           pageSize,
-          id
+          id,
+          dependsOn?.[0]
         );
 
         data = allSpecialities;
@@ -152,7 +157,8 @@ const fetchTableData = async ({
           searchTerm,
           page,
           pageSize,
-          id
+          id,
+          dependsOn?.[0]
         );
 
         data = allFaculties;
@@ -165,7 +171,8 @@ const fetchTableData = async ({
           searchTerm,
           page,
           pageSize,
-          id
+          id,
+          dependsOn?.[0]
         );
         data = allAcademicYears;
         count = allAcademicYears.length;
@@ -189,7 +196,8 @@ const fetchTableData = async ({
           searchTerm,
           page,
           pageSize,
-          id
+          id,
+          dependsOn
         );
         data = allPrograms;
         count = allPrograms.length;
@@ -204,7 +212,8 @@ const fetchTableData = async ({
           id,
           userProfile?.roles?.name || "",
           userProfile?.id || "",
-          userProfile?.id || ""
+          userProfile?.id || "",
+          dependsOn?.[0]
         );
         data = allStudents;
         count = allStudents.length;
@@ -275,7 +284,7 @@ export function SearchableDropdown({
           searchField: searchField,
           page: currentPage,
           pageSize: 10,
-          dependsOn,
+          dependsOn: dependsOn || [],
           label,
           userProfile,
         });
@@ -294,7 +303,7 @@ export function SearchableDropdown({
         setLoading(false);
       }
     },
-    [table, searchField, dependsOn]
+    [table, searchField, dependsOn, label, userProfile]
   );
 
   // Load more data when scrolling to bottom
@@ -309,6 +318,20 @@ export function SearchableDropdown({
     loadData(0, debouncedSearchTerm);
     setHighlightedIndex(-1);
   }, [debouncedSearchTerm, loadData]);
+
+  // Reset list and selection when dependency changes
+  useEffect(() => {
+    // When dependsOn value changes, clear selection and reload from first page
+    if (dependsOn) {
+      setSelectedItem(null);
+      setItems([]);
+      setPage(0);
+      setSearchTerm("");
+      setInitialLoaded(false);
+      loadData(0, "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dependsOn]);
 
   // Handle initial value
   useEffect(() => {
@@ -327,7 +350,7 @@ export function SearchableDropdown({
               searchField: "id",
               page: 0,
               pageSize: 1,
-              dependsOn: { field: "id", value: initialValue },
+              dependsOn: dependsOn || [],
               id: initialValue as string,
               label: "",
               userProfile,
@@ -345,7 +368,7 @@ export function SearchableDropdown({
         fetchInitialItem();
       }
     }
-  }, [initialValue, items, loading, initialLoaded, table]);
+  }, [initialValue, items, loading, initialLoaded, table, userProfile]);
 
   // Handle scroll for pagination
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -524,7 +547,7 @@ export function SearchableDropdown({
                     }}
                     onMouseEnter={() => setHighlightedIndex(index)}
                     className={cn(
-                      "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none cursor-pointer",
+                      "relative flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none cursor-pointer",
                       highlightedIndex === index
                         ? "bg-accent text-accent-foreground"
                         : "hover:bg-accent hover:text-accent-foreground"

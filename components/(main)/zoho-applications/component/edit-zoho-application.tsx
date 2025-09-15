@@ -194,27 +194,6 @@ export default function EditZohoApplication({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="program"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Program*</FormLabel>
-                    <SearchableDropdown
-                      placeholder="Search program..."
-                      table="zoho-programs"
-                      searchField="name"
-                      displayField="name"
-                      initialValue={field.value}
-                      onSelect={(item) => {
-                        field.onChange(item.id);
-                      }}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -279,7 +258,8 @@ export default function EditZohoApplication({
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);
                           // Reset dependent fields
-                          // form.setValue("university", "");
+                          form.setValue("university", "");
+                          form.setValue("program", "");
                         }}
                       />
                       <FormMessage />
@@ -300,13 +280,17 @@ export default function EditZohoApplication({
                         displayField="name"
                         initialValue={field.value}
                         bottom={false}
-                        // dependsOn={{
-                        //   field: "country",
-                        //   value: form.watch("country") || null
-                        // }}
-                        // disabled={!form.watch("country")}
+                        dependsOn={[
+                          {
+                            field: "country",
+                            value: form.watch("country") || null,
+                          },
+                        ]}
+                        disabled={!form.watch("country")}
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);
+                          // Reset dependent fields
+                          form.setValue("program", "");
                         }}
                         renderItem={(item: any) => (
                           <div className="flex items-center gap-2">
@@ -352,6 +336,46 @@ export default function EditZohoApplication({
                         bottom={false}
                         initialValue={field.value}
                         onSelect={(item: { id: string }) => {
+                          field.onChange(item.id);
+                        }}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* Program (depends on at least university; can be extended) */}
+                <FormField
+                  control={form.control}
+                  name="program"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel>Program*</FormLabel>
+                      <SearchableDropdown
+                        placeholder="Search program..."
+                        table="zoho-programs"
+                        searchField="name"
+                        displayField="name"
+                        dependsOn={[
+                          {
+                            field: "university_id",
+                            value: form.watch("university") || null,
+                          },
+                          {
+                            field: "country_id",
+                            value: form.watch("country") || null,
+                          },
+                          {
+                            field: "degree_id",
+                            value: form.watch("degree") || null,
+                          },
+                        ]}
+                        disabled={
+                          !form.watch("university") ||
+                          !form.watch("country") ||
+                          !form.watch("degree")
+                        }
+                        initialValue={field.value}
+                        onSelect={(item) => {
                           field.onChange(item.id);
                         }}
                       />

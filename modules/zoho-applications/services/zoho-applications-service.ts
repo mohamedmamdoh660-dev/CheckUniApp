@@ -268,11 +268,17 @@ export const zohoApplicationsService = {
   /**
    * Get all academic years
    */
-  getAcademicYears: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoAcademicYear[]> => {
+  getAcademicYears: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, dependsOn: { field: string, value: string | number | null } | null = null): Promise<ZohoAcademicYear[]> => {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
+      let filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
+      if (dependsOn && dependsOn.value) {
+        filter = {
+          ...filter,
+          [dependsOn.field]: { eq: dependsOn.value }
+        };
+      }
       const response = await executeGraphQLBackend(GET_ZOHO_ACADEMIC_YEARS, { filter, limit: pageSize, offset });
       return response.zoho_academic_yearsCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
@@ -284,11 +290,17 @@ export const zohoApplicationsService = {
   /**
    * Get all semesters
    */
-  getSemesters: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null): Promise<ZohoSemester[]> => {
+  getSemesters: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, dependsOn: { field: string, value: string | number | null } | null = null): Promise<ZohoSemester[]> => {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
+      let filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
+      if (dependsOn && dependsOn.value) {
+        filter = {
+          ...filter,
+          [dependsOn.field]: { eq: dependsOn.value }
+        };
+      }
       const response = await executeGraphQLBackend(GET_ZOHO_SEMESTERS, { filter, limit: pageSize, offset });
       return response.zoho_semestersCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
@@ -300,12 +312,18 @@ export const zohoApplicationsService = {
   /**
    * Get all students
    */
-  getStudents: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, userRole: string, user_id: string, agency_id: string): Promise<ZohoStudent[]> => {
+  getStudents: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, userRole: string, user_id: string, agency_id: string, dependsOn: { field: string, value: string | number | null } | null = null): Promise<ZohoStudent[]> => {
     
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      const filter =  { or: [ { first_name: { ilike: searchPattern } }, { last_name: { ilike: searchPattern } }, { email: { ilike: searchPattern } } ], ...(id ? { id: { eq: id } } : {}), ...(userRole === 'agent' ? { agency_id: { eq: agency_id } } : userRole === 'sub agent' ? { user_id: { eq: user_id } } : {}) };
+      let filter =  { or: [ { first_name: { ilike: searchPattern } }, { last_name: { ilike: searchPattern } }, { email: { ilike: searchPattern } } ], ...(id ? { id: { eq: id } } : {}), ...(userRole === 'agent' ? { agency_id: { eq: agency_id } } : userRole === 'sub agent' ? { user_id: { eq: user_id } } : {}) };
+      if (dependsOn && dependsOn.value) {
+        filter = {
+          ...filter,
+          [dependsOn.field]: { eq: dependsOn.value }
+        };
+      }
       const response = await executeGraphQLBackend(GET_ZOHO_STUDENTS, { filter, limit: pageSize, offset });
       return response.zoho_studentsCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
