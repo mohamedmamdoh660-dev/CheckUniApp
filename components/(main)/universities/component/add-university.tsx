@@ -287,10 +287,12 @@ export default function AddUniversity({
                           searchField="name"
                           displayField="name"
                           initialValue={field.value}
-                          dependsOn={{
-                            field: "country",
-                            value: form.watch("country") || null,
-                          }}
+                          dependsOn={[
+                            {
+                              field: "country",
+                              value: form.watch("country") || null,
+                            },
+                          ]}
                           disabled={!form.watch("country")}
                           onSelect={(item) => {
                             field.onChange(item.id);

@@ -234,10 +234,12 @@ export default function AddAnnouncementDialog({
                       searchField="name"
                       displayField="name"
                       initialValue={field.value}
-                      dependsOn={{
-                        field: "university",
-                        value: form.watch("university") || null,
-                      }}
+                      dependsOn={[
+                        {
+                          field: "university",
+                          value: form.watch("university") || null,
+                        },
+                      ]}
                       disabled={!form.watch("university")}
                       onSelect={(item) => {
                         field.onChange(item.id);
