@@ -184,11 +184,11 @@ export const zohoProgramsService = {
   /**
    * Get all countries
    */
-  getCountries: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, label?: string, dependsOn: { field: string, value: string | number | null } | null = null): Promise<ZohoCountry[]> => {
+  getCountries: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, label?: string, dependsOn: { field: string, value: string | number | null } | null = null, activeOnNationalities?: boolean, activeOnUniversity?: boolean): Promise<ZohoCountry[]> => {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      let filter = label === 'Nationality'? { name: { ilike: searchPattern }, active_on_nationalities: { eq: true }, ...(id ? { id: { eq: id } } : {}) } : label === 'Country of Residence'? { name: { ilike: searchPattern }, active_on_university: { eq: true }, ...(id ? { id: { eq: id } } : {}) } : { name: { ilike: searchPattern },active_on_nationalities: { eq: true }, active_on_university: { eq: true } };
+      let filter = label === 'Nationality'? { name: { ilike: searchPattern }, active_on_nationalities: { eq: true }, ...(id ? { id: { eq: id } } : {}) } : label === 'Country of Residence'? { name: { ilike: searchPattern }, active_on_university: { eq: true }, ...(id ? { id: { eq: id } } : {}) } : { name: { ilike: searchPattern }, ...(activeOnNationalities ? { active_on_nationalities: { eq: activeOnNationalities } } : {}), ...(activeOnUniversity ? { active_on_university: { eq: activeOnUniversity } } : {}) };
             if (dependsOn && dependsOn.value) {
         filter = {
           ...filter,

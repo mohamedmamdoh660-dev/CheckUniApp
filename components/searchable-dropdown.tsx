@@ -89,7 +89,9 @@ const fetchTableData = async ({
           pageSize,
           id,
           label,
-          dependsOn?.[0]
+          dependsOn?.[0],
+          true,
+          true
         );
 
         data = allCountries;
