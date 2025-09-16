@@ -517,7 +517,7 @@ export function SearchableDropdown({
             {/* Items List */}
             <div
               ref={listRef}
-              className="max-h-60 scroll-py-1 overflow-x-hidden overflow-y-auto"
+              className="max-h-54 scroll-py-1 overflow-x-hidden overflow-y-auto"
               onScroll={handleScroll}
             >
               {/* Empty State */}

@@ -111,6 +111,12 @@ export default function AddZohoApplication({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (open) {
+      form.reset();
+    }
+  }, [open]);
+
   // Handler for creating application
   const onSubmit = async (values: FormSchema) => {
     setIsLoading(true);
