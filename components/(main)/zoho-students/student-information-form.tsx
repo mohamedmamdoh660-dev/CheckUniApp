@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,59 +65,89 @@ import { ZohoCountry } from "@/types/types";
 import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
 
 // Enhanced form validation schema based on the images
-const formSchema = z.object({
-  // Basic student info
-  transfer_student: z.enum(["yes", "no"]).optional(),
-  have_tc: z.enum(["yes", "no"]).optional(),
-  blue_card: z.enum(["yes", "no"]).optional(),
+const formSchema = z
+  .object({
+    // Basic student info
+    transfer_student: z.enum(["yes", "no"], {
+      required_error: "Transfer student is required",
+    }),
+    have_tc: z.enum(["yes", "no"]).optional(),
+    blue_card: z.enum(["yes", "no"], {
+      required_error: "Blue card selection is required",
+    }),
 
-  // Personal Information
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  gender: z.string().optional(),
-  date_of_birth: z.date().optional(),
-  nationality: z.string().optional(),
-  passport_number: z.string().optional(),
-  passport_issue_date: z.date().optional(),
-  passport_expiry_date: z.date().optional(),
-  country_of_residence: z.string().optional(),
-  student_id: z.string().optional(),
+    // Personal Information
+    first_name: z.string().min(1, "First name is required"),
+    last_name: z.string().min(1, "Last name is required"),
+    gender: z.enum(["Male", "Female", "Other"], {
+      required_error: "Gender is required",
+    }),
+    date_of_birth: z.date({ required_error: "Date of birth is required" }),
+    nationality: z.string().min(1, "Nationality is required"),
+    passport_number: z.string().min(1, "Passport number is required"),
+    passport_issue_date: z.date({ required_error: "Issue date is required" }),
+    passport_expiry_date: z.date({ required_error: "Expiry date is required" }),
+    country_of_residence: z.string().min(1, "Country of residence is required"),
+    student_id: z.string().optional(),
 
-  // Contact Information
-  email: z.string().email("Invalid email address").optional().or(z.literal("")),
-  mobile: z.string().optional(),
+    // Contact Information
+    email: z
+      .string({ required_error: "Email is required" })
+      .email("Invalid email address"),
+    mobile: z.string().optional(),
 
-  // Address Information
-  address_line_1: z.string().optional(),
-  city_district: z.string().optional(),
-  state_province: z.string().optional(),
-  postal_code: z.string().optional(),
-  address_country: z.string().optional(),
+    // Address Information
+    address_line_1: z.string().optional(),
+    city_district: z.string().optional(),
+    state_province: z.string().optional(),
+    postal_code: z.string().optional(),
+    address_country: z.string().optional(),
 
-  // Parent Information
-  father_name: z.string().optional(),
-  father_mobile: z.string().optional(),
-  father_occupation: z.string().optional(),
-  mother_name: z.string().optional(),
-  mother_mobile: z.string().optional(),
-  mother_occupation: z.string().optional(),
+    // Parent Information
+    father_name: z.string().min(1, "Father name is required"),
+    father_mobile: z.string().optional(),
+    father_occupation: z.string().optional(),
+    mother_name: z.string().optional(),
+    mother_mobile: z.string().optional(),
+    mother_occupation: z.string().optional(),
 
-  // Education Information
-  education_level: z.string().optional(),
+    // Education Information
+    education_level: z.string().optional(),
 
-  // Photo
-  photo: z.any().optional(),
+    // Photo
+    photo: z.any().optional(),
 
-  // Documents
-  documents: z
-    .array(
-      z.object({
-        attachment_type: z.string(),
-        file: z.any(),
-      })
-    )
-    .optional(),
-});
+    // Documents
+    documents: z
+      .array(
+        z.object({
+          attachment_type: z.string(),
+          file: z.any(),
+        })
+      )
+      .optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (
+      val.passport_issue_date &&
+      val.passport_expiry_date &&
+      val.passport_expiry_date < val.passport_issue_date
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["passport_expiry_date"],
+        message: "Expiry date cannot be before issue date",
+      });
+    }
+
+    if (val.date_of_birth && val.date_of_birth > new Date()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["date_of_birth"],
+        message: "Date of birth cannot be in the future",
+      });
+    }
+  });
 
 interface StudentInformationFormProps {
   mode: "create" | "edit";
@@ -148,15 +178,15 @@ export default function StudentInformationForm({
 
   const [contries, setContries] = useState<ZohoCountry[]>([]);
   // Initialize form
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<any>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      transfer_student: undefined,
-      have_tc: undefined,
-      blue_card: undefined,
+      transfer_student: "no",
+      have_tc: "no",
+      blue_card: "no",
       first_name: "",
       last_name: "",
-      gender: "",
+      gender: undefined,
       date_of_birth: undefined,
       nationality: "",
       passport_number: "",
@@ -183,14 +213,7 @@ export default function StudentInformationForm({
     },
   });
 
-  // Load student data for edit mode
-  useEffect(() => {
-    if (mode === "edit" && studentId) {
-      loadStudentData();
-    }
-  }, [mode, studentId]);
-
-  const loadStudentData = async () => {
+  const loadStudentData = useCallback(async () => {
     try {
       setIsLoading(true);
       const student = await zohoStudentsService.getStudentById(studentId!);
@@ -199,7 +222,7 @@ export default function StudentInformationForm({
         form.reset({
           first_name: student.first_name || "",
           last_name: student.last_name || "",
-          gender: student.gender || "",
+          gender: student.gender || undefined,
           date_of_birth: student.date_of_birth
             ? new Date(student.date_of_birth)
             : undefined,
@@ -228,10 +251,17 @@ export default function StudentInformationForm({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [form, studentId]);
+
+  // Load student data for edit mode
+  useEffect(() => {
+    if (mode === "edit" && studentId) {
+      loadStudentData();
+    }
+  }, [mode, studentId, loadStudentData]);
 
   // Handler for form submission
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: any) => {
     setIsLoading(true);
 
     try {
@@ -879,20 +909,6 @@ export default function StudentInformationForm({
                         </SelectContent>
                       </Select>
 
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="student_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Student ID</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Student ID" {...field} />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
