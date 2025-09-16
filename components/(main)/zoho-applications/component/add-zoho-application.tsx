@@ -114,6 +114,10 @@ export default function AddZohoApplication({
   useEffect(() => {
     if (open) {
       form.reset();
+      const academicYear = academicYears.find((y: any) => y.is_default) || null;
+      const semester = semesters.find((s: any) => s.is_default) || null;
+      form.setValue("acdamic_year", academicYear?.id || "");
+      form.setValue("semester", semester?.id || "");
     }
   }, [open]);
 

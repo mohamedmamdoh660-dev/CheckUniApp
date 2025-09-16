@@ -219,20 +219,20 @@ export function getZohoApplicationsColumns(
       enableHiding: true,
     },
 
-    {
-      id: "actions",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actions" />
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">
-          <ZohoApplicationsTableRowActions
-            row={row}
-            fetchApplications={fetchApplications}
-          />
-        </div>
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Actions" />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-center">
+    //       <ZohoApplicationsTableRowActions
+    //         row={row}
+    //         fetchApplications={fetchApplications}
+    //       />
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;
