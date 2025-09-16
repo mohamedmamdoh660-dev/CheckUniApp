@@ -293,6 +293,7 @@ export const GET_ZOHO_ACADEMIC_YEARS = `
           id
           name
           active
+          is_default
           created_at
           updated_at
         }
@@ -313,6 +314,7 @@ export const GET_ZOHO_SEMESTERS = `
           id
           name
           active
+          is_default
           created_at
           updated_at
         }

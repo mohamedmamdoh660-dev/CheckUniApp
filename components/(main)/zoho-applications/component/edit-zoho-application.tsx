@@ -37,6 +37,7 @@ import { SearchableDropdown } from "@/components/searchable-dropdown";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { useAuth } from "@/context/AuthContext";
+import { ZohoAcademicYear, ZohoSemester } from "@/types/types";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -66,8 +67,9 @@ export default function EditZohoApplication({
   fetchApplications,
 }: EditZohoApplicationProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [students, setStudents] = useState<ZohoStudent[]>([]);
   const { userProfile } = useAuth();
+  const [academicYears, setAcademicYears] = useState<ZohoAcademicYear[]>([]);
+  const [semesters, setSemesters] = useState<ZohoSemester[]>([]);
   // Initialize form
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -82,6 +84,33 @@ export default function EditZohoApplication({
       degree: applicationData?.degree?.toString() || "",
     },
   });
+
+  // Fetch lists once and set default if empty
+  useEffect(() => {
+    const loadLists = async () => {
+      try {
+        const [years, sems] = await Promise.all([
+          zohoApplicationsService.getAcademicYears("", 0, 100),
+          zohoApplicationsService.getSemesters("", 0, 100),
+        ]);
+        setAcademicYears(years);
+        setSemesters(sems);
+
+        if (!form.getValues("acdamic_year")) {
+          const defYear = years.find((y: any) => y.is_default) || null;
+          if (defYear) form.setValue("acdamic_year", defYear.id);
+        }
+        if (!form.getValues("semester")) {
+          const defSem = sems.find((s: any) => s.is_default) || null;
+          if (defSem) form.setValue("semester", defSem.id);
+        }
+      } catch (e) {
+        // non-blocking
+      }
+    };
+    loadLists();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Reset form when applicationData changes
   useEffect(() => {
@@ -201,17 +230,23 @@ export default function EditZohoApplication({
                   render={({ field }) => (
                     <FormItem className="space-y-1">
                       <FormLabel>Academic Year</FormLabel>
-                      <SearchableDropdown
-                        placeholder="Search academic year..."
-                        table="zoho-academic-years"
-                        searchField="name"
-                        displayField="name"
-                        bottom={false}
-                        initialValue={field.value}
-                        onSelect={(item) => {
-                          field.onChange(item.id);
-                        }}
-                      />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select academic year" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {academicYears.map((y) => (
+                            <SelectItem key={y.id} value={y.id}>
+                              {y.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
                       <FormMessage />
                     </FormItem>
@@ -224,17 +259,23 @@ export default function EditZohoApplication({
                   render={({ field }) => (
                     <FormItem className="space-y-1">
                       <FormLabel>Semester</FormLabel>
-                      <SearchableDropdown
-                        placeholder="Search semester..."
-                        table="zoho-semesters"
-                        searchField="name"
-                        displayField="name"
-                        bottom={false}
-                        initialValue={field.value}
-                        onSelect={(item) => {
-                          field.onChange(item.id);
-                        }}
-                      />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select semester" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {semesters.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
-import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
 import { createApplicationViaWebhook } from "@/lib/actions/zoho-applications-actions";
 import { toast } from "sonner";
 import {
@@ -37,6 +35,8 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
 import { useAuth } from "@/context/AuthContext";
+import { ZohoAcademicYear, ZohoSemester } from "@/types/types";
+import { zohoApplicationsService } from "@/modules";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -65,6 +65,8 @@ export default function AddZohoApplication({
 }: AddZohoApplicationProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { userProfile } = useAuth();
+  const [academicYears, setAcademicYears] = useState<ZohoAcademicYear[]>([]);
+  const [semesters, setSemesters] = useState<ZohoSemester[]>([]);
 
   // Initialize form
   const form = useForm<FormSchema>({
@@ -80,6 +82,34 @@ export default function AddZohoApplication({
       degree: "",
     },
   });
+
+  // Auto-assign default academic year and semester if available
+  useEffect(() => {
+    const loadLists = async () => {
+      try {
+        const [years, sems] = await Promise.all([
+          zohoApplicationsService.getAcademicYears("", 0, 100),
+          zohoApplicationsService.getSemesters("", 0, 100),
+        ]);
+        setAcademicYears(years);
+        setSemesters(sems);
+
+        // Assign defaults if empty
+        if (!form.getValues("acdamic_year")) {
+          const defYear = years.find((y: any) => y.is_default) || null;
+          if (defYear) form.setValue("acdamic_year", defYear.id);
+        }
+        if (!form.getValues("semester")) {
+          const defSem = sems.find((s: any) => s.is_default) || null;
+          if (defSem) form.setValue("semester", defSem.id);
+        }
+      } catch (e) {
+        // non-blocking
+      }
+    };
+    loadLists();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handler for creating application
   const onSubmit = async (values: FormSchema) => {
@@ -196,17 +226,23 @@ export default function AddZohoApplication({
                   render={({ field }) => (
                     <FormItem className="space-y-1">
                       <FormLabel>Academic Year</FormLabel>
-                      <SearchableDropdown
-                        placeholder="Select academic year..."
-                        table="zoho-academic-years"
-                        searchField="name"
-                        displayField="name"
-                        bottom={false}
-                        initialValue={field.value}
-                        onSelect={(item) => {
-                          field.onChange(item.id);
-                        }}
-                      />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select academic year" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {academicYears.map((y) => (
+                            <SelectItem key={y.id} value={y.id}>
+                              {y.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -218,17 +254,23 @@ export default function AddZohoApplication({
                   render={({ field }) => (
                     <FormItem className="space-y-1">
                       <FormLabel>Semester</FormLabel>
-                      <SearchableDropdown
-                        placeholder="Select semester..."
-                        table="zoho-semesters"
-                        searchField="name"
-                        displayField="name"
-                        bottom={false}
-                        initialValue={field.value}
-                        onSelect={(item) => {
-                          field.onChange(item.id);
-                        }}
-                      />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select semester" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {semesters.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
