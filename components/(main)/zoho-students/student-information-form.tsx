@@ -738,7 +738,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="first_name"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>First Name *</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter first name" {...field} />
@@ -752,7 +752,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="passport_number"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Passport No *</FormLabel>
                       <FormControl>
                         <Input placeholder="Passport number" {...field} />
@@ -766,7 +766,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="last_name"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Last Name *</FormLabel>
                       <FormControl>
                         <Input placeholder="Last name" {...field} />
@@ -780,7 +780,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="passport_issue_date"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Issue Date *</FormLabel>
                       <DatePicker
                         field={field}
@@ -796,7 +796,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="gender"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Gender *</FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -824,7 +824,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="passport_expiry_date"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Expiry Date *</FormLabel>
                       <DatePicker
                         field={field}
@@ -840,7 +840,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="date_of_birth"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Date of Birth *</FormLabel>
                       <DatePicker
                         field={field}
@@ -856,7 +856,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="nationality"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Nationality *</FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -889,7 +889,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="country_of_residence"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Country of Residence *</FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -931,7 +931,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="email"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Email *</FormLabel>
                       <FormControl>
                         <Input
@@ -949,7 +949,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="mobile"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Mobile</FormLabel>
                       <FormControl>
                         <PhoneInput
@@ -978,7 +978,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="address_line_1"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Address Line 1</FormLabel>
                       <FormControl>
                         <Textarea
@@ -997,7 +997,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="city_district"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>City / District</FormLabel>
                         <FormControl>
                           <Input placeholder="City / District" {...field} />
@@ -1011,7 +1011,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="state_province"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>State / Province</FormLabel>
                         <FormControl>
                           <Input placeholder="State / Province" {...field} />
@@ -1024,7 +1024,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="postal_code"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>Postal Code</FormLabel>
                         <FormControl>
                           <Input placeholder="Postal Code" {...field} />
@@ -1038,7 +1038,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="address_country"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>Country</FormLabel>
                         <Select
                           onValueChange={field.onChange}
@@ -1076,7 +1076,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="father_name"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>Father_Name *</FormLabel>
                         <FormControl>
                           <Input placeholder="Father's name" {...field} />
@@ -1090,7 +1090,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="father_mobile"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>Father Mobile</FormLabel>
                         <FormControl>
                           <PhoneInput
@@ -1110,7 +1110,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="father_occupation"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>Father Occupation</FormLabel>
                         <FormControl>
                           <Input placeholder="Father's occupation" {...field} />
@@ -1124,7 +1124,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="mother_name"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>Mother Name</FormLabel>
                         <FormControl>
                           <Input placeholder="Mother's name" {...field} />
@@ -1137,7 +1137,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="mother_mobile"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>Mother Mobile</FormLabel>
                         <FormControl>
                           <PhoneInput
@@ -1156,7 +1156,7 @@ export default function StudentInformationForm({
                     control={form.control}
                     name="mother_occupation"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>Mother Occupation</FormLabel>
                         <FormControl>
                           <Input placeholder="Mother's occupation" {...field} />
@@ -1183,7 +1183,7 @@ export default function StudentInformationForm({
                 control={form.control}
                 name="education_level"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Student will apply for</FormLabel>
                     <SearchableDropdown
                       placeholder="Select Education Level..."
@@ -1216,7 +1216,7 @@ export default function StudentInformationForm({
                 control={form.control}
                 name="photo"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormControl>
                       <div className="space-y-4">
                         {photoUrl && (
