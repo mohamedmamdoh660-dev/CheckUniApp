@@ -318,6 +318,7 @@ export default function StudentInformationForm({
           state_province: student.state_province || "",
           postal_code: student.postal_code || "",
           address_country: student.address_country || "",
+          photo_url: student.photo_url || "",
         });
       }
 
@@ -330,6 +331,12 @@ export default function StudentInformationForm({
           url: doc.url,
         }))
       );
+      setPhotoUrl(student.photo_url || "");
+
+      setTimeout(() => {
+        form.setValue("nationality", student.nationality || "");
+        form.setValue("address_country", student.address_country || "");
+      }, 4000);
     } catch (error) {
       console.error("Error loading student data:", error);
       toast.error("Failed to load student data");
