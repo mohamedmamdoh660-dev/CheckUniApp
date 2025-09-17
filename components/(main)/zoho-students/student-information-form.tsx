@@ -72,6 +72,7 @@ const formSchema = z
       required_error: "Transfer student is required",
     }),
     have_tc: z.enum(["yes", "no"]).optional(),
+    tc_number: z.string().optional(),
     blue_card: z.enum(["yes", "no"], {
       required_error: "Blue card selection is required",
     }),
@@ -87,7 +88,6 @@ const formSchema = z
     passport_number: z.string().min(1, "Passport number is required"),
     passport_issue_date: z.date({ required_error: "Issue date is required" }),
     passport_expiry_date: z.date({ required_error: "Expiry date is required" }),
-    country_of_residence: z.string().min(1, "Country of residence is required"),
     student_id: z.string().optional(),
 
     // Contact Information
@@ -113,6 +113,22 @@ const formSchema = z
 
     // Education Information
     education_level: z.string().optional(),
+    education_level_name: z.string().optional(),
+
+    // High School Information
+    high_school_country: z.string().optional(),
+    high_school_name: z.string().optional(),
+    high_school_gpa_percent: z.string().optional(),
+
+    // Bachelor Information (for Master/Phd applicants)
+    bachelor_school_name: z.string().optional(),
+    bachelor_country: z.string().optional(),
+    bachelor_gpa_percent: z.string().optional(),
+
+    // Master Information (for Phd applicants)
+    master_school_name: z.string().optional(),
+    master_country: z.string().optional(),
+    master_gpa_percent: z.string().optional(),
 
     // Photo
     photo: z.any().optional(),
@@ -140,11 +156,38 @@ const formSchema = z
       });
     }
 
-    if (val.date_of_birth && val.date_of_birth > new Date()) {
+    if (val.date_of_birth) {
+      const today = new Date();
+      const minAgeDate = new Date(
+        today.getFullYear() - 15,
+        today.getMonth(),
+        today.getDate()
+      );
+      if (val.date_of_birth > today) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["date_of_birth"],
+          message: "Date of birth cannot be in the future",
+        });
+      }
+      if (val.date_of_birth > minAgeDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["date_of_birth"],
+          message: "Student must be at least 15 years old",
+        });
+      }
+    }
+
+    // Require TC number when have_tc is yes
+    if (
+      val.have_tc === "yes" &&
+      (!val.tc_number || val.tc_number.trim() === "")
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["date_of_birth"],
-        message: "Date of birth cannot be in the future",
+        path: ["tc_number"],
+        message: "T.C. number is required when T.C is selected",
       });
     }
   });
@@ -177,12 +220,14 @@ export default function StudentInformationForm({
   const { userProfile } = useAuth();
 
   const [contries, setContries] = useState<ZohoCountry[]>([]);
+  const [defaultPhoneCountry, setDefaultPhoneCountry] = useState<string>("ae");
   // Initialize form
   const form = useForm<any>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       transfer_student: "no",
       have_tc: "no",
+      tc_number: "",
       blue_card: "no",
       first_name: "",
       last_name: "",
@@ -208,6 +253,16 @@ export default function StudentInformationForm({
       mother_mobile: "",
       mother_occupation: "",
       education_level: "",
+      education_level_name: "",
+      high_school_country: "",
+      high_school_name: "",
+      high_school_gpa_percent: "",
+      bachelor_school_name: "",
+      bachelor_country: "",
+      bachelor_gpa_percent: "",
+      master_school_name: "",
+      master_country: "",
+      master_gpa_percent: "",
       photo: null,
       documents: [],
     },
@@ -243,6 +298,17 @@ export default function StudentInformationForm({
           mother_name: student.mother_name || "",
           mother_mobile: student.mother_mobile || "",
           mother_occupation: student.mother_job || "",
+          education_level: student.education_level || "",
+          education_level_name: student.education_level_name || "",
+          high_school_country: student.high_school_country || "",
+          high_school_name: student.high_school_name || "",
+          high_school_gpa_percent: student.high_school_gpa_percent || "",
+          bachelor_school_name: student.bachelor_school_name || "",
+          bachelor_country: student.bachelor_country || "",
+          bachelor_gpa_percent: student.bachelor_gpa_percent || "",
+          master_school_name: student.master_school_name || "",
+          master_country: student.master_country || "",
+          master_gpa_percent: student.master_gpa_percent || "",
         });
       }
     } catch (error) {
@@ -280,25 +346,26 @@ export default function StudentInformationForm({
         transfer_student: values.transfer_student === "yes" ? "Yes" : "No",
         have_tc: values.have_tc === "yes" ? "Yes" : "No",
         blue_card: values.blue_card === "yes" ? "Yes" : "No",
+        tc_number: values.have_tc === "yes" ? values.tc_number : undefined,
 
         // Personal Details
         first_name: values.first_name,
         last_name: values.last_name,
         gender: values.gender,
-        date_of_birth: values.date_of_birth?.toISOString().split("T")[0],
+        date_of_birth: values.date_of_birth
+          ? new Date(values.date_of_birth).toISOString().split("T")[0]
+          : undefined,
         nationality: values.nationality
           ? values.nationality.toString()
           : undefined,
         passport_number: values.passport_number,
         passport_issue_date: values.passport_issue_date
-          ?.toISOString()
-          .split("T")[0],
-        passport_expiry_date: values.passport_expiry_date
-          ?.toISOString()
-          .split("T")[0],
-        country_of_residence: values.country_of_residence
-          ? values.country_of_residence.toString()
+          ? new Date(values.passport_issue_date).toISOString().split("T")[0]
           : undefined,
+        passport_expiry_date: values.passport_expiry_date
+          ? new Date(values.passport_expiry_date).toISOString().split("T")[0]
+          : undefined,
+
         student_id: values.student_id,
 
         // Contact & Address Information
@@ -320,6 +387,22 @@ export default function StudentInformationForm({
 
         // Academic Information
         education_level: values.education_level,
+        education_level_name: values.education_level_name,
+
+        // High School
+        high_school_country: values.high_school_country,
+        high_school_name: values.high_school_name,
+        high_school_gpa_percent: values.high_school_gpa_percent,
+
+        // Bachelor (if provided)
+        bachelor_school_name: values.bachelor_school_name,
+        bachelor_country: values.bachelor_country,
+        bachelor_gpa_percent: values.bachelor_gpa_percent,
+
+        // Master (if provided)
+        master_school_name: values.master_school_name,
+        master_country: values.master_country,
+        master_gpa_percent: values.master_gpa_percent,
 
         // Photo Upload
         photo_url: values.photo, // Pass the URL instead of file
@@ -335,6 +418,7 @@ export default function StudentInformationForm({
               : userProfile?.agency_id,
         crm_id: userProfile?.crm_id || userProfile?.agency?.crm_id || "",
       };
+      console.log("🚀 ~ onSubmit ~ webhookStudentData:", webhookStudentData);
 
       // Data for database - only include the fields we're already passing
       const dbStudentData = {
@@ -424,9 +508,6 @@ export default function StudentInformationForm({
     }
   };
 
-  // Education level options
-  const educationLevels = ["Associate", "Bachelor", "Master", "Phd"];
-
   // Document attachment types
   const attachmentTypes = [
     "Passport",
@@ -438,7 +519,7 @@ export default function StudentInformationForm({
   ];
 
   // Gender options
-  const genders = ["Male", "Female", "Other"];
+  const genders = ["Male", "Female"];
 
   // Custom Date Picker Component
   const DatePicker = ({
@@ -478,10 +559,24 @@ export default function StudentInformationForm({
           disabled={(date) => {
             // Only apply date restrictions when it's not an expiry date field
             if (label !== "Expiry Date") {
-              return date > new Date() || date < new Date("1900-01-01");
+              const today = new Date();
+              const minAgeDate = new Date(
+                today.getFullYear() - 15,
+                today.getMonth(),
+                today.getDate()
+              );
+              // For Date of Birth, enforce at least 15 years old
+              if (label === "Date of Birth") {
+                return date > minAgeDate || date < new Date("1900-01-01");
+              }
+              return date > today || date < new Date("1900-01-01");
             }
-            // For expiry dates, allow future dates
-            return date < new Date("1900-01-01");
+            // For expiry dates, disable dates before the selected Issue Date
+            const issueDate = form.getValues("passport_issue_date") as
+              | Date
+              | undefined;
+            const minDate = issueDate ?? new Date("1900-01-01");
+            return date < minDate || date < new Date("1900-01-01");
           }}
           initialFocus
           defaultMonth={
@@ -625,6 +720,27 @@ export default function StudentInformationForm({
     fetchCountries();
   }, []);
 
+  // Reset dependent degree fields when degree is changed to a lower level
+  const watchedEducationLevelName = (form.watch("education_level_name") || "")
+    .toString()
+    .toLowerCase();
+
+  useEffect(() => {
+    const levelName = watchedEducationLevelName;
+    // Always clear when changing to lower than master
+    if (levelName !== "master" && levelName !== "phd") {
+      form.setValue("bachelor_school_name", "");
+      form.setValue("bachelor_country", "");
+      form.setValue("bachelor_gpa_percent", "");
+    }
+    // Clear master fields unless explicit phd
+    if (levelName !== "phd") {
+      form.setValue("master_school_name", "");
+      form.setValue("master_country", "");
+      form.setValue("master_gpa_percent", "");
+    }
+  }, [watchedEducationLevelName, form]);
+
   return (
     <div className="space-y-6">
       <Form {...form}>
@@ -644,7 +760,7 @@ export default function StudentInformationForm({
                   control={form.control}
                   name="transfer_student"
                   render={({ field }) => (
-                    <FormItem className="gap-5">
+                    <FormItem className="gap-5 flex flex-col">
                       <FormLabel>Transfer student? *</FormLabel>
                       <FormControl>
                         <RadioGroup
@@ -667,38 +783,59 @@ export default function StudentInformationForm({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="have_tc"
-                  render={({ field }) => (
-                    <FormItem className="gap-5">
-                      <FormLabel>Have T.C</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          className="flex gap-4"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="yes" id="tc-yes" />
-                            <Label htmlFor="tc-yes">Yes</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="no" id="tc-no" />
-                            <Label htmlFor="tc-no">No</Label>
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="flex flex-col gap-4">
+                  <FormField
+                    control={form.control}
+                    name="have_tc"
+                    render={({ field }) => (
+                      <FormItem className="gap-5">
+                        <FormLabel>Have T.C</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              if (value !== "yes") {
+                                form.setValue("tc_number", "");
+                              }
+                            }}
+                            value={field.value}
+                            className="flex gap-4"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="yes" id="tc-yes" />
+                              <Label htmlFor="tc-yes">Yes</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="no" id="tc-no" />
+                              <Label htmlFor="tc-no">No</Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  {form.watch("have_tc") === "yes" && (
+                    <FormField
+                      control={form.control}
+                      name="tc_number"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormControl>
+                            <Input placeholder="Enter T.C. number" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
                 <FormField
                   control={form.control}
                   name="blue_card"
                   render={({ field }) => (
-                    <FormItem className="gap-5">
+                    <FormItem className="gap-5 flex flex-col">
                       <FormLabel>Blue Card *</FormLabel>
                       <FormControl>
                         <RadioGroup
@@ -884,35 +1021,6 @@ export default function StudentInformationForm({
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="country_of_residence"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Country of Residence *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="-Select-" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {contries.map((country) => (
-                            <SelectItem key={country.id} value={country.name}>
-                              {country.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
             </CardContent>
           </Card>
@@ -953,7 +1061,7 @@ export default function StudentInformationForm({
                       <FormLabel>Mobile</FormLabel>
                       <FormControl>
                         <PhoneInput
-                          defaultCountry="ae"
+                          defaultCountry={defaultPhoneCountry as any}
                           value={field.value}
                           onChange={(phone: any) => field.onChange(phone)}
                           placeholder="Enter mobile number"
@@ -1094,7 +1202,7 @@ export default function StudentInformationForm({
                         <FormLabel>Father Mobile</FormLabel>
                         <FormControl>
                           <PhoneInput
-                            defaultCountry="ae"
+                            defaultCountry={defaultPhoneCountry as any}
                             value={field.value}
                             onChange={(phone: any) => field.onChange(phone)}
                             placeholder="Enter mobile number"
@@ -1141,7 +1249,7 @@ export default function StudentInformationForm({
                         <FormLabel>Mother Mobile</FormLabel>
                         <FormControl>
                           <PhoneInput
-                            defaultCountry="ae"
+                            defaultCountry={defaultPhoneCountry as any}
                             value={field.value}
                             onChange={(phone: any) => field.onChange(phone)}
                             placeholder="Enter mobile number"
@@ -1179,27 +1287,248 @@ export default function StudentInformationForm({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <FormField
-                control={form.control}
-                name="education_level"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Student will apply for</FormLabel>
-                    <SearchableDropdown
-                      placeholder="Select Education Level..."
-                      table="zoho-degrees"
-                      searchField="name"
-                      displayField="name"
-                      bottom={false}
-                      initialValue={field.value}
-                      onSelect={(item: { id: string }) => {
-                        field.onChange(item.id);
-                      }}
+              <div className="">
+                <FormField
+                  control={form.control}
+                  name="education_level"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Student will apply for</FormLabel>
+                      <SearchableDropdown
+                        placeholder="Select Education Level..."
+                        table="zoho-degrees"
+                        searchField="name"
+                        displayField="name"
+                        bottom={false}
+                        initialValue={field.value}
+                        onSelect={(item: { id: string; name?: string }) => {
+                          field.onChange(item.id);
+                          form.setValue(
+                            "education_level_name",
+                            item?.name || ""
+                          );
+                        }}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              {/* High School Fields - always show */}
+
+              {(form.watch("education_level_name") || "").trim() !== "" && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="high_school_country"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>High School Country</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="-Select-" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {contries.map((country) => (
+                              <SelectItem key={country.id} value={country.name}>
+                                {country.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="high_school_name"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>High School Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter high school name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="high_school_gpa_percent"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>High School GPA %</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. 85" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+              {/* Conditional Bachelor fields for Master/Phd */}
+              {(form.watch("education_level_name") || "").toLowerCase() ===
+                "master" ||
+              (form.watch("education_level_name") || "").toLowerCase() ===
+                "phd" ? (
+                <div className="space-y-4">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <GraduationCap
+                      size={20}
+                      className="text-muted-foreground"
                     />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    Bachelor Details
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="bachelor_country"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Bachelor Country</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="-Select-" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {contries.map((country) => (
+                                <SelectItem
+                                  key={country.id}
+                                  value={country.name}
+                                >
+                                  {country.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="bachelor_school_name"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Bachelor School Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter bachelor school"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="bachelor_gpa_percent"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Bachelor GPA %</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g. 85" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Conditional Master fields for Phd */}
+              {(form.watch("education_level_name") || "").toLowerCase() ===
+              "phd" ? (
+                <div className="space-y-4">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <GraduationCap
+                      size={16}
+                      className="text-muted-foreground"
+                    />
+                    Master Details
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="master_country"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Master Country</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="-Select-" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {contries.map((country) => (
+                                <SelectItem
+                                  key={country.id}
+                                  value={country.name}
+                                >
+                                  {country.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="master_school_name"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Master School Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter master school"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="master_gpa_percent"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Master GPA %</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g. 90" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              ) : null}
             </CardContent>
           </Card>
 
@@ -1233,7 +1562,8 @@ export default function StudentInformationForm({
                           onClick={() => {
                             const input = document.createElement("input");
                             input.type = "file";
-                            input.accept = "image/*";
+                            input.accept =
+                              "image/jpg, image/jpeg, image/png, image/gif, image/bmp";
                             input.onchange = (e) => {
                               const file = (e.target as HTMLInputElement)
                                 .files?.[0];
@@ -1297,7 +1627,7 @@ export default function StudentInformationForm({
                   >
                     <div className="flex items-center justify-between ">
                       <h4 className="font-medium text-sm flex items-center gap-2">
-                        <FileText size={16} className="text-primary" />
+                        <FileText size={16} className="text-muted-foreground" />
                         Document {index + 1}
                       </h4>
                       {index > 0 && (
