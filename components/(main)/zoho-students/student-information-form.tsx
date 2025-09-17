@@ -308,8 +308,28 @@ export default function StudentInformationForm({
           master_school_name: student.master_school_name || "",
           master_country: student.master_country || "",
           master_gpa_percent: student.master_gpa_percent || "",
+          have_tc: student.have_tc === "Yes" ? "yes" : "no",
+          tc_number: student.tc_number || "",
+          blue_card: student.blue_card === "Yes" ? "yes" : "no",
+          student_id: student.student_id || "",
+          transfer_student: student.transfer_student === "Yes" ? "yes" : "no",
+          address_line_1: student.address_line_1 || "",
+          city_district: student.city_district || "",
+          state_province: student.state_province || "",
+          postal_code: student.postal_code || "",
+          address_country: student.address_country || "",
         });
       }
+
+      const documents = JSON.parse(student.documents || "[]");
+      setDocuments(
+        documents.map((doc: any) => ({
+          attachment_type: doc.type,
+          file: doc.url ? new File([], doc.filename) : null,
+          uploading: false,
+          url: doc.url,
+        }))
+      );
     } catch (error) {
       console.error("Error loading student data:", error);
       toast.error("Failed to load student data");
@@ -365,8 +385,6 @@ export default function StudentInformationForm({
           ? new Date(values.passport_expiry_date).toISOString().split("T")[0]
           : undefined,
 
-        student_id: values.student_id,
-
         // Contact & Address Information
         email: values.email,
         mobile: values.mobile,
@@ -374,7 +392,7 @@ export default function StudentInformationForm({
         city_district: values.city_district,
         state_province: values.state_province,
         postal_code: values.postal_code,
-        address_country: values.address_country,
+        address_country: values.address_country || null,
 
         // Family Information
         father_name: values.father_name,
@@ -389,18 +407,18 @@ export default function StudentInformationForm({
         education_level_name: values.education_level_name,
 
         // High School
-        high_school_country: values.high_school_country,
+        high_school_country: values.high_school_country || null,
         high_school_name: values.high_school_name,
         high_school_gpa_percent: values.high_school_gpa_percent,
 
         // Bachelor (if provided)
         bachelor_school_name: values.bachelor_school_name,
-        bachelor_country: values.bachelor_country,
+        bachelor_country: values.bachelor_country || null,
         bachelor_gpa_percent: values.bachelor_gpa_percent,
 
         // Master (if provided)
         master_school_name: values.master_school_name,
-        master_country: values.master_country,
+        master_country: values.master_country || null,
         master_gpa_percent: values.master_gpa_percent,
 
         // Photo Upload
@@ -417,36 +435,6 @@ export default function StudentInformationForm({
               : userProfile?.agency_id,
         crm_id: userProfile?.crm_id || userProfile?.agency?.crm_id || "",
       };
-      console.log("🚀 ~ onSubmit ~ webhookStudentData:", webhookStudentData);
-
-      // Data for database - only include the fields we're already passing
-      const dbStudentData = {
-        first_name: values.first_name,
-        last_name: values.last_name,
-        gender: values.gender,
-        date_of_birth: values.date_of_birth?.toISOString().split("T")[0],
-        nationality: values.nationality
-          ? values.nationality.toString()
-          : undefined,
-        passport_number: values.passport_number,
-        passport_issue_date: values.passport_issue_date
-          ?.toISOString()
-          .split("T")[0],
-        passport_expiry_date: values.passport_expiry_date
-          ?.toISOString()
-          .split("T")[0],
-        country_of_residence: values.country_of_residence
-          ? values.country_of_residence.toString()
-          : undefined,
-        email: values.email,
-        mobile: values.mobile,
-        father_name: values.father_name,
-        father_mobile: values.father_mobile,
-        father_job: values.father_occupation,
-        mother_name: values.mother_name,
-        mother_mobile: values.mother_mobile,
-        mother_job: values.mother_occupation,
-      };
 
       if (mode === "create") {
         // Create new student
@@ -455,8 +443,9 @@ export default function StudentInformationForm({
 
         if (webhookResponse.status) {
           const studentDataWithId = {
-            ...dbStudentData,
+            ...webhookStudentData,
             id: webhookResponse.id,
+            // id: Math.random().toString(36).substring(2, 15),
             user_id: userProfile?.id,
             agency_id:
               userProfile?.roles?.name === "agent"
@@ -464,8 +453,9 @@ export default function StudentInformationForm({
                 : userProfile?.roles?.name === "admin"
                   ? null
                   : userProfile?.agency_id,
+            documents: JSON.stringify(documentsData),
           };
-
+          // @ts-ignore
           await zohoStudentsService.createStudent(studentDataWithId);
           toast.success("Student created successfully");
           router.push("/students");
@@ -484,7 +474,8 @@ export default function StudentInformationForm({
         if (webhookResponse.status) {
           await zohoStudentsService.updateStudent({
             id: studentId,
-            ...dbStudentData, // Only update the fields we're already passing
+            ...webhookStudentData, // Only update the fields we're already passingd
+            documents: JSON.stringify(documentsData),
           });
           toast.success("Student updated successfully");
           router.push("/students");
@@ -1354,7 +1345,7 @@ export default function StudentInformationForm({
                           </FormControl>
                           <SelectContent>
                             {contries.map((country) => (
-                              <SelectItem key={country.id} value={country.name}>
+                              <SelectItem key={country.id} value={country.id}>
                                 {country.name}
                               </SelectItem>
                             ))}
@@ -1428,10 +1419,7 @@ export default function StudentInformationForm({
                             </FormControl>
                             <SelectContent>
                               {contries.map((country) => (
-                                <SelectItem
-                                  key={country.id}
-                                  value={country.name}
-                                >
+                                <SelectItem key={country.id} value={country.id}>
                                   {country.name}
                                 </SelectItem>
                               ))}
@@ -1503,10 +1491,7 @@ export default function StudentInformationForm({
                             </FormControl>
                             <SelectContent>
                               {contries.map((country) => (
-                                <SelectItem
-                                  key={country.id}
-                                  value={country.name}
-                                >
+                                <SelectItem key={country.id} value={country.id}>
                                   {country.name}
                                 </SelectItem>
                               ))}

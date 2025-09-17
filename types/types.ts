@@ -330,4 +330,28 @@ export interface ZohoStudent {
   agency?: User | null;
   user?: User | null;
   agent?: User | null;
+  crm_id?: string;
+  photo_url?: string;
+  documents?: any;
+  education_level?: string;
+  education_level_name?: string;
+  high_school_country?: string;
+  high_school_name?: string;
+  high_school_gpa_percent?: string;
+  bachelor_school_name?: string;
+  bachelor_country?: string;
+  bachelor_gpa_percent?: string;
+  master_school_name?: string;
+  master_country?: string;
+  master_gpa_percent?: string;
+  transfer_student?: string;
+  have_tc?: string;
+  tc_number?: string;
+  blue_card?: string;
+  student_id?: string;
+  address_line_1?: string;
+  city_district?: string;
+  state_province?: string;
+  postal_code?: string;
+  address_country?: string;
 }

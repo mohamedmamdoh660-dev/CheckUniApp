@@ -123,6 +123,30 @@ export const GET_STUDENT_BY_ID = `
           mother_name
           mother_mobile
           mother_job
+          crm_id
+          photo_url
+          documents
+          education_level
+          education_level_name
+          high_school_country
+          high_school_name
+          high_school_gpa_percent
+          bachelor_school_name
+          bachelor_country
+          bachelor_gpa_percent
+          master_school_name
+          master_country
+          master_gpa_percent
+          transfer_student
+          have_tc
+          tc_number
+          blue_card
+          student_id
+          address_line_1
+          city_district
+          state_province
+          postal_code
+          address_country
         }
       }
     }
@@ -159,6 +183,30 @@ export const UPDATE_STUDENT = `
     $mother_name: String
     $mother_mobile: String
     $mother_job: String
+    $crm_id: String
+    $photo_url: String
+    $documents: String
+    $education_level: String
+    $education_level_name: String
+    $high_school_country: String
+    $high_school_name: String
+    $high_school_gpa_percent: String
+    $bachelor_school_name: String
+    $bachelor_country: String
+    $bachelor_gpa_percent: String
+    $master_school_name: String
+    $master_country: String
+    $master_gpa_percent: String
+    $transfer_student: String
+    $have_tc: String
+    $tc_number: String
+    $blue_card: String
+    $student_id: String
+    $address_line_1: String
+    $city_district: String
+    $state_province: String
+    $postal_code: String
+    $address_country: String
   ) {
     updatezoho_studentsCollection(
       filter: { id: { eq: $id } }
@@ -180,6 +228,30 @@ export const UPDATE_STUDENT = `
         mother_name: $mother_name
         mother_mobile: $mother_mobile
         mother_job: $mother_job
+        crm_id: $crm_id
+        photo_url: $photo_url
+        documents: $documents
+        education_level: $education_level
+        education_level_name: $education_level_name
+        high_school_country: $high_school_country
+        high_school_name: $high_school_name
+        high_school_gpa_percent: $high_school_gpa_percent
+        bachelor_school_name: $bachelor_school_name
+        bachelor_country: $bachelor_country
+        bachelor_gpa_percent: $bachelor_gpa_percent
+        master_school_name: $master_school_name
+        master_country: $master_country
+        master_gpa_percent: $master_gpa_percent
+        transfer_student: $transfer_student
+        have_tc: $have_tc
+        tc_number: $tc_number
+        blue_card: $blue_card
+        student_id: $student_id
+        address_line_1: $address_line_1
+        city_district: $city_district
+        state_province: $state_province
+        postal_code: $postal_code
+        address_country: $address_country
         updated_at: "now()"
       }
     ) {
