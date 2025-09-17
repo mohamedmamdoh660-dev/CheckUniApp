@@ -47,7 +47,6 @@ import {
   Upload,
   X,
   Plus,
-  ArrowLeft,
   User,
   IdCard,
   Phone,
@@ -740,6 +739,26 @@ export default function StudentInformationForm({
       form.setValue("master_gpa_percent", "");
     }
   }, [watchedEducationLevelName, form]);
+
+  // Keep expiry date consistent when issue date changes
+  const watchedIssueDate = form.watch("passport_issue_date") as
+    | Date
+    | undefined;
+  const watchedExpiryDate = form.watch("passport_expiry_date") as
+    | Date
+    | undefined;
+  useEffect(() => {
+    if (
+      watchedIssueDate &&
+      watchedExpiryDate &&
+      watchedExpiryDate < watchedIssueDate
+    ) {
+      form.setValue("passport_expiry_date", undefined, {
+        shouldValidate: true,
+      });
+      form.trigger("passport_expiry_date");
+    }
+  }, [watchedIssueDate, watchedExpiryDate, form]);
 
   return (
     <div className="space-y-6">
