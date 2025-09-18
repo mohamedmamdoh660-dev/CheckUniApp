@@ -29,6 +29,7 @@ import { getStudentById } from "@/supabase/actions/students";
 import { DocumentIcon } from "@/utils/file-icons";
 import { useAuth } from "@/context/AuthContext";
 import { formatFileSize } from "@/utils/format-file-size";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export function StudentDetailPage() {
   const [student, setStudent] = useState<ZohoStudent | null>(null);
@@ -171,7 +172,10 @@ export function StudentDetailPage() {
               <Avatar className="h-24 w-24 ring-4 ring-accent/20">
                 <AvatarImage
                   src={
-                    student?.photo_url || "/professional-student-headshot.jpg"
+                    student?.photo_url ||
+                    generateNameAvatar(
+                      `${student?.first_name} ${student?.last_name}`
+                    )
                   }
                   alt={`${student?.first_name} ${student?.last_name}`}
                 />
@@ -256,25 +260,25 @@ export function StudentDetailPage() {
             <TabsList className="grid w-full grid-cols-4 bg-muted/50">
               <TabsTrigger
                 value="personal"
-                className="data-[state=active]:bg-accent data-[state=active]:text-primary-foreground"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
               >
                 Personal Details
               </TabsTrigger>
               <TabsTrigger
                 value="education"
-                className="data-[state=active]:bg-accent data-[state=active]:text-primary-foreground"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
               >
                 Education History
               </TabsTrigger>
               <TabsTrigger
                 value="family"
-                className="data-[state=active]:bg-accent data-[state=active]:text-primary-foreground"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
               >
                 Family Info
               </TabsTrigger>
               <TabsTrigger
                 value="documents"
-                className="data-[state=active]:bg-accent data-[state=active]:text-primary-foreground"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
               >
                 Documents
               </TabsTrigger>
