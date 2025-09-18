@@ -163,7 +163,7 @@ export function StudentDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className=" bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="bg-card border-b border-border">
           <div className="p-8">
@@ -285,7 +285,7 @@ export function StudentDetailPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Contact Information */}
                 <Card className="shadow-sm">
-                  <CardHeader className="pb-4">
+                  <CardHeader className="pb-0">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Mail className="w-5 h-5 text-primary" />
                       Contact Information
@@ -339,7 +339,7 @@ export function StudentDetailPage() {
 
                 {/* Address Information */}
                 <Card className="shadow-sm">
-                  <CardHeader className="pb-4">
+                  <CardHeader className="pb-0">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Home className="w-5 h-5 text-primary" />
                       Address Information
@@ -396,7 +396,7 @@ export function StudentDetailPage() {
 
               {/* Passport Details */}
               <Card className="shadow-sm">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-0">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <CreditCard className="w-5 h-5 text-primary" />
                     Passport & Identity Details
@@ -444,7 +444,7 @@ export function StudentDetailPage() {
             {/* Education History Tab */}
             <TabsContent value="education" className="space-y-6">
               <Card className="shadow-sm">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-0">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <GraduationCap className="w-5 h-5 text-primary" />
                     Educational Background
@@ -594,7 +594,7 @@ export function StudentDetailPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Father's Information */}
                 <Card className="shadow-sm">
-                  <CardHeader className="pb-4">
+                  <CardHeader className="pb-0">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Users className="w-5 h-5 text-primary" />
                       Father's Information
@@ -630,7 +630,7 @@ export function StudentDetailPage() {
 
                 {/* Mother's Information */}
                 <Card className="shadow-sm">
-                  <CardHeader className="pb-4">
+                  <CardHeader className="pb-0">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Users className="w-5 h-5 text-primary" />
                       Mother's Information
@@ -669,7 +669,7 @@ export function StudentDetailPage() {
             {/* Documents Tab */}
             <TabsContent value="documents" className="space-y-6">
               <Card className="shadow-sm">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-0">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <FileText className="w-5 h-5 text-primary" />
                     Student Documents ({student?.documents?.length || 0})
