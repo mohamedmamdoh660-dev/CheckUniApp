@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { Ellipsis, Edit, Trash } from "lucide-react";
+import { Ellipsis, Edit, Trash, Eye } from "lucide-react";
 import { ZohoStudent } from "@/types/types";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
 import { deleteStudentViaWebhook } from "@/lib/actions/zoho-students-actions";
@@ -89,6 +89,13 @@ export function ZohoStudentsTableRowActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-max">
+          <DropdownMenuItem
+            onClick={() => router.push(`/students/${values.id}`)}
+            className="cursor-pointer flex items-center"
+          >
+            <Eye className="mr-1 h-4 w-4" />
+            View Details
+          </DropdownMenuItem>
           {isCrmId && (
             <DropdownMenuItem
               onClick={() => {

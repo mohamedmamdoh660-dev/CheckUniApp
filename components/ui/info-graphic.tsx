@@ -24,7 +24,7 @@ export default function InfoGraphic({
         gradient ? "bg-gradient-to-b from-background to-secondary/10" : ""
       } p-8`}
     >
-      <div className="relative mb-8">
+      <div className="relative mb-6">
         {icon}
         {isLeftArrow && (
           <ArrowLeft className="absolute -left-12 top-1/2 transform -translate-y-1/2 h-10 w-10 text-primary animate-pulse" />

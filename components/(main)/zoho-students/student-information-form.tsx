@@ -62,6 +62,9 @@ import { saveFile } from "@/supabase/actions/save-file";
 import { useAuth } from "@/context/AuthContext";
 import { ZohoCountry } from "@/types/types";
 import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
+import { formatFileSize } from "@/utils/format-file-size";
+import moment from "moment-timezone";
+import { getCountriesForTimezone } from "countries-and-timezones";
 
 // Enhanced form validation schema based on the images
 const formSchema = z
@@ -207,9 +210,10 @@ export default function StudentInformationForm({
       attachment_type: string;
       file: File | null;
       uploading: boolean;
+      size: number;
       url?: string;
     }>
-  >([{ attachment_type: "", file: null, uploading: false }]);
+  >([{ attachment_type: "", file: null, uploading: false, size: 0 }]);
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string>("");
   const [dropdown] =
@@ -219,7 +223,7 @@ export default function StudentInformationForm({
   const { userProfile } = useAuth();
 
   const [contries, setContries] = useState<ZohoCountry[]>([]);
-  const [defaultPhoneCountry, setDefaultPhoneCountry] = useState<string>("ae");
+  const [defaultPhoneCountry, setDefaultPhoneCountry] = useState<string>("");
   // Initialize form
   const form = useForm<any>({
     resolver: zodResolver(formSchema),
@@ -329,6 +333,7 @@ export default function StudentInformationForm({
           file: doc.url ? new File([], doc.filename) : null,
           uploading: false,
           url: doc.url,
+          size: doc.size,
         }))
       );
       setPhotoUrl(student.photo_url || "");
@@ -345,6 +350,10 @@ export default function StudentInformationForm({
     }
   }, [form, studentId]);
 
+  function getCountryFromTimezone(timezone: string) {
+    const countries = getCountriesForTimezone(timezone);
+    return countries.length > 0 ? countries[0].id : "Unknown";
+  }
   // Load student data for edit mode
   useEffect(() => {
     if (mode === "edit" && studentId) {
@@ -364,6 +373,7 @@ export default function StudentInformationForm({
           type: doc.attachment_type,
           url: doc.url,
           filename: doc.file?.name || "",
+          size: doc.file?.size || doc.size,
         }));
 
       // Data for webhook - include ALL fields and files from every section
@@ -380,17 +390,15 @@ export default function StudentInformationForm({
         gender: values.gender,
         date_of_birth: values.date_of_birth
           ? new Date(values.date_of_birth).toISOString().split("T")[0]
-          : undefined,
-        nationality: values.nationality
-          ? values.nationality.toString()
-          : undefined,
+          : null,
+        nationality: values.nationality ? values.nationality.toString() : null,
         passport_number: values.passport_number,
         passport_issue_date: values.passport_issue_date
           ? new Date(values.passport_issue_date).toISOString().split("T")[0]
-          : undefined,
+          : null,
         passport_expiry_date: values.passport_expiry_date
           ? new Date(values.passport_expiry_date).toISOString().split("T")[0]
-          : undefined,
+          : null,
 
         // Contact & Address Information
         email: values.email,
@@ -410,7 +418,7 @@ export default function StudentInformationForm({
         mother_job: values.mother_occupation,
 
         // Academic Information
-        education_level: values.education_level,
+        education_level: values.education_level || null,
         education_level_name: values.education_level_name,
 
         // High School
@@ -451,8 +459,8 @@ export default function StudentInformationForm({
         if (webhookResponse.status) {
           const studentDataWithId = {
             ...webhookStudentData,
-            id: webhookResponse.id,
-            // id: Math.random().toString(36).substring(2, 15),
+            // id: webhookResponse.id,
+            id: Math.random().toString(36).substring(2, 15),
             user_id: userProfile?.id,
             agency_id:
               userProfile?.roles?.name === "agent"
@@ -632,7 +640,7 @@ export default function StudentInformationForm({
   const addDocumentRow = () => {
     setDocuments([
       ...documents,
-      { attachment_type: "", file: null, uploading: false },
+      { attachment_type: "", file: null, uploading: false, size: 0 },
     ]);
   };
 
@@ -705,6 +713,12 @@ export default function StudentInformationForm({
   };
 
   useEffect(() => {
+    const getTimezone = async () => {
+      const timezone = moment.tz.guess();
+      const countryCode = getCountryFromTimezone(timezone);
+      setDefaultPhoneCountry(countryCode.toLocaleLowerCase() || "ae");
+    };
+
     const fetchCountries = async () => {
       const countries = await zohoProgramsService.getCountries(
         "",
@@ -714,6 +728,8 @@ export default function StudentInformationForm({
       );
       setContries(countries);
     };
+
+    getTimezone();
     fetchCountries();
   }, []);
 
@@ -1077,13 +1093,15 @@ export default function StudentInformationForm({
                     <FormItem className="flex flex-col">
                       <FormLabel>Mobile</FormLabel>
                       <FormControl>
-                        <PhoneInput
-                          defaultCountry={defaultPhoneCountry as any}
-                          value={field.value}
-                          onChange={(phone: any) => field.onChange(phone)}
-                          placeholder="Enter mobile number"
-                          inputClassName="h-11 rounded-md px-3 text-sm w-full"
-                        />
+                        {defaultPhoneCountry && (
+                          <PhoneInput
+                            defaultCountry={defaultPhoneCountry as any}
+                            value={field.value}
+                            onChange={(phone: any) => field.onChange(phone)}
+                            placeholder="Enter mobile number"
+                            inputClassName="h-11 rounded-md px-3 text-sm w-full"
+                          />
+                        )}
                         {/* <Input placeholder="Mobile number" {...field} /> */}
                       </FormControl>
                       <FormMessage />
@@ -1218,13 +1236,15 @@ export default function StudentInformationForm({
                       <FormItem className="flex flex-col">
                         <FormLabel>Father Mobile</FormLabel>
                         <FormControl>
-                          <PhoneInput
-                            defaultCountry={defaultPhoneCountry as any}
-                            value={field.value}
-                            onChange={(phone: any) => field.onChange(phone)}
-                            placeholder="Enter mobile number"
-                            inputClassName="h-11 rounded-md px-3 text-sm w-full"
-                          />
+                          {defaultPhoneCountry && (
+                            <PhoneInput
+                              defaultCountry={defaultPhoneCountry as any}
+                              value={field.value}
+                              onChange={(phone: any) => field.onChange(phone)}
+                              placeholder="Enter mobile number"
+                              inputClassName="h-11 rounded-md px-3 text-sm w-full"
+                            />
+                          )}
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1265,13 +1285,15 @@ export default function StudentInformationForm({
                       <FormItem className="flex flex-col">
                         <FormLabel>Mother Mobile</FormLabel>
                         <FormControl>
-                          <PhoneInput
-                            defaultCountry={defaultPhoneCountry as any}
-                            value={field.value}
-                            onChange={(phone: any) => field.onChange(phone)}
-                            placeholder="Enter mobile number"
-                            inputClassName="h-11 rounded-md px-3 text-sm w-full"
-                          />
+                          {defaultPhoneCountry && (
+                            <PhoneInput
+                              defaultCountry={defaultPhoneCountry as any}
+                              value={field.value}
+                              onChange={(phone: any) => field.onChange(phone)}
+                              placeholder="Enter mobile number"
+                              inputClassName="h-11 rounded-md px-3 text-sm w-full"
+                            />
+                          )}
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1693,9 +1715,13 @@ export default function StudentInformationForm({
                                   <p className="text-sm font-medium text-green-700 dark:text-green-300 truncate">
                                     {doc.file.name}
                                   </p>
-                                  <p className="text-xs text-green-600 dark:text-green-400">
-                                    {(doc.file.size / 1024).toFixed(1)} KB
-                                  </p>
+                                  {(doc.file.size || doc.size) && (
+                                    <p className="text-xs text-green-600 dark:text-green-400">
+                                      {formatFileSize(
+                                        doc.file.size || doc.size
+                                      )}
+                                    </p>
+                                  )}
                                 </div>
                                 <Button
                                   type="button"
@@ -1729,40 +1755,6 @@ export default function StudentInformationForm({
                               </Button>
                             </div>
                           ) : (
-                            // <div
-                            //   className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/5 hover:bg-muted/10 transition-colors hover:border-primary/50"
-                            //   onClick={() => {
-                            //     const input = document.createElement("input");
-                            //     input.type = "file";
-                            //     input.accept =
-                            //       ".pdf,.doc,.docx,.jpg,.jpeg,.png";
-                            //     input.onchange = (e) => {
-                            //       const file = (e.target as HTMLInputElement)
-                            //         .files?.[0];
-                            //       if (file) handleDocumentUpload(index, file);
-                            //     };
-                            //     input.click();
-                            //   }}
-                            // >
-                            //   {doc.uploading ? (
-                            //     <div className="flex flex-col items-center justify-center gap-2">
-                            //       <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
-                            //       <p className="text-sm text-muted-foreground">
-                            //         Uploading...
-                            //       </p>
-                            //     </div>
-                            //   ) : (
-                            //     <div className="flex flex-col items-center justify-center gap-2">
-                            //       <Upload className="h-8 w-8 text-muted-foreground" />
-                            //       <p className="text-sm text-muted-foreground">
-                            //         Click to upload document
-                            //       </p>
-                            //       <p className="text-xs text-muted-foreground">
-                            //         PDF, DOC, DOCX, JPG, PNG (Max 10MB)
-                            //       </p>
-                            //     </div>
-                            //   )}
-                            // </div>
                             <div
                               className="border-2 border-dashed border-muted rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors w-full cursor-pointer"
                               onClick={() => {

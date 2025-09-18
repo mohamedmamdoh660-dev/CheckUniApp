@@ -204,14 +204,14 @@ export default function AnnouncementList() {
             <Loader />
           </div>
         ) : announcements.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-center">
+          <div className="flex flex-col items-center justify-center h-[calc(100vh-300px)] text-center">
             <InfoGraphic
               icon={<BellRing className="!h-16 !w-16 text-primary" />}
               title="No announcements found"
               description={
                 searchQuery
-                  ? `there is no announcement found for this search`
-                  : `there is no announcement found at the moment`
+                  ? `There is no announcement found for this search`
+                  : `There is no announcement found at the moment`
               }
               isLeftArrow={false}
               gradient={false}

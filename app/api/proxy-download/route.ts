@@ -4,6 +4,7 @@ export const GET = async (request: NextRequest) => {
   try {
     // Get the URL from the query parameter
     const url = request.nextUrl.searchParams.get("url");
+    const filename = request.nextUrl.searchParams.get("filename");
     
     if (!url) {
       return NextResponse.json(
@@ -28,12 +29,20 @@ export const GET = async (request: NextRequest) => {
     // Get the content type from the response
     const contentType = response.headers.get("content-type") || "application/octet-stream";
     
+    // Determine filename for Content-Disposition
+    let contentDisposition = "attachment";
+    if (filename) {
+      // Basic sanitization: strip CR/LF and quotes
+      const safeFilename = filename.replace(/[\r\n\"]+/g, " ").trim() || "download";
+      contentDisposition = `attachment; filename="${safeFilename}"`;
+    }
+
     // Create a new response with the file content
     const newResponse = new NextResponse(arrayBuffer, {
       status: 200,
       headers: {
         "Content-Type": contentType,
-        "Content-Disposition": "attachment",
+        "Content-Disposition": contentDisposition,
       },
     });
 
