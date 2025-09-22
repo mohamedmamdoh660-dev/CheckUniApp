@@ -55,6 +55,7 @@ import {
   FileText,
   Home,
   Users,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchableDropdown } from "@/components/searchable-dropdown";
@@ -424,17 +425,17 @@ export default function StudentInformationForm({
         // High School
         high_school_country: values.high_school_country || null,
         high_school_name: values.high_school_name,
-        high_school_gpa_percent: values.high_school_gpa_percent,
+        high_school_gpa_percent: Number(values.high_school_gpa_percent),
 
         // Bachelor (if provided)
         bachelor_school_name: values.bachelor_school_name,
         bachelor_country: values.bachelor_country || null,
-        bachelor_gpa_percent: values.bachelor_gpa_percent,
+        bachelor_gpa_percent: Number(values.bachelor_gpa_percent),
 
         // Master (if provided)
         master_school_name: values.master_school_name,
         master_country: values.master_country || null,
-        master_gpa_percent: values.master_gpa_percent,
+        master_gpa_percent: Number(values.master_gpa_percent),
 
         // Photo Upload
         photo_url: values.photo, // Pass the URL instead of file
@@ -455,7 +456,6 @@ export default function StudentInformationForm({
         // Create new student
         const webhookResponse =
           await createStudentViaWebhook(webhookStudentData);
-
         if (webhookResponse.status) {
           const studentDataWithId = {
             ...webhookStudentData,
@@ -471,7 +471,7 @@ export default function StudentInformationForm({
             documents: JSON.stringify(documentsData),
           };
           // @ts-ignore
-          await zohoStudentsService.createStudent(studentDataWithId);
+          // await zohoStudentsService.createStudent(studentDataWithId);
           toast.success("Student created successfully");
           router.push("/students");
         } else {
@@ -776,6 +776,22 @@ export default function StudentInformationForm({
 
   return (
     <div className="space-y-6">
+      {isLoading && mode === "create" && (
+        <div className="fixed inset-0  flex items-center justify-center bg-black/50 backdrop-blur-sm mb-[0px] z-[7]">
+          <div className="flex flex-col items-center gap-4 rounded-lg border bg-card p-8 shadow-lg max-w-sm">
+            {/* Simple spinner */}
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+
+            {/* Clean text */}
+            <div className="text-center space-y-2">
+              <p className="text-[18px] font-medium">Creating student…</p>
+              <p className="text-sm text-muted-foreground">
+                Please wait while we save the information.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Student Basic Info Card */}
@@ -1374,7 +1390,7 @@ export default function StudentInformationForm({
                           </FormControl>
                           <SelectContent>
                             {contries.map((country) => (
-                              <SelectItem key={country.id} value={country.id}>
+                              <SelectItem key={country.id} value={country.name}>
                                 {country.name}
                               </SelectItem>
                             ))}
@@ -1409,7 +1425,11 @@ export default function StudentInformationForm({
                       <FormItem className="flex flex-col">
                         <FormLabel>High School GPA %</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g. 85" {...field} />
+                          <Input
+                            type="number"
+                            placeholder="e.g. 3.5"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1448,7 +1468,10 @@ export default function StudentInformationForm({
                             </FormControl>
                             <SelectContent>
                               {contries.map((country) => (
-                                <SelectItem key={country.id} value={country.id}>
+                                <SelectItem
+                                  key={country.id}
+                                  value={country.name}
+                                >
                                   {country.name}
                                 </SelectItem>
                               ))}
@@ -1481,7 +1504,11 @@ export default function StudentInformationForm({
                         <FormItem className="flex flex-col">
                           <FormLabel>Bachelor GPA %</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g. 85" {...field} />
+                            <Input
+                              type="number"
+                              placeholder="e.g. 3.5"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1520,7 +1547,10 @@ export default function StudentInformationForm({
                             </FormControl>
                             <SelectContent>
                               {contries.map((country) => (
-                                <SelectItem key={country.id} value={country.id}>
+                                <SelectItem
+                                  key={country.id}
+                                  value={country.name}
+                                >
                                   {country.name}
                                 </SelectItem>
                               ))}
@@ -1553,7 +1583,11 @@ export default function StudentInformationForm({
                         <FormItem className="flex flex-col">
                           <FormLabel>Master GPA %</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g. 90" {...field} />
+                            <Input
+                              type="number"
+                              placeholder="e.g. 3.5"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

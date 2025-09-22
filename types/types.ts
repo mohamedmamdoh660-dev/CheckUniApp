@@ -156,6 +156,10 @@ export interface ZohoUniversity {
   country?: string;
   created_at?: string;
   update_at?: string;
+  year_founded?: string;
+  qs_rank?: string;
+  times_higher_education_rank?: string;
+  shanghai_ranking?: string;
   
   // Related entities
   zoho_cities?: {
@@ -199,6 +203,7 @@ export interface ZohoApplication {
   user_id?: string | null;
   agency?: User | null;
   user?: User | null;
+  added_user?: User | null;
   crm_id?: string;
 }
 
@@ -337,13 +342,13 @@ export interface ZohoStudent {
   education_level_name?: string;
   high_school_country?: string | null;
   high_school_name?: string;
-  high_school_gpa_percent?: string;
+  high_school_gpa_percent?: number;
   bachelor_school_name?: string;
   bachelor_country?: string | null;
-  bachelor_gpa_percent?: string | null;
+  bachelor_gpa_percent?: number | null;
   master_school_name?: string;
   master_country?: string | null;
-  master_gpa_percent?: string | null;
+  master_gpa_percent?: number | null;
   transfer_student?: string;
   have_tc?: string | null;
   tc_number?: string | null;
@@ -355,8 +360,6 @@ export interface ZohoStudent {
   postal_code?: string;
   address_country?: string | null;
   address_country_record?: ZohoCountry;
-  master_country_record?: ZohoCountry;
-  bachelor_country_record?: ZohoCountry;
-  high_school_country_record?: ZohoCountry;
+  
   academic_level_record?: ZohoDegree;
 }

@@ -3,7 +3,7 @@ const nextConfig = {
   transpilePackages: ["@workspace/ui"],
   experimental: {
     serverActions: {
-      bodySizeLimit: "10mb",
+      bodySizeLimit: "50mb",
     },
   },
   images: {

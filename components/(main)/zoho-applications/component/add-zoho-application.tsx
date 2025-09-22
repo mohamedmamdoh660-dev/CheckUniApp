@@ -159,7 +159,7 @@ export default function AddZohoApplication({
         };
 
         // @ts-ignore
-        await zohoApplicationsService.createApplication(applicationDataWithId);
+        // await zohoApplicationsService.createApplication(applicationDataWithId);
         toast.success("Application created successfully");
 
         // Close dialog and refresh application list

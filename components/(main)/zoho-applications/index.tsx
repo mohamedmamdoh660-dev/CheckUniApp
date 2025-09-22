@@ -8,6 +8,7 @@ import { zohoApplicationsService } from "@/modules/zoho-applications/services/zo
 import { ZohoApplication } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function ZohoApplicationsManagementPage({
   type,
@@ -24,6 +25,7 @@ export default function ZohoApplicationsManagementPage({
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
   const { userProfile } = useAuth();
+  const router = useRouter();
   async function fetchApplications() {
     setIsRefetching(true);
     try {
@@ -79,7 +81,7 @@ export default function ZohoApplicationsManagementPage({
             type={type}
           />
         }
-        columns={getZohoApplicationsColumns(fetchApplications)}
+        columns={getZohoApplicationsColumns(fetchApplications, router)}
         onGlobalFilterChange={handleGlobalFilterChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}

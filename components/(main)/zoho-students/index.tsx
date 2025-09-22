@@ -8,6 +8,7 @@ import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-stude
 import { ZohoStudent } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [listStudents, setListStudents] = useState<ZohoStudent[]>([]);
@@ -18,6 +19,7 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
   const { userProfile } = useAuth();
+  const router = useRouter();
   async function fetchStudents() {
     setIsRefetching(true);
     try {
@@ -73,7 +75,7 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
             type={type}
           />
         }
-        columns={getZohoStudentsColumns(fetchStudents)}
+        columns={getZohoStudentsColumns(fetchStudents, router)}
         onGlobalFilterChange={handleGlobalFilterChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}

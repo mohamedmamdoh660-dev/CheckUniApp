@@ -7,9 +7,16 @@ import { currentTimezone } from "@/lib/helper/current-timezone";
 import { ZohoStudent } from "@/types/types";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 export function getZohoStudentsColumns(
-  fetchStudents: () => void
+  fetchStudents: () => void,
+  router: any
 ): ColumnDef<ZohoStudent>[] {
   const columns: ColumnDef<ZohoStudent, unknown>[] = [
     {
@@ -192,11 +199,22 @@ export function getZohoStudentsColumns(
         <DataTableColumnHeader column={column} title="Actions" />
       ),
       cell: ({ row }) => (
-        <div className="text-center">
-          <ZohoStudentsTableRowActions
+        <div className="flex items-center justify-center">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info
+                className="!h-6 !w-6 hover:cursor-pointer hover:text-primary"
+                onClick={() => router.push(`/students/${row.original.id}`)}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>View Details</p>
+            </TooltipContent>
+          </Tooltip>
+          {/* <ZohoStudentsTableRowActions
             row={row}
             fetchStudents={fetchStudents}
-          />
+          /> */}
         </div>
       ),
     },

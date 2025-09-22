@@ -52,80 +52,6 @@ export function StudentDetailPage() {
     }
   };
 
-  const downloadStudentCsv = (s: ZohoStudent) => {
-    if (!s) return;
-    const safe = (v?: any) => (v === undefined || v === null ? "" : String(v));
-    const fields: Record<string, string> = {
-      id: safe(s.id),
-      first_name: safe(s.first_name),
-      last_name: safe(s.last_name),
-      gender: safe(s.gender),
-      date_of_birth: safe(s.date_of_birth),
-      nationality: safe(s.nationality_record?.name || s.nationality),
-      email: safe(s.email),
-      mobile: safe(s.mobile),
-      transfer_student: safe(s.transfer_student),
-      have_tc: safe(s.have_tc),
-      tc_number: safe(s.tc_number),
-      blue_card: safe(s.blue_card),
-      passport_number: safe(s.passport_number),
-      passport_issue_date: safe(s.passport_issue_date),
-      passport_expiry_date: safe(s.passport_expiry_date),
-      address_line_1: safe(s.address_line_1),
-      city_district: safe(s.city_district),
-      state_province: safe(s.state_province),
-      postal_code: safe(s.postal_code),
-      address_country: safe(
-        s.address_country_record?.name || s.address_country
-      ),
-      father_name: safe(s.father_name),
-      father_mobile: safe(s.father_mobile),
-      father_job: safe(s.father_job),
-      mother_name: safe(s.mother_name),
-      mother_mobile: safe(s.mother_mobile),
-      mother_job: safe(s.mother_job),
-      education_level: safe(s.education_level),
-      education_level_name: safe(s.education_level_name),
-      high_school_name: safe(s.high_school_name),
-      high_school_country: safe(
-        s.high_school_country_record?.name || s.high_school_country
-      ),
-      high_school_gpa_percent: safe(s.high_school_gpa_percent),
-      bachelor_school_name: safe(s.bachelor_school_name),
-      bachelor_country: safe(
-        s.bachelor_country_record?.name || s.bachelor_country
-      ),
-      bachelor_gpa_percent: safe(s.bachelor_gpa_percent),
-      master_school_name: safe(s.master_school_name),
-      master_country: safe(s.master_country_record?.name || s.master_country),
-      master_gpa_percent: safe(s.master_gpa_percent),
-      photo_url: safe(s.photo_url),
-      documents_count: String(
-        Array.isArray(s.documents) ? s.documents.length : 0
-      ),
-      documents: safe(JSON.stringify(s.documents)),
-    };
-
-    const headers = Object.keys(fields);
-    const escapeCsv = (val: string) => {
-      const needsQuotes = /[",\n]/.test(val);
-      let out = val.replace(/"/g, '""');
-      return needsQuotes ? `"${out}"` : out;
-    };
-    const row = headers.map((h) => escapeCsv(fields[h])).join(",");
-    const csv = `${headers.join(",")}\n${row}`;
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    const filename = `${safe(s.first_name)}_${safe(s.last_name)}_${safe(s.id)}.csv`;
-    a.href = url;
-    a.download = filename.replace(/\s+/g, "_");
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   useEffect(() => {
     if (studentId) {
       getStudent();
@@ -243,13 +169,6 @@ export function StudentDetailPage() {
                     Edit Profile
                   </Button>
                 )}
-                <Button
-                  onClick={() => downloadStudentCsv(student)}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </Button>
               </div>
             </div>
           </div>
@@ -476,9 +395,7 @@ export function StudentDetailPage() {
                             Country
                           </p>
                           <p className="font-medium">
-                            {student?.high_school_country_record?.name ||
-                              student?.high_school_country ||
-                              "N/A"}
+                            {student?.high_school_country || "N/A"}
                           </p>
                         </div>
                         <div>
@@ -514,9 +431,7 @@ export function StudentDetailPage() {
                             Country
                           </p>
                           <p className="font-medium">
-                            {student?.bachelor_country_record?.name ||
-                              student?.bachelor_country ||
-                              "N/A"}
+                            {student?.bachelor_country || "N/A"}
                           </p>
                         </div>
                         <div>
@@ -552,9 +467,7 @@ export function StudentDetailPage() {
                             Country
                           </p>
                           <p className="font-medium">
-                            {student?.master_country_record?.name ||
-                              student?.master_country ||
-                              "N/A"}
+                            {student?.master_country || "N/A"}
                           </p>
                         </div>
                         <div>

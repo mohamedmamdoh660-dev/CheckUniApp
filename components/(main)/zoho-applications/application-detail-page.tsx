@@ -1,0 +1,536 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  GraduationCap,
+  MapPin,
+  FileText,
+  User,
+  Building2,
+  ChevronDown,
+  Printer,
+} from "lucide-react";
+import Loader from "@/components/loader";
+import InfoGraphic from "@/components/ui/info-graphic";
+import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
+import { ZohoApplication } from "@/types/types";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { getApplicationById } from "@/supabase/actions/students";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DropdownMenuContent } from "@/components/dropdown-menu";
+
+export default function ApplicationDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const applicationId = params.id as string;
+  const [isLoading, setIsLoading] = useState(false);
+  const [application, setApplication] = useState<ZohoApplication | null>(null);
+
+  const getApplication = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const app = await getApplicationById(applicationId);
+      setApplication(app);
+    } catch (error) {
+      console.error("Error fetching application:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [applicationId]);
+
+  useEffect(() => {
+    if (applicationId) {
+      getApplication();
+    }
+  }, [applicationId, getApplication]);
+
+  // No separate student fetch; use student data included in the application record
+
+  const getInitials = (name?: string) => {
+    if (!name) return "AP";
+    const parts = name.split(" ").filter(Boolean);
+    if (parts.length === 1) return parts[0][0]?.toUpperCase() || "A";
+    return `${parts[0][0] || "A"}${parts[1][0] || "P"}`.toUpperCase();
+  };
+
+  const safe = (v?: any) => (v === undefined || v === null ? "N/A" : String(v));
+
+  const formatDate = (d?: string) => {
+    if (!d) return "N/A";
+    return new Date(d).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  if (isLoading) return <Loader />;
+
+  if (!application) {
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-200px)]">
+        <InfoGraphic
+          title="Application Not Found"
+          description="The application you are looking for does not exist."
+          icon={<FileText className="!w-16 !h-16 text-primary" />}
+          isLeftArrow={false}
+          gradient={false}
+        />
+      </div>
+    );
+  }
+
+  const studentFullName =
+    `${application?.zoho_students?.first_name || ""} ${application?.zoho_students?.last_name || ""}`.trim();
+  const universityName = application?.zoho_universities?.name || "";
+  const programName = application?.zoho_programs?.name || "";
+
+  return (
+    <div className=" bg-background">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-card border-b border-border">
+          <div className="p-8">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
+              <Avatar className="h-24 w-24 ring-4 ring-accent/20">
+                <AvatarImage
+                  src={
+                    application?.zoho_students?.photo_url ||
+                    generateNameAvatar(studentFullName)
+                  }
+                  alt={studentFullName || "Student"}
+                />
+                <AvatarFallback className="text-xl font-bold bg-accent/10 text-primary">
+                  {getInitials(studentFullName)}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex-1 space-y-4">
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground text-balance">
+                    {studentFullName || "Student"}
+                  </h1>
+                  <p className="text-lg text-muted-foreground mt-1">
+                    Application ID: {application?.id || "N/A"}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {application?.stage ? (
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary/10 text-primary border-primary/20"
+                    >
+                      <FileText className="w-3 h-3 mr-1" />
+                      {application.stage}
+                    </Badge>
+                  ) : null}
+                  {application?.zoho_degrees?.name ? (
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary/10 text-primary border-primary/20"
+                    >
+                      <GraduationCap className="w-3 h-3 mr-1" />
+                      {application.zoho_degrees.name}
+                    </Badge>
+                  ) : null}
+                  {application?.zoho_countries?.name ? (
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary/10 text-primary border-primary/20"
+                    >
+                      <MapPin className="w-3 h-3 mr-1" />
+                      {application.zoho_countries.name}
+                    </Badge>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button variant="outline">Download Conditionals</Button>
+                <Button variant="outline">Download Final Acceptance</Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      <Printer className="mr-2 h-4 w-4" />
+                      <span>Print</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-8">
+          <Tabs defaultValue="application" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+              <TabsTrigger
+                value="application"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
+              >
+                Application Details
+              </TabsTrigger>
+              <TabsTrigger
+                value="student"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
+              >
+                Student Information
+              </TabsTrigger>
+              <TabsTrigger
+                value="university"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
+              >
+                University Information
+              </TabsTrigger>
+              <TabsTrigger
+                value="letters"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
+              >
+                University Letters
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Application Details Tab */}
+            <TabsContent value="application" className="space-y-6">
+              <Card className="shadow-sm">
+                <CardHeader className="pb-0">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <FileText className="w-5 h-5 text-primary" />
+                    Application Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        App Id
+                      </p>
+                      <p className="font-medium">{"N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Online Application Id
+                      </p>
+                      <p className="font-medium">{application?.id || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Owner
+                      </p>
+                      <p className="font-medium">
+                        {application?.user?.first_name +
+                          " " +
+                          application?.user?.last_name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Added User
+                      </p>
+                      <p className="font-medium">
+                        {application?.added_user?.first_name +
+                          " " +
+                          application?.added_user?.last_name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Program
+                      </p>
+                      <p className="font-medium">{programName || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        University
+                      </p>
+                      <p className="font-medium">{universityName || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Country
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_countries?.name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Academic Year
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_academic_years?.name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Semester
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_semesters?.name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Degree
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_degrees?.name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Stage
+                      </p>
+                      <Badge variant="outline" className="">
+                        {safe(application?.stage)}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Created At
+                      </p>
+                      <p className="font-medium">
+                        {formatDate(application?.created_at)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Updated At
+                      </p>
+                      <p className="font-medium">
+                        {formatDate(application?.updated_at)}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Student Information Tab */}
+            <TabsContent value="student" className="space-y-6">
+              <Card className="shadow-sm">
+                <CardHeader className="pb-0">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <User className="w-5 h-5 text-primary" />
+                    Student Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        First Name
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_students?.first_name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Last Name
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_students?.last_name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Passport No
+                      </p>
+                      <p className="font-mono font-medium">
+                        {application?.zoho_students?.passport_number || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Issue Date
+                      </p>
+                      <p className="font-medium">
+                        {formatDate(
+                          application?.zoho_students?.passport_issue_date || ""
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Expiry Date
+                      </p>
+                      <p className="font-medium">
+                        {formatDate(
+                          application?.zoho_students?.passport_expiry_date || ""
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Gender
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_students?.gender || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Nationality
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_students?.nationality_record?.name ||
+                          application?.zoho_students?.nationality ||
+                          "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        City of Residence
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_students?.city_district || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Mobile
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_students?.mobile || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Email
+                      </p>
+                      <p className="font-medium break-all">
+                        {application?.zoho_students?.email || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* University Information Tab */}
+            <TabsContent value="university" className="space-y-6">
+              <Card className="shadow-sm">
+                <CardHeader className="pb-0">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Building2 className="w-5 h-5 text-primary" />
+                    University Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Name
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_universities?.name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Sector
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_universities?.sector || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Country
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_universities?.zoho_countries?.name ||
+                          "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        City
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_universities?.zoho_cities?.name ||
+                          "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Year Founded
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_universities?.year_founded || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        QS Rank
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_universities?.qs_rank || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Times Higher Education Rank
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_universities
+                          ?.times_higher_education_rank || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Shanghai Ranking
+                      </p>
+                      <p className="font-medium">
+                        {application?.zoho_universities?.shanghai_ranking ||
+                          "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* University Letters Tab */}
+            <TabsContent value="letters" className="space-y-6">
+              <Card className="shadow-sm">
+                <CardHeader className="pb-0">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <FileText className="w-5 h-5 text-primary" />
+                    University Letters
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
+                      <FileText className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                    <p className="text-muted-foreground text-lg">
+                      No letters found
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
+  );
+}

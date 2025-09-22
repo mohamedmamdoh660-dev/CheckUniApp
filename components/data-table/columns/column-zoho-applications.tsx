@@ -8,11 +8,18 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import Image from "next/image";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
-import { ZohoApplicationsTableRowActions } from "../actions/zoho-applications-actions";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { DownloadIcon, Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function getZohoApplicationsColumns(
-  fetchApplications: () => void
+  fetchApplications: () => void,
+  router: any
 ): ColumnDef<ZohoApplication>[] {
   const columns: ColumnDef<ZohoApplication, unknown>[] = [
     {
@@ -219,20 +226,70 @@ export function getZohoApplicationsColumns(
       enableHiding: true,
     },
 
-    // {
-    //   id: "actions",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Actions" />
-    //   ),
-    //   cell: ({ row }) => (
-    //     <div className="text-center">
-    //       <ZohoApplicationsTableRowActions
-    //         row={row}
-    //         fetchApplications={fetchApplications}
-    //       />
-    //     </div>
-    //   ),
-    // },
+    {
+      accessorKey: "download_conditional",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Download Conditional" />
+      ),
+      cell: ({ row }) => {
+        // const created = row.original.download_conditional;
+        return (
+          <div className="text-left overflow-hidden whitespace-nowrap">
+            <Button variant="outline" size="sm" disabled>
+              <DownloadIcon className="mr-1 h-4 w-4" />
+              Download Conditional
+            </Button>
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      accessorKey: "final_acceptance",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Final Acceptance" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-left overflow-hidden whitespace-nowrap">
+            <Button variant="outline" size="sm" disabled>
+              <DownloadIcon className="mr-1 h-4 w-4" />
+              Download Final Acceptance
+            </Button>
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
+
+    {
+      id: "actions",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Actions" />
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info
+                className="!h-6 !w-6 hover:cursor-pointer hover:text-primary"
+                onClick={() => router.push(`/applications/${row.original.id}`)}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>View Details</p>
+            </TooltipContent>
+          </Tooltip>
+          {/* <ZohoApplicationsTableRowActions
+            row={row}
+            fetchApplications={fetchApplications}
+          /> */}
+        </div>
+      ),
+    },
   ];
 
   return columns;
