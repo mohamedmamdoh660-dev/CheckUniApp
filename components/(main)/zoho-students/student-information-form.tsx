@@ -526,6 +526,8 @@ export default function StudentInformationForm({
   // Gender options
   const genders = ["Male", "Female"];
 
+  const RequiredStar = () => <span className="text-red-500 ml-0.5">*</span>;
+
   // Custom Date Picker Component
   const DatePicker = ({
     field,
@@ -810,7 +812,7 @@ export default function StudentInformationForm({
                   name="transfer_student"
                   render={({ field }) => (
                     <FormItem className="gap-5 flex flex-col">
-                      <FormLabel>Transfer student? *</FormLabel>
+                      <FormLabel>Transfer student?</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
@@ -885,7 +887,7 @@ export default function StudentInformationForm({
                   name="blue_card"
                   render={({ field }) => (
                     <FormItem className="gap-5 flex flex-col">
-                      <FormLabel>Blue Card *</FormLabel>
+                      <FormLabel>Blue Card</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
@@ -925,7 +927,9 @@ export default function StudentInformationForm({
                   name="first_name"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>First Name *</FormLabel>
+                      <FormLabel>
+                        First Name <RequiredStar />
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Enter first name" {...field} />
                       </FormControl>
@@ -933,27 +937,14 @@ export default function StudentInformationForm({
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="passport_number"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Passport No *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Passport number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name="last_name"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Last Name *</FormLabel>
+                      <FormLabel>
+                        Last Name <RequiredStar />
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Last name" {...field} />
                       </FormControl>
@@ -964,26 +955,12 @@ export default function StudentInformationForm({
 
                 <FormField
                   control={form.control}
-                  name="passport_issue_date"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Issue Date *</FormLabel>
-                      <DatePicker
-                        field={field}
-                        placeholder="yyyy-MM-dd"
-                        label="Issue Date"
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="gender"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Gender *</FormLabel>
+                      <FormLabel>
+                        Gender <RequiredStar />
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
@@ -1008,10 +985,46 @@ export default function StudentInformationForm({
 
                 <FormField
                   control={form.control}
+                  name="passport_number"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>
+                        Passport No <RequiredStar />
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Passport number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="passport_issue_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>
+                        Issue Date <RequiredStar />
+                      </FormLabel>
+                      <DatePicker
+                        field={field}
+                        placeholder="yyyy-MM-dd"
+                        label="Issue Date"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="passport_expiry_date"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Expiry Date *</FormLabel>
+                      <FormLabel>
+                        Expiry Date <RequiredStar />
+                      </FormLabel>
                       <DatePicker
                         field={field}
                         placeholder="yyyy-MM-dd"
@@ -1027,7 +1040,9 @@ export default function StudentInformationForm({
                   name="date_of_birth"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Date of Birth *</FormLabel>
+                      <FormLabel>
+                        Date of Birth <RequiredStar />
+                      </FormLabel>
                       <DatePicker
                         field={field}
                         placeholder="yyyy-MM-dd"
@@ -1043,7 +1058,9 @@ export default function StudentInformationForm({
                   name="nationality"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Nationality *</FormLabel>
+                      <FormLabel>
+                        Nationality <RequiredStar />
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
@@ -1089,7 +1106,9 @@ export default function StudentInformationForm({
                   name="email"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Email *</FormLabel>
+                      <FormLabel>
+                        Email <RequiredStar />
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="email"
@@ -1236,7 +1255,9 @@ export default function StudentInformationForm({
                     name="father_name"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>Father_Name *</FormLabel>
+                        <FormLabel>
+                          Father_Name <RequiredStar />
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="Father's name" {...field} />
                         </FormControl>

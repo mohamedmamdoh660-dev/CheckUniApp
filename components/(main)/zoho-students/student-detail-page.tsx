@@ -156,20 +156,7 @@ export function StudentDetailPage() {
                 </div>
               </div>
 
-              <div className="flex gap-3">
-                {userProfile?.crm_id && (
-                  <Button
-                    onClick={() => {
-                      router.push(`/students/edit/${student.id}`);
-                    }}
-                    variant="outline"
-                    className="border-primary/20 hover:bg-primary/5 bg-transparent"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Button>
-                )}
-              </div>
+              <div className="flex gap-3"></div>
             </div>
           </div>
         </div>
@@ -331,7 +318,7 @@ export function StudentDetailPage() {
                       <p className="text-sm font-medium text-muted-foreground mb-1">
                         Passport Number
                       </p>
-                      <p className="font-mono font-medium">
+                      <p className="font-medium">
                         {student?.passport_number || "N/A"}
                       </p>
                     </div>
@@ -402,7 +389,7 @@ export function StudentDetailPage() {
                           <p className="text-sm font-medium text-muted-foreground mb-1">
                             GPA
                           </p>
-                          <Badge variant="outline" className="font-mono">
+                          <Badge variant="outline" className="">
                             {student?.high_school_gpa_percent || "N/A"}
                           </Badge>
                         </div>
@@ -438,7 +425,7 @@ export function StudentDetailPage() {
                           <p className="text-sm font-medium text-muted-foreground mb-1">
                             GPA
                           </p>
-                          <Badge variant="outline" className="font-mono">
+                          <Badge variant="outline" className="">
                             {student?.bachelor_gpa_percent || "N/A"}
                           </Badge>
                         </div>
@@ -474,7 +461,7 @@ export function StudentDetailPage() {
                           <p className="text-sm font-medium text-muted-foreground mb-1">
                             GPA
                           </p>
-                          <Badge variant="outline" className="font-mono">
+                          <Badge variant="outline" className="">
                             {student?.master_gpa_percent || "N/A"}
                           </Badge>
                         </div>
