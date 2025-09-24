@@ -282,7 +282,11 @@ export default function ApplicationDetailPage() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        router.push(`/applications/print/${application.id}`)
+                      }
+                    >
                       <Printer className="mr-2 h-4 w-4" />
                       <span>Print</span>
                     </DropdownMenuItem>
