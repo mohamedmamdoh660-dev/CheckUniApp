@@ -367,6 +367,22 @@ export default function StudentInformationForm({
     setIsLoading(true);
 
     try {
+      // Validate required documents: at least one Passport and one HighSchool Transcript
+      const hasPassport = documents.some(
+        (d) => d.attachment_type?.toLowerCase() === "passport" && d.url
+      );
+      const hasTranscript = documents.some(
+        (d) =>
+          d.attachment_type?.toLowerCase() === "highschool transcript" && d.url
+      );
+      if (!hasPassport || !hasTranscript) {
+        setIsLoading(false);
+        toast.error(
+          "Please upload at least one Passport and one HighSchool Transcript"
+        );
+        return;
+      }
+
       // Prepare documents data - passing URLs instead of file objects
       const documentsData = documents
         .filter((doc) => doc.attachment_type && doc.url)
@@ -451,34 +467,35 @@ export default function StudentInformationForm({
               : userProfile?.agency_id,
         crm_id: userProfile?.crm_id || userProfile?.agency?.crm_id || "",
       };
+      console.log("🚀 ~ onSubmit ~ webhookStudentData:", webhookStudentData);
 
       if (mode === "create") {
         // Create new student
-        const webhookResponse =
-          await createStudentViaWebhook(webhookStudentData);
-        if (webhookResponse.status) {
-          const studentDataWithId = {
-            ...webhookStudentData,
-            // id: webhookResponse.id,
-            id: Math.random().toString(36).substring(2, 15),
-            user_id: userProfile?.id,
-            agency_id:
-              userProfile?.roles?.name === "agent"
-                ? userProfile?.id
-                : userProfile?.roles?.name === "admin"
-                  ? null
-                  : userProfile?.agency_id,
-            documents: JSON.stringify(documentsData),
-          };
-          // @ts-ignore
-          // await zohoStudentsService.createStudent(studentDataWithId);
-          toast.success("Student created successfully");
-          router.push("/students");
-        } else {
-          throw new Error(
-            webhookResponse.message || "Failed to create student via webhook"
-          );
-        }
+        // const webhookResponse =
+        //   await createStudentViaWebhook(webhookStudentData);
+        // if (webhookResponse.status) {
+        //   const studentDataWithId = {
+        //     ...webhookStudentData,
+        //     // id: webhookResponse.id,
+        //     id: Math.random().toString(36).substring(2, 15),
+        //     user_id: userProfile?.id,
+        //     agency_id:
+        //       userProfile?.roles?.name === "agent"
+        //         ? userProfile?.id
+        //         : userProfile?.roles?.name === "admin"
+        //           ? null
+        //           : userProfile?.agency_id,
+        //     documents: JSON.stringify(documentsData),
+        //   };
+        //   // @ts-ignore
+        //   // await zohoStudentsService.createStudent(studentDataWithId);
+        //   toast.success("Student created successfully");
+        //   router.push("/students");
+        // } else {
+        //   throw new Error(
+        //     webhookResponse.message || "Failed to create student via webhook"
+        //   );
+        // }
       } else {
         // Update existing student
         const webhookResponse = await updateStudentViaWebhook({
@@ -599,8 +616,8 @@ export default function StudentInformationForm({
     if (!file) return;
 
     // Check file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Photo size must be less than 10MB");
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Photo size must be less than 5MB");
       return;
     }
 
@@ -665,9 +682,9 @@ export default function StudentInformationForm({
   const handleDocumentUpload = async (index: number, file: File | null) => {
     if (!file) return;
 
-    // Check file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Document size must be less than 10MB");
+    // Check file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Document size must be less than 5MB");
       return;
     }
 
@@ -689,6 +706,10 @@ export default function StudentInformationForm({
     }
 
     const newDocs = [...documents];
+    if (!newDocs[index].attachment_type) {
+      toast.error("Please select a document type first");
+      return;
+    }
     newDocs[index].uploading = true;
     setDocuments([...newDocs]);
 
@@ -1684,7 +1705,7 @@ export default function StudentInformationForm({
                                 )}
                               </Button>
                               <p className="text-sm text-muted-foreground mt-2">
-                                PNG, JPG, GIF up to 10MB
+                                PNG, JPG, GIF up to 5MB
                               </p>
                             </div>
                           </div>
@@ -1849,7 +1870,7 @@ export default function StudentInformationForm({
                                     )}
                                   </Button>
                                   <p className="text-sm text-muted-foreground mt-2">
-                                    PDF, DOC, DOCX, JPG, PNG up to 10MB
+                                    PDF, DOC, DOCX, JPG, PNG up to 5MB
                                   </p>
                                 </div>
                               </div>

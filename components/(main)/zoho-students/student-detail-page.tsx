@@ -35,9 +35,7 @@ export function StudentDetailPage() {
   const [student, setStudent] = useState<ZohoStudent | null>(null);
   const params = useParams();
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const studentId = params.id as string;
-  const { userProfile } = useAuth();
 
   const getStudent = async () => {
     try {

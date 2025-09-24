@@ -3,6 +3,12 @@ import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export const saveFile = async (file: File) => {
   try {
+    // Enforce 5 MB max across the app
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE_BYTES) {
+      throw new Error("File size exceeds 5MB limit");
+    }
+
     const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME || "uploads";
 
     const { data, error } = await supabaseClient.storage
@@ -21,6 +27,7 @@ export const saveFile = async (file: File) => {
     return publicUrl;
   } catch (error) {
     console.error("Error saving file:", error);
-    return null;
+    // return null;
+    throw new Error(error instanceof Error ? error.message : "Error saving file");
   }
 };

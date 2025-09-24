@@ -15,6 +15,8 @@ import {
   Building2,
   ChevronDown,
   Printer,
+  Upload,
+  Loader2,
 } from "lucide-react";
 import Loader from "@/components/loader";
 import InfoGraphic from "@/components/ui/info-graphic";
@@ -22,6 +24,8 @@ import { zohoApplicationsService } from "@/modules/zoho-applications/services/zo
 import { ZohoApplication } from "@/types/types";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { getApplicationById } from "@/supabase/actions/students";
+import { saveFile } from "@/supabase/actions/save-file";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -35,6 +39,7 @@ export default function ApplicationDetailPage() {
   const applicationId = params.id as string;
   const [isLoading, setIsLoading] = useState(false);
   const [application, setApplication] = useState<ZohoApplication | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const getApplication = useCallback(async () => {
     try {
@@ -94,6 +99,89 @@ export default function ApplicationDetailPage() {
     `${application?.zoho_students?.first_name || ""} ${application?.zoho_students?.last_name || ""}`.trim();
   const universityName = application?.zoho_universities?.name || "";
   const programName = application?.zoho_programs?.name || "";
+
+  const stage = (application?.stage || "").toLowerCase();
+  const canUploadCard = [
+    "final acceptance",
+    "awaiting student card",
+    "awaiting student",
+  ].includes(stage);
+  const canUploadPayment = [
+    "conditional acceptance",
+    "awaiting payment",
+  ].includes(stage);
+
+  const handleUpload = async (type: "card" | "payment") => {
+    try {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".pdf,.jpg,.jpeg,.png,.doc,.docx";
+
+      // Check file type
+      const allowedTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+      ];
+
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+        setIsUploading(true);
+        try {
+          if (file.size > 5 * 1024 * 1024) {
+            toast.error("File size must be less than 5MB");
+            setIsUploading(false);
+            return;
+          }
+          if (!allowedTypes.includes(file.type)) {
+            toast.error(
+              "Please select a valid document file (PDF, DOC, DOCX, JPG, PNG)"
+            );
+            return;
+          }
+          const fileUrl = await saveFile(file);
+          if (!fileUrl) {
+            toast.error("Failed to upload file");
+            setIsUploading(false);
+            return;
+          }
+          const res = await fetch(
+            "https://n8n.browserautomations.com/webhook/58e479b5-ea43-42ee-abdd-b50815dfa4d9",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: application?.id,
+                file_url: fileUrl,
+                type,
+              }),
+            }
+          );
+          if (!res.ok) {
+            throw new Error("Webhook upload failed");
+          }
+          toast.success(
+            type === "card"
+              ? "Student card uploaded"
+              : "Payment receipt uploaded"
+          );
+        } catch (err) {
+          console.error(err);
+          toast.error("Upload failed");
+        } finally {
+          setIsUploading(false);
+        }
+      };
+      input.click();
+    } catch (e) {
+      console.error(e);
+      toast.error("Could not open file picker");
+    }
+  };
 
   return (
     <div className=" bg-background">
@@ -156,8 +244,37 @@ export default function ApplicationDetailPage() {
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline">Download Conditionals</Button>
-                <Button variant="outline">Download Final Acceptance</Button>
+                {/* <Button variant="outline">Download Conditionals</Button>
+                <Button variant="outline">Download Final Acceptance</Button> */}
+                {canUploadPayment && (
+                  <Button
+                    variant="outline"
+                    disabled={isUploading}
+                    onClick={() => handleUpload("payment")}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4" />
+                    )}
+                    {isUploading ? "Uploading…" : "Upload Payment Receipt"}
+                  </Button>
+                )}
+                {canUploadCard && (
+                  <Button
+                    variant="outline"
+                    disabled={isUploading}
+                    onClick={() => handleUpload("card")}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4" />
+                    )}
+
+                    {isUploading ? "Uploading…" : "Upload Student Card"}
+                  </Button>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="icon">
@@ -399,7 +516,8 @@ export default function ApplicationDetailPage() {
                         City of Residence
                       </p>
                       <p className="font-medium">
-                        {application?.zoho_students?.city_district || "N/A"}
+                        {application?.zoho_students?.address_country_record
+                          ?.name || "N/A"}
                       </p>
                     </div>
                     <div>
