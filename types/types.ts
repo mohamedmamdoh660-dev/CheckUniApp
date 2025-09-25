@@ -183,6 +183,7 @@ export interface ZohoApplication {
   created_at?: string;
   updated_at?: string;
   student?: string | null;
+  application_name?: string | null;
   program?: string | null;
   acdamic_year?: string | null;
   semester?: string | null;

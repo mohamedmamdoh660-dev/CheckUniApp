@@ -23,28 +23,28 @@ export function getZohoApplicationsColumns(
 ): ColumnDef<ZohoApplication>[] {
   const columns: ColumnDef<ZohoApplication, unknown>[] = [
     {
-      accessorKey: "student",
+      accessorKey: "application_name",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Student" />
+        <DataTableColumnHeader column={column} title="Application" />
       ),
       cell: ({ row }) => {
+        const applicationName = row.original.application_name;
         const student = row.original.zoho_students;
-        const fullName = student
-          ? `${student.first_name || ""} ${student.last_name || ""}`.trim()
-          : "-";
-        const initials = student
-          ? `${student.first_name?.[0] || ""}${student.last_name?.[0] || ""}`.toUpperCase()
-          : "";
+        console.log("🚀 ~ getZohoApplicationsColumns ~ student:", student);
+        const fullName =
+          `${student?.first_name || ""} ${student?.last_name || ""}`.trim();
 
         return (
           <div className="flex items-center w-full">
             <Avatar className="border-foreground/10 border-[1px]">
-              <AvatarImage src={generateNameAvatar(fullName)} />
+              <AvatarImage
+                src={student?.photo_url || generateNameAvatar(fullName)}
+              />
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
-              <span className=" font-semibold">{fullName}</span>
-              <span className=" text-xs text-muted-foreground">
-                {student?.email || "-"}
+              <span className="font-semibold">{applicationName}</span>
+              <span className="text-xs text-muted-foreground ">
+                {fullName || "-"}
               </span>
             </div>
           </div>
@@ -235,7 +235,13 @@ export function getZohoApplicationsColumns(
         // const created = row.original.download_conditional;
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
-            <Button variant="outline" size="sm" disabled>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={
+                row?.original?.stage?.toLowerCase() !== "conditional acceptance"
+              }
+            >
               <DownloadIcon className="mr-1 h-4 w-4" />
               Download Conditional
             </Button>
@@ -254,7 +260,13 @@ export function getZohoApplicationsColumns(
       cell: ({ row }) => {
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
-            <Button variant="outline" size="sm" disabled>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={
+                row?.original?.stage?.toLowerCase() !== "final acceptance"
+              }
+            >
               <DownloadIcon className="mr-1 h-4 w-4" />
               Download Final Acceptance
             </Button>

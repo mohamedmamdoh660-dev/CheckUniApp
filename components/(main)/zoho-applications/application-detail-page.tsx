@@ -17,6 +17,7 @@ import {
   Printer,
   Upload,
   Loader2,
+  Download,
 } from "lucide-react";
 import Loader from "@/components/loader";
 import InfoGraphic from "@/components/ui/info-graphic";
@@ -244,8 +245,18 @@ export default function ApplicationDetailPage() {
               </div>
 
               <div className="flex gap-3">
-                {/* <Button variant="outline">Download Conditionals</Button>
-                <Button variant="outline">Download Final Acceptance</Button> */}
+                {stage === "conditional acceptance" && (
+                  <Button variant="outline">
+                    <Download className="w-4 h-4 mr-1" />
+                    Download Conditionals
+                  </Button>
+                )}
+                {stage === "final acceptance" && (
+                  <Button variant="outline">
+                    <Download className="w-4 h-4 mr-1" />
+                    Download Final Acceptance
+                  </Button>
+                )}
                 {canUploadPayment && (
                   <Button
                     variant="outline"
@@ -253,9 +264,9 @@ export default function ApplicationDetailPage() {
                     onClick={() => handleUpload("payment")}
                   >
                     {isUploading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin mr-1" />
                     ) : (
-                      <Upload className="h-4 w-4" />
+                      <Upload className="h-4 w-4 mr-1" />
                     )}
                     {isUploading ? "Uploading…" : "Upload Payment Receipt"}
                   </Button>

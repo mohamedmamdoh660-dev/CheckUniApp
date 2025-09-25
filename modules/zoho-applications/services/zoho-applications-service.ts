@@ -83,6 +83,7 @@ export const zohoApplicationsService = {
           university,
           stage,
           degree,
+          application_name,
   
           agent:user_profile!zoho_applications_user_id_fkey (
             id,
@@ -97,7 +98,8 @@ export const zohoApplicationsService = {
             first_name,
             last_name,
             email,
-            mobile
+            mobile,
+            photo_url
           ),
   
           zoho_programs (
