@@ -53,6 +53,10 @@ const generateChartConfig = (stages: string[]): ChartConfig => {
   return config;
 };
 
+// Ensure SVG ids are valid and consistent (no spaces or special characters)
+const toSafeId = (value: string): string =>
+  `fill-${value.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+
 export function ApplicationChart() {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState("30");
@@ -221,8 +225,8 @@ export function ApplicationChart() {
                   <defs>
                     {stages.map((stage, index) => (
                       <linearGradient
-                        key={`fill-${stage}`}
-                        id={`fill${stage.charAt(0).toUpperCase() + stage.slice(1)}`}
+                        key={toSafeId(stage)}
+                        id={toSafeId(stage)}
                         x1="0"
                         y1="0"
                         x2="0"
@@ -272,7 +276,7 @@ export function ApplicationChart() {
                       name={stage.charAt(0).toUpperCase() + stage.slice(1)}
                       stroke={COLORS[index]}
                       strokeWidth={2}
-                      fill={`url(#fill${stage.charAt(0).toUpperCase() + stage.slice(1)})`}
+                      fill={`url(#${toSafeId(stage)})`}
                       isAnimationActive={true}
                     />
                   ))}

@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { ChevronDown, Search, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -275,6 +275,10 @@ export function SearchableDropdown({
   const containerRef = useRef<HTMLDivElement>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const { userProfile } = useAuth();
+  const dependsKey = useMemo(
+    () => JSON.stringify(dependsOn || []),
+    [dependsOn]
+  );
   // Load initial data or search results
   const loadData = useCallback(
     async (currentPage = 0, search = "") => {
@@ -305,7 +309,7 @@ export function SearchableDropdown({
         setLoading(false);
       }
     },
-    [table, searchField, dependsOn, label, userProfile]
+    [table, searchField, dependsKey, label, userProfile]
   );
 
   // Load more data when scrolling to bottom
@@ -321,7 +325,7 @@ export function SearchableDropdown({
     setHighlightedIndex(-1);
   }, [debouncedSearchTerm, loadData]);
 
-  // Reset list and selection when dependency changes
+  // Reset list and selection when dependency values change
   useEffect(() => {
     // When dependsOn value changes, clear selection and reload from first page
     if (dependsOn) {
@@ -333,7 +337,7 @@ export function SearchableDropdown({
       loadData(0, "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dependsOn]);
+  }, [dependsKey]);
 
   // Handle initial value
   useEffect(() => {
