@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { getApplicationById } from "@/supabase/actions/students";
+import { getApplicationById } from "@/supabase/actions/db-actions";
 import { ZohoApplication } from "@/types/types";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import Loader from "@/components/loader";

@@ -21,10 +21,9 @@ import {
 } from "lucide-react";
 import Loader from "@/components/loader";
 import InfoGraphic from "@/components/ui/info-graphic";
-import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
 import { ZohoApplication } from "@/types/types";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
-import { getApplicationById } from "@/supabase/actions/students";
+import { getApplicationById } from "@/supabase/actions/db-actions";
 import { saveFile } from "@/supabase/actions/save-file";
 import { toast } from "sonner";
 import {

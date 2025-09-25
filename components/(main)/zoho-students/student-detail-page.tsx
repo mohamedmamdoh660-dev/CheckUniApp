@@ -25,7 +25,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loader from "@/components/loader";
 import InfoGraphic from "@/components/ui/info-graphic";
-import { getStudentById } from "@/supabase/actions/students";
+import { getStudentById } from "@/supabase/actions/db-actions";
 import { DocumentIcon } from "@/utils/file-icons";
 import { useAuth } from "@/context/AuthContext";
 import { formatFileSize } from "@/utils/format-file-size";

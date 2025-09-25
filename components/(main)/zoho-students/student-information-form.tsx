@@ -467,35 +467,34 @@ export default function StudentInformationForm({
               : userProfile?.agency_id,
         crm_id: userProfile?.crm_id || userProfile?.agency?.crm_id || "",
       };
-      console.log("🚀 ~ onSubmit ~ webhookStudentData:", webhookStudentData);
 
       if (mode === "create") {
         // Create new student
-        // const webhookResponse =
-        //   await createStudentViaWebhook(webhookStudentData);
-        // if (webhookResponse.status) {
-        //   const studentDataWithId = {
-        //     ...webhookStudentData,
-        //     // id: webhookResponse.id,
-        //     id: Math.random().toString(36).substring(2, 15),
-        //     user_id: userProfile?.id,
-        //     agency_id:
-        //       userProfile?.roles?.name === "agent"
-        //         ? userProfile?.id
-        //         : userProfile?.roles?.name === "admin"
-        //           ? null
-        //           : userProfile?.agency_id,
-        //     documents: JSON.stringify(documentsData),
-        //   };
-        //   // @ts-ignore
-        //   // await zohoStudentsService.createStudent(studentDataWithId);
-        //   toast.success("Student created successfully");
-        //   router.push("/students");
-        // } else {
-        //   throw new Error(
-        //     webhookResponse.message || "Failed to create student via webhook"
-        //   );
-        // }
+        const webhookResponse =
+          await createStudentViaWebhook(webhookStudentData);
+        if (webhookResponse.status) {
+          const studentDataWithId = {
+            ...webhookStudentData,
+            // id: webhookResponse.id,
+            id: Math.random().toString(36).substring(2, 15),
+            user_id: userProfile?.id,
+            agency_id:
+              userProfile?.roles?.name === "agent"
+                ? userProfile?.id
+                : userProfile?.roles?.name === "admin"
+                  ? null
+                  : userProfile?.agency_id,
+            documents: JSON.stringify(documentsData),
+          };
+          // @ts-ignore
+          // await zohoStudentsService.createStudent(studentDataWithId);
+          toast.success("Student created successfully");
+          router.push("/students");
+        } else {
+          throw new Error(
+            webhookResponse.message || "Failed to create student via webhook"
+          );
+        }
       } else {
         // Update existing student
         const webhookResponse = await updateStudentViaWebhook({

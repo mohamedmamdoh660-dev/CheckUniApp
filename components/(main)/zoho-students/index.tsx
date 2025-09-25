@@ -4,12 +4,11 @@ import { useState, useEffect } from "react";
 import { getZohoStudentsColumns } from "@/components/data-table/columns/column-zoho-students";
 import { ZohoStudentsDataTableToolbar } from "@/components/data-table/toolbars/zoho-students-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
-import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
 import { ZohoStudent } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-
+import { getStudentsPagination } from "@/supabase/actions/db-actions";
 export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [listStudents, setListStudents] = useState<ZohoStudent[]>([]);
   const [recordCount, setRecordCount] = useState<number>(0);
@@ -23,15 +22,14 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   async function fetchStudents() {
     setIsRefetching(true);
     try {
-      const studentsResponse: any =
-        await zohoStudentsService.getStudentsPagination(
-          `${debouncedSearchTerm}`,
-          pageSize,
-          currentPage,
-          userProfile?.id || "",
-          userProfile?.roles?.name || "",
-          userProfile?.agency_id || ""
-        );
+      const studentsResponse: any = await getStudentsPagination(
+        `${debouncedSearchTerm}`,
+        pageSize,
+        currentPage,
+        userProfile?.id || "",
+        userProfile?.roles?.name || "",
+        userProfile?.agency_id || ""
+      );
 
       setListStudents(studentsResponse.students);
       setRecordCount(studentsResponse.totalCount);

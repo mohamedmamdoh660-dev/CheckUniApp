@@ -9,6 +9,7 @@ import { ZohoApplication } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { getApplicationsPagination } from "@/supabase/actions/db-actions";
 
 export default function ZohoApplicationsManagementPage({
   type,
@@ -29,15 +30,14 @@ export default function ZohoApplicationsManagementPage({
   async function fetchApplications() {
     setIsRefetching(true);
     try {
-      const applicationsResponse: any =
-        await zohoApplicationsService.getApplicationsPagination(
-          `${debouncedSearchTerm}`,
-          pageSize,
-          currentPage,
-          userProfile?.id || "",
-          userProfile?.roles?.name || "",
-          userProfile?.agency_id || ""
-        );
+      const applicationsResponse: any = await getApplicationsPagination(
+        `${debouncedSearchTerm}`,
+        pageSize,
+        currentPage,
+        userProfile?.id || "",
+        userProfile?.roles?.name || "",
+        userProfile?.agency_id || ""
+      );
 
       setListApplications(applicationsResponse.applications);
       setRecordCount(applicationsResponse.totalCount);
