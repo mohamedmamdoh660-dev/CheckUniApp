@@ -67,6 +67,8 @@ export default function AddZohoApplication({
   const { userProfile } = useAuth();
   const [academicYears, setAcademicYears] = useState<ZohoAcademicYear[]>([]);
   const [semesters, setSemesters] = useState<ZohoSemester[]>([]);
+  const [studentName, setStudentName] = useState("");
+  const [programName, setProgramName] = useState("");
 
   // Initialize form
   const form = useForm<FormSchema>({
@@ -127,7 +129,7 @@ export default function AddZohoApplication({
 
     try {
       // Create application
-      const applicationData = {
+      const applicationData: any = {
         student: values.student || null,
         program: values.program || null,
         acdamic_year: values.acdamic_year || null,
@@ -135,6 +137,8 @@ export default function AddZohoApplication({
         country: values.country || null,
         university: values.university || null,
         degree: values.degree || null,
+        student_name: studentName || null,
+        program_name: programName || null,
         user_id: userProfile?.id,
         agency_id:
           userProfile?.roles?.name === "agent"
@@ -205,6 +209,8 @@ export default function AddZohoApplication({
                       initialValue={field.value?.toString() || ""}
                       onSelect={(item) => {
                         field.onChange(item.id);
+                        // @ts-ignore - item has first_name and last_name
+                        setStudentName(`${item.first_name} ${item.last_name}`);
                       }}
                       renderItem={(item) => (
                         <div className="flex items-center gap-2">
@@ -425,6 +431,8 @@ export default function AddZohoApplication({
                         initialValue={field.value?.toString() || ""}
                         onSelect={(item) => {
                           field.onChange(item.id);
+                          // @ts-ignore - item has name
+                          setProgramName(item.name);
                         }}
                       />
                       <FormMessage />
