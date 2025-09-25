@@ -30,7 +30,6 @@ export function getZohoApplicationsColumns(
       cell: ({ row }) => {
         const applicationName = row.original.application_name;
         const student = row.original.zoho_students;
-        console.log("🚀 ~ getZohoApplicationsColumns ~ student:", student);
         const fullName =
           `${student?.first_name || ""} ${student?.last_name || ""}`.trim();
 
