@@ -206,7 +206,7 @@ export default function ApplicationDetailPage() {
               <div className="flex-1 space-y-4">
                 <div>
                   <h1 className="text-3xl font-bold text-foreground text-balance">
-                    {application?.application_name || ""}
+                    {application?.application_name || "Application"}
                   </h1>
                   <p
                     className="text-lg text-muted-foreground mt-1 hover:cursor-pointer hover:text-primary flex flex-row items-center"
@@ -215,7 +215,7 @@ export default function ApplicationDetailPage() {
                     }
                   >
                     {studentFullName}
-                    <ExternalLink className="w-4 h-4 ml-1" />
+                    <ExternalLink className="w-3 h-3 ml-1" />
                   </p>
                 </div>
 
@@ -223,27 +223,27 @@ export default function ApplicationDetailPage() {
                   {application?.stage ? (
                     <Badge
                       variant="secondary"
-                      className="bg-primary/10 text-primary border-primary/20"
+                      className="bg-primary/10 text-primary border-primary/20 text-[13px]"
                     >
-                      <FileText className="w-3 h-3 mr-1" />
+                      <FileText className="w-4 h-4 mr-1" />
                       {application.stage}
                     </Badge>
                   ) : null}
                   {application?.zoho_degrees?.name ? (
                     <Badge
                       variant="secondary"
-                      className="bg-primary/10 text-primary border-primary/20"
+                      className="bg-primary/10 text-primary border-primary/20 text-[13px]"
                     >
-                      <GraduationCap className="w-3 h-3 mr-1" />
+                      <GraduationCap className="w-4 h-4 mr-1" />
                       {application.zoho_degrees.name}
                     </Badge>
                   ) : null}
                   {application?.zoho_countries?.name ? (
                     <Badge
                       variant="secondary"
-                      className="bg-primary/10 text-primary border-primary/20"
+                      className="bg-primary/10 text-primary border-primary/20 text-[13px]"
                     >
-                      <MapPin className="w-3 h-3 mr-1" />
+                      <MapPin className="w-4 h-4 mr-1" />
                       {application.zoho_countries.name}
                     </Badge>
                   ) : null}

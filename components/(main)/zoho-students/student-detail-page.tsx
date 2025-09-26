@@ -353,140 +353,140 @@ export function StudentDetailPage() {
             <TabsContent value="education" className="space-y-6">
               <Card className="shadow-sm">
                 <CardHeader className="pb-0">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <GraduationCap className="w-5 h-5 text-primary" />
-                    Educational Background
-                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <GraduationCap className="w-5 h-5 text-primary" />
+                      Educational Background
+                    </CardTitle>
+                    {student?.academic_level_record?.name ? (
+                      <Badge
+                        variant="secondary"
+                        className="bg-primary/10 text-primary border-primary/20 text-[13px]"
+                      >
+                        {student.academic_level_record.name}
+                      </Badge>
+                    ) : null}
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* High School */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
-                        <h4 className="font-semibold text-lg">High School</h4>
+                  {student?.academic_level_record?.name ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      {/* High School */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          <h4 className="font-semibold text-lg">High School</h4>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              School Name
+                            </p>
+                            <p className="font-medium">
+                              {student?.high_school_name || "N/A"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              Country
+                            </p>
+                            <p className="font-medium">
+                              {student?.high_school_country || "N/A"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              GPA
+                            </p>
+                            <Badge variant="outline" className="">
+                              {student?.high_school_gpa_percent || "N/A"}
+                            </Badge>
+                          </div>
+                        </div>
                       </div>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                            School Name
-                          </p>
-                          <p className="font-medium">
-                            {student?.high_school_name || "N/A"}
-                          </p>
+
+                      {/* Bachelor's */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          <h4 className="font-semibold text-lg">
+                            Bachelor's Degree
+                          </h4>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                            Country
-                          </p>
-                          <p className="font-medium">
-                            {student?.high_school_country || "N/A"}
-                          </p>
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              School Name
+                            </p>
+                            <p className="font-medium">
+                              {student?.bachelor_school_name || "N/A"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              Country
+                            </p>
+                            <p className="font-medium">
+                              {student?.bachelor_country || "N/A"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              GPA
+                            </p>
+                            <Badge variant="outline" className="">
+                              {student?.bachelor_gpa_percent || "N/A"}
+                            </Badge>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                            GPA
-                          </p>
-                          <Badge variant="outline" className="">
-                            {student?.high_school_gpa_percent || "N/A"}
-                          </Badge>
+                      </div>
+
+                      {/* Master's */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          <h4 className="font-semibold text-lg">
+                            Master's Degree
+                          </h4>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              School Name
+                            </p>
+                            <p className="font-medium">
+                              {student?.master_school_name || "N/A"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              Country
+                            </p>
+                            <p className="font-medium">
+                              {student?.master_country || "N/A"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              GPA
+                            </p>
+                            <Badge variant="outline" className="">
+                              {student?.master_gpa_percent || "N/A"}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
                     </div>
-
-                    {/* Bachelor's */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
-                        <h4 className="font-semibold text-lg">
-                          Bachelor's Degree
-                        </h4>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
+                        <GraduationCap className="w-8 h-8 text-muted-foreground" />
                       </div>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                            School Name
-                          </p>
-                          <p className="font-medium">
-                            {student?.bachelor_school_name || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                            Country
-                          </p>
-                          <p className="font-medium">
-                            {student?.bachelor_country || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                            GPA
-                          </p>
-                          <Badge variant="outline" className="">
-                            {student?.bachelor_gpa_percent || "N/A"}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Master's */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
-                        <h4 className="font-semibold text-lg">
-                          Master's Degree
-                        </h4>
-                      </div>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                            School Name
-                          </p>
-                          <p className="font-medium">
-                            {student?.master_school_name || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                            Country
-                          </p>
-                          <p className="font-medium">
-                            {student?.master_country || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                            GPA
-                          </p>
-                          <Badge variant="outline" className="">
-                            {student?.master_gpa_percent || "N/A"}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator className="my-8" />
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        Current Education Level
-                      </p>
-                      <p className="font-medium text-lg">
-                        {student?.academic_level_record?.name || "N/A"}
+                      <p className="text-muted-foreground text-lg">
+                        Education level is not set for this student
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        Education Level Name
-                      </p>
-                      <p className="font-medium text-lg">
-                        {student?.education_level_name || "N/A"}
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
