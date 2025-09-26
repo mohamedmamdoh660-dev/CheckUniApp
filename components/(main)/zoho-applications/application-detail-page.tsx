@@ -18,6 +18,7 @@ import {
   Upload,
   Loader2,
   Download,
+  ExternalLink,
 } from "lucide-react";
 import Loader from "@/components/loader";
 import InfoGraphic from "@/components/ui/info-graphic";
@@ -205,10 +206,16 @@ export default function ApplicationDetailPage() {
               <div className="flex-1 space-y-4">
                 <div>
                   <h1 className="text-3xl font-bold text-foreground text-balance">
-                    {studentFullName || "Student"}
+                    {application?.application_name || ""}
                   </h1>
-                  <p className="text-lg text-muted-foreground mt-1">
-                    Application ID: {application?.id || "N/A"}
+                  <p
+                    className="text-lg text-muted-foreground mt-1 hover:cursor-pointer hover:text-primary flex flex-row items-center"
+                    onClick={() =>
+                      router.push(`/students/${application?.zoho_students?.id}`)
+                    }
+                  >
+                    {studentFullName}
+                    <ExternalLink className="w-4 h-4 ml-1" />
                   </p>
                 </div>
 
@@ -347,38 +354,6 @@ export default function ApplicationDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        App Id
-                      </p>
-                      <p className="font-medium">{"N/A"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        Online Application Id
-                      </p>
-                      <p className="font-medium">{application?.id || "N/A"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        Owner
-                      </p>
-                      <p className="font-medium">
-                        {application?.user?.first_name +
-                          " " +
-                          application?.user?.last_name || "N/A"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        Added User
-                      </p>
-                      <p className="font-medium">
-                        {application?.added_user?.first_name +
-                          " " +
-                          application?.added_user?.last_name || "N/A"}
-                      </p>
-                    </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">
                         Program
