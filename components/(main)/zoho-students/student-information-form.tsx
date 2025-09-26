@@ -399,7 +399,7 @@ export default function StudentInformationForm({
         transfer_student: values.transfer_student === "yes" ? "Yes" : "No",
         have_tc: values.have_tc === "yes" ? "Yes" : "No",
         blue_card: values.blue_card === "yes" ? "Yes" : "No",
-        tc_number: values.have_tc === "yes" ? values.tc_number : undefined,
+        tc_number: values.have_tc === "yes" ? values.tc_number || null : null,
 
         // Personal Details
         first_name: values.first_name,
@@ -419,7 +419,7 @@ export default function StudentInformationForm({
 
         // Contact & Address Information
         email: values.email,
-        mobile: values.mobile,
+        mobile: values.mobile.length < 5 ? null : values.mobile,
         address_line_1: values.address_line_1?.replace(/\n/g, " "),
         city_district: values.city_district,
         state_province: values.state_province,
@@ -428,10 +428,12 @@ export default function StudentInformationForm({
 
         // Family Information
         father_name: values.father_name,
-        father_mobile: values.father_mobile,
+        father_mobile:
+          values.father_mobile.length < 5 ? null : values.father_mobile,
         father_job: values.father_occupation,
         mother_name: values.mother_name,
-        mother_mobile: values.mother_mobile,
+        mother_mobile:
+          values.mother_mobile.length < 5 ? null : values.mother_mobile,
         mother_job: values.mother_occupation,
 
         // Academic Information
