@@ -33,6 +33,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuContent } from "@/components/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { DocumentAttachmentDialog } from "@/components/ui/document-attachment-dialog";
+import {
+  canUploadCard,
+  canUploadPayment,
+  conditionalButtonDisabled,
+  finalAcceptanceButtonDisabled,
+} from "./component/stages-conditions";
 
 export default function ApplicationDetailPage() {
   const params = useParams();
@@ -41,6 +56,15 @@ export default function ApplicationDetailPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [application, setApplication] = useState<ZohoApplication | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isMissingOpen, setIsMissingOpen] = useState(false);
+  const [missingUploading, setMissingUploading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [letterDownloadingId, setLetterDownloadingId] = useState<string | null>(
+    null
+  );
+  const [letters, setLetters] = useState<Array<{ id: string; name: string }>>(
+    []
+  );
 
   const getApplication = useCallback(async () => {
     try {
@@ -59,6 +83,31 @@ export default function ApplicationDetailPage() {
       getApplication();
     }
   }, [applicationId, getApplication]);
+
+  useEffect(() => {
+    const loadLetters = async () => {
+      try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+        const res = await fetch(
+          `${supabaseUrl}/rest/v1/zoho_attachments?module_id=eq.${encodeURIComponent(
+            applicationId
+          )}&select=id,name`,
+          {
+            headers: {
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+            },
+            cache: "no-store",
+          }
+        );
+        if (!res.ok) return;
+        const rows = (await res.json()) as Array<{ id: string; name: string }>;
+        setLetters(rows || []);
+      } catch {}
+    };
+    if (applicationId) loadLetters();
+  }, [applicationId]);
 
   // No separate student fetch; use student data included in the application record
 
@@ -102,15 +151,6 @@ export default function ApplicationDetailPage() {
   const programName = application?.zoho_programs?.name || "";
 
   const stage = (application?.stage || "").toLowerCase();
-  const canUploadCard = [
-    "final acceptance",
-    "awaiting student card",
-    "awaiting student",
-  ].includes(stage);
-  const canUploadPayment = [
-    "conditional acceptance",
-    "awaiting payment",
-  ].includes(stage);
 
   const handleUpload = async (type: "card" | "payment") => {
     try {
@@ -184,6 +224,33 @@ export default function ApplicationDetailPage() {
     }
   };
 
+  const handleDownload = async (filename: string) => {
+    try {
+      setDownloading(true);
+      const url = `/api/attachments/download?record_id=${encodeURIComponent(
+        application?.id || ""
+      )}&type=${encodeURIComponent(filename)}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}) as any);
+        throw new Error(err?.error || `Download failed (${res.status})`);
+      }
+      const blob = await res.blob();
+      const link = document.createElement("a");
+      const objectUrl = URL.createObjectURL(blob);
+      link.href = objectUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch (e: any) {
+      toast.error(e?.message || "Download failed");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div className=" bg-background">
       <div className="max-w-7xl mx-auto">
@@ -251,19 +318,51 @@ export default function ApplicationDetailPage() {
               </div>
 
               <div className="flex gap-3">
-                {stage === "conditional acceptance" && (
-                  <Button variant="outline">
-                    <Download className="w-4 h-4 mr-1" />
+                {application?.stage?.toLowerCase() === "missing" && (
+                  <>
+                    <Button
+                      variant="outline"
+                      disabled={true}
+                      onClick={() => setIsMissingOpen(true)}
+                    >
+                      <Upload className="w-4 h-4 mr-1" /> Upload Missing
+                    </Button>
+                    <DocumentAttachmentDialog
+                      open={isMissingOpen}
+                      onOpenChange={setIsMissingOpen}
+                      onUploaded={() => setIsMissingOpen(false)}
+                    />
+                  </>
+                )}
+                {!conditionalButtonDisabled(stage) && (
+                  <Button
+                    variant="outline"
+                    disabled={downloading}
+                    onClick={() => handleDownload("Conditional Acceptance.pdf")}
+                  >
+                    {downloading ? (
+                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4 mr-1" />
+                    )}
                     Download Conditionals
                   </Button>
                 )}
-                {stage === "final acceptance" && (
-                  <Button variant="outline">
-                    <Download className="w-4 h-4 mr-1" />
+                {!finalAcceptanceButtonDisabled(stage) && (
+                  <Button
+                    variant="outline"
+                    disabled={downloading}
+                    onClick={() => handleDownload("Final Acceptance.pdf")}
+                  >
+                    {downloading ? (
+                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4 mr-1" />
+                    )}
                     Download Final Acceptance
                   </Button>
                 )}
-                {canUploadPayment && (
+                {canUploadPayment(stage) && (
                   <Button
                     variant="outline"
                     disabled={isUploading}
@@ -277,7 +376,7 @@ export default function ApplicationDetailPage() {
                     {isUploading ? "Uploading…" : "Upload Payment Receipt"}
                   </Button>
                 )}
-                {canUploadCard && (
+                {canUploadCard(stage) && (
                   <Button
                     variant="outline"
                     disabled={isUploading}
@@ -624,14 +723,76 @@ export default function ApplicationDetailPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
-                      <FileText className="w-8 h-8 text-muted-foreground" />
+                  {letters.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
+                        <FileText className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                      <p className="text-muted-foreground text-lg">
+                        No letters found
+                      </p>
                     </div>
-                    <p className="text-muted-foreground text-lg">
-                      No letters found
-                    </p>
-                  </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {letters.map((l) => (
+                        <Card
+                          key={l.id}
+                          className="group border hover:border-primary/30 transition-colors"
+                        >
+                          <CardContent className="p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center">
+                                <FileText className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-medium truncate">
+                                  {l.name || "Letter"}
+                                </p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  Attachment ID: {l.id}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={letterDownloadingId === l.id}
+                              onClick={async () => {
+                                try {
+                                  setLetterDownloadingId(l.id);
+                                  const url = `/api/attachments/download?record_id=${encodeURIComponent(
+                                    applicationId
+                                  )}&type=${encodeURIComponent(l.name || "Letter.pdf")}`;
+                                  const res = await fetch(url);
+                                  if (!res.ok)
+                                    throw new Error("Download failed");
+                                  const blob = await res.blob();
+                                  const link = document.createElement("a");
+                                  const objectUrl = URL.createObjectURL(blob);
+                                  link.href = objectUrl;
+                                  link.download = l.name || "Letter.pdf";
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  link.remove();
+                                  URL.revokeObjectURL(objectUrl);
+                                } catch {
+                                } finally {
+                                  setLetterDownloadingId(null);
+                                }
+                              }}
+                            >
+                              {letterDownloadingId === l.id ? (
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                              ) : (
+                                <Download className="h-4 w-4 mr-1" />
+                              )}
+                              Download
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

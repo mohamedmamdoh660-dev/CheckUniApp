@@ -3,11 +3,22 @@
 import type { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
-import { Download, Plus, RefreshCcw, X, Search } from "lucide-react";
+import {
+  Download,
+  Plus,
+  RefreshCcw,
+  X,
+  Search,
+  Table as TableIcon,
+  LayoutGrid,
+  Upload,
+} from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import AddZohoApplication from "@/components/(main)/zoho-applications/component/add-zoho-application";
 import { useAuth } from "@/context/AuthContext";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { DocumentAttachmentDialog } from "@/components/ui/document-attachment-dialog";
 
 interface DataTableToolbarProps<TData> {
   table?: Table<TData>;
@@ -17,6 +28,8 @@ interface DataTableToolbarProps<TData> {
   onGlobalFilterChange?: (value: string) => void;
   fetchRecords: () => void;
   type?: string;
+  viewMode: "table" | "cards";
+  setViewMode: (viewMode: "table" | "cards") => void;
 }
 
 export function ZohoApplicationsDataTableToolbar<TData>({
@@ -27,9 +40,12 @@ export function ZohoApplicationsDataTableToolbar<TData>({
   onGlobalFilterChange,
   fetchRecords,
   type,
+  viewMode,
+  setViewMode,
 }: DataTableToolbarProps<TData>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [attachOpen, setAttachOpen] = useState(false);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -67,6 +83,25 @@ export function ZohoApplicationsDataTableToolbar<TData>({
           </Button>
         )}
       </div>
+
+      {/* <ToggleGroup
+        type="single"
+        value={viewMode}
+        onValueChange={(v) => v && setViewMode(v as any)}
+        variant="outline"
+        className="hidden md:flex"
+      >
+        <ToggleGroupItem
+          value="table"
+          aria-label="Table view"
+          className="gap-2"
+        >
+          <TableIcon className="h-4 w-4" /> Table
+        </ToggleGroupItem>
+        <ToggleGroupItem value="cards" aria-label="Card view" className="gap-2">
+          <LayoutGrid className="h-4 w-4" /> Cards
+        </ToggleGroupItem>
+      </ToggleGroup> */}
       {tableName && (
         <div className="px-2">
           <Button
@@ -80,7 +115,7 @@ export function ZohoApplicationsDataTableToolbar<TData>({
           </Button>
         </div>
       )}
-      <div className="px-2">
+      <div className="px-2 flex items-center gap-2">
         <Button
           variant="outline"
           size="sm"
@@ -89,6 +124,17 @@ export function ZohoApplicationsDataTableToolbar<TData>({
         >
           <RefreshCcw className="mr-2 h-4 w-4" /> Refresh
         </Button>
+        {/* {
+
+        }
+        <Button
+          variant="outline"
+          size="sm"
+          className="hidden h-8 lg:flex"
+          onClick={() => setAttachOpen(true)}
+        >
+          <Upload className="mr-2 h-4 w-4" /> Upload Missing
+        </Button> */}
       </div>
       {table && <DataTableViewOptions table={table} />}
       {isCrmId && (
@@ -108,6 +154,10 @@ export function ZohoApplicationsDataTableToolbar<TData>({
             onOpenChange={setIsDialogOpen}
             onRefresh={fetchRecords}
           />
+          {/* <DocumentAttachmentDialog
+            open={attachOpen}
+            onOpenChange={setAttachOpen}
+          /> */}
         </>
       )}
     </div>

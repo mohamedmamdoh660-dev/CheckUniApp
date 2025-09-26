@@ -96,3 +96,51 @@ export async function deleteApplicationViaWebhook(applicationId: string) {
     throw error;
   }
 }
+
+/**
+ * Trigger n8n to download an attachment for an application.
+ * Looks up attachment id from public.zoho_attachments by module_id = applicationId
+ */
+export async function downloadApplicationAttachment(applicationId: string, type:string) {
+  console.log("🚀 ~ downloadApplicationAttachment ~ type:", type)
+  console.log("🚀 ~ downloadApplicationAttachment ~ applicationId:", applicationId)
+  try {
+    const webhookUrl = "https://n8n.browserautomations.com/webhook/13eca8cf-8742-4351-9ae6-eaace4fa10ce";
+    // Query Supabase for an attachment linked to this application
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/zoho_attachments?module_id=eq.${applicationId}&select=id,name`, {
+      headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+      },
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      throw new Error(`Attachment lookup failed: ${res.status}`);
+    }
+    const rows: { id: string, name: string }[] = await res.json();
+    console.log("🚀 ~ downloadApplicationAttachment ~ rows:", rows)
+    const attachmentId = rows?.find((row) => row.name === type)?.id;
+    console.log("🚀 ~ downloadApplicationAttachment ~ attachmentId:", attachmentId)
+
+    const payload = {
+      id: attachmentId || applicationId, // fallback to record id if none stored yet
+      module_id: applicationId,
+    };
+
+    const webhookRes = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    console.log("🚀 ~ downloadApplicationAttachment ~ webhookRes:", webhookRes)
+    if (!webhookRes.ok) {
+      throw new Error(`n8n download webhook failed: ${webhookRes.status}`);
+    }
+    const webhookData = await webhookRes.json();
+    console.log("🚀 ~ downloadApplicationAttachment ~ webhookData:", webhookData)
+    return webhookData;
+  } catch (error) {
+    console.error('Error in downloadApplicationAttachment:', error);
+    throw error;
+  }
+}

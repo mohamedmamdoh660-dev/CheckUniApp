@@ -3,7 +3,15 @@
 import type { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
-import { Download, Plus, RefreshCcw, X, Search } from "lucide-react";
+import {
+  Download,
+  Plus,
+  RefreshCcw,
+  X,
+  Search,
+  Table as TableIcon,
+  LayoutGrid,
+} from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -17,6 +25,8 @@ interface DataTableToolbarProps<TData> {
   onGlobalFilterChange?: (value: string) => void;
   fetchRecords: () => void;
   type?: string;
+  viewMode?: "table" | "cards";
+  setViewMode?: (viewMode: "table" | "cards") => void;
 }
 
 export function ZohoStudentsDataTableToolbar<TData>({
@@ -27,6 +37,8 @@ export function ZohoStudentsDataTableToolbar<TData>({
   onGlobalFilterChange,
   fetchRecords,
   type,
+  viewMode,
+  setViewMode,
 }: DataTableToolbarProps<TData>) {
   const router = useRouter();
   const [globalFilter, setGlobalFilter] = useState<string>("");
@@ -67,6 +79,26 @@ export function ZohoStudentsDataTableToolbar<TData>({
           </Button>
         )}
       </div>
+      {/* {viewMode && setViewMode && (
+        <div className="px-2 hidden md:block">
+          <div className="inline-flex rounded-md border">
+            <button
+              className={`px-3 py-1.5 text-sm inline-flex items-center gap-2 ${viewMode === "table" ? "bg-muted" : ""}`}
+              onClick={() => setViewMode("table")}
+              aria-label="Table view"
+            >
+              <TableIcon className="h-4 w-4" /> Table
+            </button>
+            <button
+              className={`px-3 py-1.5 text-sm inline-flex items-center gap-2 border-l ${viewMode === "cards" ? "bg-muted" : ""}`}
+              onClick={() => setViewMode("cards")}
+              aria-label="Card view"
+            >
+              <LayoutGrid className="h-4 w-4" /> Cards
+            </button>
+          </div>
+        </div>
+      )} */}
       {tableName && (
         <div className="px-2">
           <Button

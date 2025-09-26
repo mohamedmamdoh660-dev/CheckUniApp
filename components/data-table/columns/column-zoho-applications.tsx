@@ -4,18 +4,22 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../data-table-column-header";
 import { currentTimezone } from "@/lib/helper/current-timezone";
 import { ZohoApplication } from "@/types/types";
-import { StatusBadge } from "@/components/ui/status-badge";
 import Image from "next/image";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DownloadIcon, Info } from "lucide-react";
+import { toast } from "sonner";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  conditionalButtonDisabled,
+  finalAcceptanceButtonDisabled,
+} from "@/components/(main)/zoho-applications/component/stages-conditions";
 
 export function getZohoApplicationsColumns(
   fetchApplications: () => void,
@@ -231,15 +235,53 @@ export function getZohoApplicationsColumns(
         <DataTableColumnHeader column={column} title="Download Conditional" />
       ),
       cell: ({ row }) => {
-        // const created = row.original.download_conditional;
+        const disabled = conditionalButtonDisabled(
+          row?.original?.stage?.toLowerCase() || ""
+        );
+        const handleClick = async (btn: HTMLButtonElement) => {
+          if (disabled) return;
+          try {
+            btn.disabled = true;
+            const icon = btn.querySelector("svg");
+            if (icon) icon.classList.add("hidden");
+            const spinner = document.createElement("span");
+            spinner.className = "mr-1 inline-flex";
+            spinner.innerHTML = `<svg class=\"h-4 w-4 animate-spin\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\"></circle><path class=\"opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h3z\"></path></svg>`;
+            btn.insertBefore(spinner, btn.firstChild);
+            const url = `/api/attachments/download?record_id=${encodeURIComponent(
+              row.original.id
+            )}&type=${encodeURIComponent("Conditional Acceptance.pdf")}`;
+            const res = await fetch(url);
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}) as any);
+              throw new Error(err?.error || `Download failed (${res.status})`);
+            }
+            const blob = await res.blob();
+            const link = document.createElement("a");
+            const objectUrl = URL.createObjectURL(blob);
+            link.href = objectUrl;
+            link.download = "Conditional Acceptance.pdf";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(objectUrl);
+          } catch (e: any) {
+            toast.error(e?.message || "Download failed");
+          } finally {
+            btn.disabled = false;
+            const spinner = btn.querySelector("span");
+            if (spinner) spinner.remove();
+            const icon = btn.querySelector("svg.hidden");
+            if (icon) icon.classList.remove("hidden");
+          }
+        };
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
             <Button
               variant="outline"
               size="sm"
-              disabled={
-                row?.original?.stage?.toLowerCase() !== "conditional acceptance"
-              }
+              disabled={disabled}
+              onClick={(e) => handleClick(e.currentTarget)}
             >
               <DownloadIcon className="mr-1 h-4 w-4" />
               Download Conditional
@@ -257,14 +299,53 @@ export function getZohoApplicationsColumns(
         <DataTableColumnHeader column={column} title="Final Acceptance" />
       ),
       cell: ({ row }) => {
+        const disabled = finalAcceptanceButtonDisabled(
+          row?.original?.stage?.toLowerCase() || ""
+        );
+        const handleClick = async (btn: HTMLButtonElement) => {
+          if (disabled) return;
+          try {
+            btn.disabled = true;
+            const icon = btn.querySelector("svg");
+            if (icon) icon.classList.add("hidden");
+            const spinner = document.createElement("span");
+            spinner.className = "mr-1 inline-flex";
+            spinner.innerHTML = `<svg class=\"h-4 w-4 animate-spin\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\"></circle><path class=\"opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h3z\"></path></svg>`;
+            btn.insertBefore(spinner, btn.firstChild);
+            const url = `/api/attachments/download?record_id=${encodeURIComponent(
+              row.original.id
+            )}&type=${encodeURIComponent("Final Acceptance.pdf")}`;
+            const res = await fetch(url);
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}) as any);
+              throw new Error(err?.error || `Download failed (${res.status})`);
+            }
+            const blob = await res.blob();
+            const link = document.createElement("a");
+            const objectUrl = URL.createObjectURL(blob);
+            link.href = objectUrl;
+            link.download = "Final Acceptance.pdf";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(objectUrl);
+          } catch (e: any) {
+            toast.error(e?.message || "Download failed");
+          } finally {
+            btn.disabled = false;
+            const spinner = btn.querySelector("span");
+            if (spinner) spinner.remove();
+            const icon = btn.querySelector("svg.hidden");
+            if (icon) icon.classList.remove("hidden");
+          }
+        };
         return (
           <div className="text-left overflow-hidden whitespace-nowrap">
             <Button
               variant="outline"
               size="sm"
-              disabled={
-                row?.original?.stage?.toLowerCase() !== "final acceptance"
-              }
+              disabled={disabled}
+              onClick={(e) => handleClick(e.currentTarget)}
             >
               <DownloadIcon className="mr-1 h-4 w-4" />
               Download Final Acceptance
