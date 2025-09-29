@@ -47,11 +47,36 @@ export const zohoProgramsService = {
   /**
    * Get programs with pagination
    */
-  getProgramsPagination: async (search: string, limit: number, offset: number, user_id: string, userRole: string, agency_id: string) => {
+  getProgramsPagination: async (
+    search: string,
+    limit: number,
+    offset: number,
+    user_id: string,
+    userRole: string,
+    agency_id: string,
+    filters: Record<string, string> = {}
+  ) => {
     let filterConditions: any = [
       { name: { ilike: search } },
-      { active: { eq: true } }
     ];
+
+    // Advanced filters mapping
+    if (filters.university) filterConditions.push({ university_id: { eq: filters.university } });
+    if (filters.faculty) filterConditions.push({ faculty_id: { eq: filters.faculty } });
+    if (filters.speciality) filterConditions.push({ speciality_id: { eq: filters.speciality } });
+    if (filters.degree) filterConditions.push({ degree_id: { eq: filters.degree } });
+    if (filters.country) filterConditions.push({ country_id: { eq: filters.country } });
+    if (filters.city) filterConditions.push({ city_id: { eq: filters.city } });
+    if (filters.language) filterConditions.push({ language_id: { eq: filters.language } });
+
+    if (filters.active === "true" || filters.active === "false") {
+      filterConditions.push({ active: { eq: filters.active === "true" } });
+    }else{
+      filterConditions.push({ active: { eq: true } });
+    }
+    if (filters.active_applications === "open" || filters.active_applications === "closed") {
+      filterConditions.push({ active_applications: { eq: filters.active_applications === "open" } });
+    }
     
     // Add user filtering based on role
     // if (userRole === 'agency') {
@@ -71,8 +96,21 @@ export const zohoProgramsService = {
     let countQuery = supabaseClient
       .from('zoho_programs')
       .select('id,name', { count: 'exact' })
-      .eq('active', true)
       .ilike('name', `${search}`);
+
+    // Apply same advanced filters to count query
+    if (filters.university) countQuery = countQuery.eq('university_id', filters.university);
+    if (filters.faculty) countQuery = countQuery.eq('faculty_id', filters.faculty);
+    if (filters.speciality) countQuery = countQuery.eq('speciality_id', filters.speciality);
+    if (filters.degree) countQuery = countQuery.eq('degree_id', filters.degree);
+    if (filters.country) countQuery = countQuery.eq('country_id', filters.country);
+    if (filters.city) countQuery = countQuery.eq('city_id', filters.city);
+    if (filters.language) countQuery = countQuery.eq('language_id', filters.language);
+
+    if (filters.active === 'true' || filters.active === 'false') countQuery = countQuery.eq('active', filters.active === 'true');
+    else countQuery = countQuery.eq('active', true);
+    if (filters.active_applications === 'open' || filters.active_applications === 'closed') countQuery = countQuery.eq('active_applications', filters.active_applications === 'open');
+
     
     // Apply role-based filtering to count query
     // if (userRole === 'agency') {
@@ -337,7 +375,7 @@ export const zohoProgramsService = {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      let filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
+      let filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
             if (dependsOn && dependsOn.value) {
         filter = {
           ...filter,

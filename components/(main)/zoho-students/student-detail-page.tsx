@@ -193,7 +193,7 @@ export function StudentDetailPage() {
     <div className=" bg-background">
       <div className="max-w-7xl mx-auto">
         {/* Top Profile Section */}
-        <div className="bg-card border-b border-border">
+        <div className="bg-card ">
           <div className="p-8">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
               <Avatar className="h-24 w-24 ring-4 ring-accent/20">
@@ -282,7 +282,7 @@ export function StudentDetailPage() {
           </div>
         </div>
 
-        <div className="p-8">
+        <div className="p-8 pt-0">
           <Tabs defaultValue="personal" className="space-y-6">
             <TabsList className="grid w-full grid-cols-5 bg-muted/50">
               <TabsTrigger

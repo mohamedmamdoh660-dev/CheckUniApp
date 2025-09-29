@@ -18,7 +18,6 @@ export const getStudentById = async (id: string) => {
   return data;
 };
 
-
 export const getApplicationById = async (id: string) => {
   const { data, error } = await supabase
     .from("zoho_applications")
@@ -30,31 +29,31 @@ export const getApplicationById = async (id: string) => {
   return data;
 };
 
-
-
-export const getApplicationsPagination = async (   search: string,
+export const getApplicationsPagination = async (
+  search: string,
   limit: number,
   offset: number,
   user_id: string,
   userRole: string,
-  agency_id: string) => {
+  agency_id: string,
+  filters: {
+    student?: string | null;
+    program?: string | null;
+    acdamic_year?: string | null;
+    semester?: string | null;
+    country?: string | null;
+    university?: string | null;
+    degree?: string | null;
+    stage?: string | null;
+  } = {}
+) => {
  
     try {
-      let studentIds = [];
       let programIds = [];
       const searchPattern = `%${search.trim()}%`;
 
       // If search is provided, get matching IDs first
       if (search && search.trim() !== "") {
-        
-        // Get matching student IDs
-        const { data: students } = await supabaseClient
-          .from("zoho_students")
-          .select("id")
-          .or(`first_name.ilike.${searchPattern},last_name.ilike.${searchPattern},email.ilike.${searchPattern}`);
-        
-        studentIds = students?.map(s => s.id) || [];
-  
         // Get matching program IDs  
         const { data: programs } = await supabaseClient
           .from("zoho_programs")
@@ -62,11 +61,6 @@ export const getApplicationsPagination = async (   search: string,
           .ilike("name", searchPattern);
         
         programIds = programs?.map(p => p.id) || [];
-        
-        // If no matches found, return empty result
-        if (studentIds.length === 0 && programIds.length === 0) {
-          return { applications: [], totalCount: 0 };
-        }
       }
   
       // Main query
@@ -150,13 +144,9 @@ export const getApplicationsPagination = async (   search: string,
         query = query.eq("user_id", user_id);
       }
   
-      // Apply search filter using IN clause
+      // Apply search filter using IN clause and text fields
       if (search && search.trim() !== "") {
         const orConditions = [];
-        
-        if (studentIds.length > 0) {
-          orConditions.push(`student.in.(${studentIds.join(',')})`);
-        }
         
         if (programIds.length > 0) {
           orConditions.push(`program.in.(${programIds.join(',')})`);
@@ -171,6 +161,34 @@ export const getApplicationsPagination = async (   search: string,
         }
       }
   
+      // Apply advanced filters
+      if (filters) {
+        if (filters.student) {
+          query = query.eq("student", filters.student);
+        }
+        if (filters.program) {
+          query = query.eq("program", filters.program);
+        }
+        if (filters.acdamic_year) {
+          query = query.eq("acdamic_year", filters.acdamic_year);
+        }
+        if (filters.semester) {
+          query = query.eq("semester", filters.semester);
+        }
+        if (filters.country) {
+          query = query.eq("country", filters.country);
+        }
+        if (filters.university) {
+          query = query.eq("university", filters.university);
+        }
+        if (filters.degree) {
+          query = query.eq("degree", filters.degree);
+        }
+        if (filters.stage) {
+          query = query.ilike("stage", `%${filters.stage}%`);
+        }
+      }
+
       // Apply pagination and ordering
       const { data, error, count } = await query
         .order("created_at", { ascending: false })

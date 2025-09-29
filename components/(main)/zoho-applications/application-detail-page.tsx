@@ -59,7 +59,6 @@ export default function ApplicationDetailPage() {
   const [application, setApplication] = useState<ZohoApplication | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isMissingOpen, setIsMissingOpen] = useState(false);
-  const [missingUploading, setMissingUploading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [letterDownloadingId, setLetterDownloadingId] = useState<string | null>(
     null
@@ -237,7 +236,7 @@ export default function ApplicationDetailPage() {
   return (
     <div className=" bg-background">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-card border-b border-border">
+        <div className="bg-card ">
           <div className="p-8">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
               <Avatar className="h-24 w-24 ring-4 ring-accent/20">
@@ -413,7 +412,7 @@ export default function ApplicationDetailPage() {
           </div>
         </div>
 
-        <div className="p-8">
+        <div className="p-8 pt-0">
           <Tabs defaultValue="application" className="space-y-6">
             <TabsList className="grid w-full grid-cols-5 bg-muted/50">
               <TabsTrigger
@@ -459,6 +458,14 @@ export default function ApplicationDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Online Application ID
+                      </p>
+                      <p className="font-medium">
+                        {application?.online_application_id || "N/A"}
+                      </p>
+                    </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">
                         Program

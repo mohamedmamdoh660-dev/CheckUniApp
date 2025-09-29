@@ -8,6 +8,7 @@ import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-progr
 import { ZohoProgram } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function ZohoProgramsManagementPage({ type }: { type: string }) {
   const [listPrograms, setListPrograms] = useState<ZohoProgram[]>([]);
@@ -18,7 +19,8 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
   const { userProfile } = useAuth();
-
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const router = useRouter();
   async function fetchPrograms() {
     setIsRefetching(true);
     try {
@@ -29,7 +31,8 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
           currentPage,
           userProfile?.id || "",
           userProfile?.roles?.name || "",
-          userProfile?.agency_id || ""
+          userProfile?.agency_id || "",
+          filters
         );
 
       setListPrograms(programsResponse.programs);
@@ -43,7 +46,7 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
 
   useEffect(() => {
     fetchPrograms();
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, filters]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
@@ -72,9 +75,14 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
           <ZohoProgramsDataTableToolbar
             fetchRecords={fetchPrograms}
             type={type}
+            onFiltersChange={(f) => {
+              setFilters(f);
+              setCurrentPage(0);
+            }}
+            filters={filters}
           />
         }
-        columns={getZohoProgramsColumns(fetchPrograms)}
+        columns={getZohoProgramsColumns(fetchPrograms, router)}
         onGlobalFilterChange={handleGlobalFilterChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}

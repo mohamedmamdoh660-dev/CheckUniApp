@@ -206,6 +206,7 @@ export interface ZohoApplication {
   user?: User | null;
   added_user?: User | null;
   crm_id?: string;
+  online_application_id?: string | null;
 }
 
 

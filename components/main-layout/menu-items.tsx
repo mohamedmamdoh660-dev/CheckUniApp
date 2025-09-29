@@ -32,7 +32,7 @@ export const getNavData = (user: { roles?: string }) => {
         },
         {
           title: "Search Programs",
-          url: "/search-programs",
+          url: "/programs",
           icon: SearchIcon,
           isActive: false,
         },
@@ -71,7 +71,7 @@ export const getNavData = (user: { roles?: string }) => {
         },
         {
           title: "Search Programs",
-          url: "/search-programs",
+          url: "/programs",
           icon: SearchIcon,
           isActive: false,
         },

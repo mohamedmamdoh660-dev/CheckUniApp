@@ -7,9 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { currentTimezone } from "@/lib/helper/current-timezone";
 import { ZohoProgram } from "@/types/types";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 export function getZohoProgramsColumns(
-  fetchPrograms: () => void
+  fetchPrograms: () => void,
+  router?: any
 ): ColumnDef<ZohoProgram>[] {
   const columns: ColumnDef<ZohoProgram, unknown>[] = [
     {
@@ -217,20 +224,27 @@ export function getZohoProgramsColumns(
       enableHiding: true,
     },
 
-    // {
-    //   id: "actions",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Actions" />
-    //   ),
-    //   cell: ({ row }) => (
-    //     <div className="text-center">
-    //       <ZohoProgramsTableRowActions
-    //         row={row}
-    //         fetchPrograms={fetchPrograms}
-    //       />
-    //     </div>
-    //   ),
-    // },
+    {
+      id: "actions",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Actions" />
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info
+                className="!h-6 !w-6 hover:cursor-pointer hover:text-primary"
+                onClick={() => router?.push(`/programs/${row.original.id}`)}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>View Details</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      ),
+    },
   ];
 
   return columns;

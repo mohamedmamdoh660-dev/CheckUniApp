@@ -46,6 +46,7 @@ export default function ZohoApplicationsManagementPage({
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
   const { userProfile } = useAuth();
   const router = useRouter();
+  const [filters, setFilters] = useState<Record<string, string>>({});
 
   const [applicationDownloading, setApplicationDownloading] = useState({
     id: "",
@@ -61,7 +62,8 @@ export default function ZohoApplicationsManagementPage({
         currentPage,
         userProfile?.id || "",
         userProfile?.roles?.name || "",
-        userProfile?.agency_id || ""
+        userProfile?.agency_id || "",
+        filters
       );
 
       setListApplications(applicationsResponse.applications);
@@ -75,7 +77,7 @@ export default function ZohoApplicationsManagementPage({
 
   useEffect(() => {
     fetchApplications();
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, filters]);
 
   // Realtime list updates for applications table
   useEffect(() => {
@@ -124,6 +126,11 @@ export default function ZohoApplicationsManagementPage({
               type={type}
               viewMode={viewMode}
               setViewMode={setViewMode}
+              onFiltersChange={(f) => {
+                setFilters(f);
+                setCurrentPage(0);
+              }}
+              filters={filters}
             />
           }
           columns={getZohoApplicationsColumns(
