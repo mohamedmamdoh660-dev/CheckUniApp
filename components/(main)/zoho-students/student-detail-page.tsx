@@ -47,6 +47,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { StatusBadge } from "@/components/ui/status-badge";
+import AddZohoApplication from "@/components/(main)/zoho-applications/component/add-zoho-application";
 
 export function StudentDetailPage() {
   const [student, setStudent] = useState<ZohoStudent | null>(null);
@@ -57,6 +59,7 @@ export function StudentDetailPage() {
   const [letterDownloadingId, setLetterDownloadingId] = useState<string | null>(
     null
   );
+  const [addOpen, setAddOpen] = useState(false);
 
   const getStudent = async () => {
     try {
@@ -254,7 +257,27 @@ export function StudentDetailPage() {
                 </div>
               </div>
 
-              <div className="flex gap-3"></div>
+              <div className="flex gap-3">
+                <Button onClick={() => setAddOpen(true)}>
+                  Add Application
+                </Button>
+                <AddZohoApplication
+                  open={addOpen}
+                  onOpenChange={setAddOpen}
+                  onRefresh={async () => {
+                    try {
+                      const apps =
+                        await zohoApplicationsService.getApplicationsByStudent(
+                          studentId
+                        );
+                      setApplications(apps || []);
+                    } catch {}
+                  }}
+                  presetStudentId={studentId}
+                  presetStudentName={`${student?.first_name || ""} ${student?.last_name || ""}`}
+                  lockStudent
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -820,9 +843,9 @@ export function StudentDetailPage() {
                                 / {a.zoho_semesters?.name || a.semester || "-"}
                               </TableCell>
                               <TableCell>
-                                <Badge variant="outline" className="capitalize">
-                                  {a.stage || "-"}
-                                </Badge>
+                                <div className="text-[12px]">
+                                  <StatusBadge status={a.stage || ""} />
+                                </div>
                               </TableCell>
                               <TableCell>
                                 <div className="flex items-center justify-center">

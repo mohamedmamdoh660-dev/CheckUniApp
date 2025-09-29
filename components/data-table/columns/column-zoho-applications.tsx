@@ -21,6 +21,7 @@ import {
   finalAcceptanceButtonDisabled,
 } from "@/components/(main)/zoho-applications/component/stages-conditions";
 import { downloadAttachment } from "@/utils/download-attachment";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export function getZohoApplicationsColumns(
   fetchApplications: () => void,
@@ -51,7 +52,12 @@ export function getZohoApplicationsColumns(
               />
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
-              <span className="font-semibold">{applicationName}</span>
+              <span
+                className="font-semibold cursor-pointer hover:text-primary"
+                onClick={() => router.push(`/applications/${row.original.id}`)}
+              >
+                {applicationName}
+              </span>
               <span className="text-xs text-muted-foreground ">
                 {fullName || "-"}
               </span>
@@ -177,9 +183,9 @@ export function getZohoApplicationsColumns(
         const stage = row.original.stage || "";
 
         return (
-          <Badge variant="outline" className="capitalize text-[12px]">
-            {stage}
-          </Badge>
+          <div className="text-[12px]">
+            <StatusBadge status={stage} />
+          </div>
         );
       },
       enableSorting: true,

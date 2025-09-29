@@ -229,7 +229,7 @@ export const getStudentsPagination = async (    search: string,
             mother_name,
             mother_mobile,
             mother_job,
-            
+      photo_url,            
             agent:user_profile!zoho_students_user_id_fkey (
               first_name,
               last_name,

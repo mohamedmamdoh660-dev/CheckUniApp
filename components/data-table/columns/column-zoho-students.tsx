@@ -27,13 +27,13 @@ export function getZohoStudentsColumns(
       cell: ({ row }) => {
         const fullName =
           `${row.original.first_name || ""} ${row.original.last_name || ""}`.trim();
-        const initials =
-          `${row.original.first_name?.[0] || ""}${row.original.last_name?.[0] || ""}`.toUpperCase();
 
         return (
           <div className="flex items-center w-full">
             <Avatar className="border-foreground/10 border-[1px]">
-              <AvatarImage src={generateNameAvatar(fullName)} />
+              <AvatarImage
+                src={row.original.photo_url || generateNameAvatar(fullName)}
+              />
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
               <span className=" font-semibold">{fullName || "-"}</span>

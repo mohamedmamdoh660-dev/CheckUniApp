@@ -56,12 +56,18 @@ interface AddZohoApplicationProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onRefresh?: () => void;
+  presetStudentId?: string; // if provided, student will be preselected
+  presetStudentName?: string; // display name when preset
+  lockStudent?: boolean; // if true, student dropdown is disabled
 }
 
 export default function AddZohoApplication({
   open = false,
   onOpenChange,
   onRefresh,
+  presetStudentId,
+  presetStudentName,
+  lockStudent = false,
 }: AddZohoApplicationProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { userProfile } = useAuth();
@@ -74,7 +80,7 @@ export default function AddZohoApplication({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      student: "",
+      student: presetStudentId || "",
       program: "",
       stage: "pending review",
       acdamic_year: "",
@@ -115,13 +121,25 @@ export default function AddZohoApplication({
 
   useEffect(() => {
     if (open) {
-      form.reset();
+      form.reset({
+        student: presetStudentId || "",
+        program: "",
+        stage: "pending review",
+        acdamic_year: "",
+        semester: "",
+        country: "",
+        university: "",
+        degree: "",
+      });
       const academicYear = academicYears.find((y: any) => y.is_default) || null;
       const semester = semesters.find((s: any) => s.is_default) || null;
       form.setValue("acdamic_year", academicYear?.id || "");
       form.setValue("semester", semester?.id || "");
+      if (presetStudentId) setStudentName(presetStudentName || "");
     }
   }, [open]);
+
+  const RequiredStar = () => <span className="text-red-500 ml-0.5">*</span>;
 
   // Handler for creating application
   const onSubmit = async (values: FormSchema) => {
@@ -199,7 +217,9 @@ export default function AddZohoApplication({
                 name="student"
                 render={({ field }) => (
                   <FormItem className="space-y-1">
-                    <FormLabel>Student*</FormLabel>
+                    <FormLabel>
+                      Student <RequiredStar />
+                    </FormLabel>
                     <SearchableDropdown
                       placeholder="Select Student..."
                       table="zoho-students"
@@ -207,7 +227,9 @@ export default function AddZohoApplication({
                       displayField="first_name"
                       displayField2="last_name"
                       initialValue={field.value?.toString() || ""}
+                      disabled={lockStudent}
                       onSelect={(item) => {
+                        if (lockStudent) return;
                         field.onChange(item.id);
                         // @ts-ignore - item has first_name and last_name
                         setStudentName(`${item.first_name} ${item.last_name}`);
@@ -402,7 +424,9 @@ export default function AddZohoApplication({
                   name="program"
                   render={({ field }) => (
                     <FormItem className="space-y-1">
-                      <FormLabel>Program*</FormLabel>
+                      <FormLabel>
+                        Program <RequiredStar />
+                      </FormLabel>
                       <SearchableDropdown
                         placeholder="Select Program..."
                         table="zoho-programs"

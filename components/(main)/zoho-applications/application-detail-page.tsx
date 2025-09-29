@@ -38,12 +38,18 @@ import { DocumentAttachmentDialog } from "@/components/ui/document-attachment-di
 import { zohoAttachmentsService } from "@/modules/zoho-attachments/services/zoho-attachments-service";
 import { downloadAttachment } from "@/utils/download-attachment";
 import { supabaseClient } from "@/lib/supabase-auth-client";
+import { StatusBadge } from "@/components/ui/status-badge";
 import {
   canUploadCard,
   canUploadPayment,
   conditionalButtonDisabled,
   finalAcceptanceButtonDisabled,
 } from "./component/stages-conditions";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 export default function ApplicationDetailPage() {
   const params = useParams();
@@ -249,9 +255,26 @@ export default function ApplicationDetailPage() {
 
               <div className="flex-1 space-y-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-foreground text-balance">
-                    {application?.application_name || "Application"}
-                  </h1>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <h1
+                        className="text-3xl font-bold text-foreground"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textAlign: "left",
+                        }}
+                      >
+                        {application?.application_name || "Application"}
+                      </h1>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {application?.application_name || "Application"}
+                    </TooltipContent>
+                  </Tooltip>
+
                   <p
                     className="text-lg text-muted-foreground mt-1 hover:cursor-pointer hover:text-primary flex flex-row items-center"
                     onClick={() =>
@@ -263,22 +286,18 @@ export default function ApplicationDetailPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 items-center">
                   {application?.stage ? (
-                    <Badge
-                      variant="secondary"
-                      className="bg-primary/10 text-primary border-primary/20 text-[13px]"
-                    >
-                      <FileText className="w-4 h-4 mr-1" />
-                      {application.stage}
-                    </Badge>
+                    <div className="text-[12px]">
+                      <StatusBadge status={application.stage} />
+                    </div>
                   ) : null}
-                  {application?.zoho_degrees?.name ? (
+                  {/* {application?.zoho_degrees?.name ? (
                     <Badge
                       variant="secondary"
                       className="bg-primary/10 text-primary border-primary/20 text-[13px]"
                     >
-                      <GraduationCap className="w-4 h-4 mr-1" />
+                      <GraduationCap className="!w-4 !h-4 mr-1" />
                       {application.zoho_degrees.name}
                     </Badge>
                   ) : null}
@@ -287,10 +306,10 @@ export default function ApplicationDetailPage() {
                       variant="secondary"
                       className="bg-primary/10 text-primary border-primary/20 text-[13px]"
                     >
-                      <MapPin className="w-4 h-4 mr-1" />
+                      <MapPin className="!w-4 !h-4 mr-1" />
                       {application.zoho_countries.name}
                     </Badge>
-                  ) : null}
+                  ) : null} */}
                 </div>
               </div>
 
@@ -396,7 +415,7 @@ export default function ApplicationDetailPage() {
 
         <div className="p-8">
           <Tabs defaultValue="application" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+            <TabsList className="grid w-full grid-cols-5 bg-muted/50">
               <TabsTrigger
                 value="application"
                 className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
@@ -420,6 +439,12 @@ export default function ApplicationDetailPage() {
                 className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
               >
                 University Letters
+              </TabsTrigger>
+              <TabsTrigger
+                value="notes"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
+              >
+                Notes
               </TabsTrigger>
             </TabsList>
 
@@ -482,9 +507,7 @@ export default function ApplicationDetailPage() {
                       <p className="text-sm font-medium text-muted-foreground mb-1">
                         Stage
                       </p>
-                      <Badge variant="outline" className="">
-                        {safe(application?.stage)}
-                      </Badge>
+                      <StatusBadge status={application?.stage || ""} />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">
@@ -705,14 +728,13 @@ export default function ApplicationDetailPage() {
                 </CardHeader>
                 <CardContent>
                   {letters.length === 0 ? (
-                    <div className="text-center py-12">
-                      <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
-                        <FileText className="w-8 h-8 text-muted-foreground" />
-                      </div>
-                      <p className="text-muted-foreground text-lg">
-                        No letters found
-                      </p>
-                    </div>
+                    <InfoGraphic
+                      icon={<FileText className="!w-16 !h-16 text-primary" />}
+                      title="No letters found"
+                      description="There are no letters found for this application."
+                      isLeftArrow={false}
+                      gradient={false}
+                    />
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {letters.map((l) => (
@@ -769,6 +791,27 @@ export default function ApplicationDetailPage() {
                       ))}
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* University Letters Tab */}
+            <TabsContent value="notes" className="space-y-6">
+              <Card className="shadow-sm">
+                <CardHeader className="pb-0">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <FileText className="w-5 h-5 text-primary" />
+                    Notes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <InfoGraphic
+                    icon={<FileText className="!w-16 !h-16 text-primary" />}
+                    title="No notes found"
+                    description="There are no notes found for this application."
+                    isLeftArrow={false}
+                    gradient={false}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>

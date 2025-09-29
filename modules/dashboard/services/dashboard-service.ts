@@ -196,7 +196,8 @@ export const dashboardService = {
             id,
             first_name,
             last_name,
-            email
+            email,
+            photo_url
           ),
           zoho_programs (
             id,

@@ -12,7 +12,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { RefreshCw } from "lucide-react";
+import { Info, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useEffect } from "react";
@@ -24,6 +24,13 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { StatusBadge } from "@/components/ui/status-badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import InfoGraphic from "@/components/ui/info-graphic";
 
 export function RecentApplications() {
   const [isReloading, setIsReloading] = useState(false);
@@ -142,7 +149,7 @@ export function RecentApplications() {
                     <TableHead>Academic Year/Semester</TableHead>
                     <TableHead>Created At</TableHead>
                     <TableHead>Status</TableHead>
-                    {/* <TableHead className="w-[70px]">Actions</TableHead> */}
+                    <TableHead className="w-[70px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -153,11 +160,14 @@ export function RecentApplications() {
                           <div className="flex items-center gap-2">
                             <Avatar className="border-foreground/10 border-[1px]">
                               <AvatarImage
-                                src={generateNameAvatar(
-                                  application.zoho_students.first_name +
-                                    " " +
-                                    application.zoho_students.last_name
-                                )}
+                                src={
+                                  application.zoho_students.photo_url ||
+                                  generateNameAvatar(
+                                    application.zoho_students.first_name +
+                                      " " +
+                                      application.zoho_students.last_name
+                                  )
+                                }
                               />
                             </Avatar>
                             <div className="flex flex-col">
@@ -210,31 +220,31 @@ export function RecentApplications() {
                           : "-"}
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant="outline"
-                          className="capitalize text-[12px]"
-                        >
-                          {application.stage || "pending"}
-                        </Badge>{" "}
+                        <div className="text-[12px]">
+                          <StatusBadge status={application.stage || ""} />
+                        </div>
                       </TableCell>
-                      {/* <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleViewDetails(application.id)}
-                            >
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Details
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell> */}
+                      <TableCell>
+                        <div className="flex items-center justify-center">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info
+                                className="!h-6 !w-6 hover:cursor-pointer hover:text-primary"
+                                onClick={() =>
+                                  router.push(`/applications/${application.id}`)
+                                }
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>View Details</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          {/* <ZohoApplicationsTableRowActions
+            row={row}
+            fetchApplications={fetchApplications}
+          /> */}
+                        </div>{" "}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
