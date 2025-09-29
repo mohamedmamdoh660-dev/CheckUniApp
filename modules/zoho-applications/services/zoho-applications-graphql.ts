@@ -370,5 +370,26 @@ export const GET_ZOHO_STUDENTS_SEARCH = `
   }
 `;
 
+export const GET_APPLICATIONS_BY_STUDENT = `
+  query GetApplicationsByStudent($student_id: String!) {
+    zoho_applicationsCollection(filter: { student: { eq: $student_id } }, orderBy: [{ created_at: DescNullsLast }]) {
+      edges {
+        node {
+          id
+          university
+          program
+          acdamic_year
+          semester
+          stage
+          zoho_universities { id name }
+          zoho_programs { id name }
+          zoho_academic_years { id name }
+          zoho_semesters { id name }
+        }
+      }
+    }
+  }
+`;
+
 
 

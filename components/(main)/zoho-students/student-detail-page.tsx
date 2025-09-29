@@ -20,24 +20,39 @@ import {
   Home,
   Eye,
   Loader2,
+  Info,
 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ZohoStudent } from "@/types/types";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loader from "@/components/loader";
 import InfoGraphic from "@/components/ui/info-graphic";
 import { getStudentById } from "@/supabase/actions/db-actions";
-import { executeGraphQL } from "@/lib/graphql-client";
 import { zohoAttachmentsService } from "@/modules/zoho-attachments/services/zoho-attachments-service";
 import { downloadAttachment } from "@/utils/download-attachment";
 
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function StudentDetailPage() {
   const [student, setStudent] = useState<ZohoStudent | null>(null);
   const params = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const studentId = params.id as string;
+  const router = useRouter();
   const [letterDownloadingId, setLetterDownloadingId] = useState<string | null>(
     null
   );
@@ -58,6 +73,7 @@ export function StudentDetailPage() {
   const [attachments, setAttachments] = useState<
     Array<{ id: string; name: string }>
   >([]);
+  const [applications, setApplications] = useState<any[]>([]);
   useEffect(() => {
     const loadAttachments = async () => {
       try {
@@ -78,6 +94,17 @@ export function StudentDetailPage() {
     if (studentId) {
       getStudent();
     }
+  }, [studentId]);
+
+  useEffect(() => {
+    const loadApps = async () => {
+      try {
+        const apps =
+          await zohoApplicationsService.getApplicationsByStudent(studentId);
+        setApplications(apps || []);
+      } catch {}
+    };
+    if (studentId) loadApps();
   }, [studentId]);
 
   const formatDate = (dateString?: string) => {
@@ -114,6 +141,7 @@ export function StudentDetailPage() {
   return (
     <div className=" bg-background">
       <div className="max-w-7xl mx-auto">
+        {/* Top Profile Section */}
         <div className="bg-card border-b border-border">
           <div className="p-8">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
@@ -185,7 +213,7 @@ export function StudentDetailPage() {
 
         <div className="p-8">
           <Tabs defaultValue="personal" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+            <TabsList className="grid w-full grid-cols-5 bg-muted/50">
               <TabsTrigger
                 value="personal"
                 className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
@@ -209,6 +237,12 @@ export function StudentDetailPage() {
                 className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
               >
                 Documents
+              </TabsTrigger>
+              <TabsTrigger
+                value="applications"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
+              >
+                Applications
               </TabsTrigger>
             </TabsList>
 
@@ -502,14 +536,15 @@ export function StudentDetailPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
-                        <GraduationCap className="w-8 h-8 text-muted-foreground" />
-                      </div>
-                      <p className="text-muted-foreground text-lg">
-                        Education level is not set for this student
-                      </p>
-                    </div>
+                    <InfoGraphic
+                      icon={
+                        <GraduationCap className="!w-16 !h-16 text-primary" />
+                      }
+                      title="No educational background found"
+                      description="There is no educational background found for this student."
+                      isLeftArrow={false}
+                      gradient={false}
+                    />
                   )}
                 </CardContent>
               </Card>
@@ -609,7 +644,7 @@ export function StudentDetailPage() {
                           key={doc.id}
                           className="group border hover:border-primary/30 transition-colors"
                         >
-                          <CardContent className="p-4 flex items-center justify-between">
+                          <CardContent className="px-4 flex items-center justify-between">
                             <div className="flex items-center gap-3 min-w-0">
                               <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center">
                                 <FileText className="w-5 h-5 text-muted-foreground" />
@@ -652,17 +687,120 @@ export function StudentDetailPage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
-                        <FileText className="w-8 h-8 text-muted-foreground" />
-                      </div>
-                      <p className="text-muted-foreground text-lg">
-                        No documents found
-                      </p>
-                    </div>
+                    <InfoGraphic
+                      icon={<FileText className="!w-16 !h-16 text-primary" />}
+                      title="No documents found"
+                      description="THere are no documents found for this student."
+                      isLeftArrow={false}
+                      gradient={false}
+                    />
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Applications Tab */}
+            <TabsContent value="applications" className="space-y-6">
+              {/* Applications overview */}
+              <div className="">
+                <Card className="shadow-sm gap-2">
+                  <CardHeader className="pb-0">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <FileText className="w-5 h-5 text-primary" /> Applications
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {applications.length > 0 ? (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <InfoGraphic
+                          icon={
+                            <FileText className="!w-16 !h-16 text-primary" />
+                          }
+                          title="No applications found"
+                          description="There are no applications found for this student."
+                          isLeftArrow={false}
+                          gradient={false}
+                        />
+                      </div>
+                    ) : (
+                      <Table>
+                        <TableHeader className=" rounded-[20px]">
+                          <TableRow>
+                            <TableHead className="text-muted-foreground">
+                              App-id
+                            </TableHead>
+                            <TableHead className="text-muted-foreground">
+                              University
+                            </TableHead>
+                            <TableHead className="text-muted-foreground">
+                              Program
+                            </TableHead>
+                            <TableHead className="text-muted-foreground">
+                              Academic Year/Semester
+                            </TableHead>
+                            <TableHead className="text-muted-foreground">
+                              Stage
+                            </TableHead>
+                            <TableHead></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {applications.map((a: any) => (
+                            <TableRow
+                              key={a.id}
+                              // className="cursor-pointer"
+                              // onClick={() =>
+                              //   router.push(`/applications/${a.id}`)
+                              // }
+                            >
+                              <TableCell className="font-medium">
+                                {a.id}
+                              </TableCell>
+                              <TableCell>
+                                {a.zoho_universities?.name ||
+                                  a.university ||
+                                  "-"}
+                              </TableCell>
+                              <TableCell>
+                                {a.zoho_programs?.name || a.program || "-"}
+                              </TableCell>
+
+                              <TableCell>
+                                {a.zoho_academic_years?.name ||
+                                  a.acdamic_year ||
+                                  "-"}{" "}
+                                / {a.zoho_semesters?.name || a.semester || "-"}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="capitalize">
+                                  {a.stage || "-"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center justify-center">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Info
+                                        className="!h-5 !w-5 hover:cursor-pointer hover:text-primary"
+                                        onClick={() =>
+                                          router.push(`/applications/${a?.id}`)
+                                        }
+                                      />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>View Details</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>

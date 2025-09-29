@@ -33,7 +33,7 @@ export default function InfoGraphic({
       <h2 className="text-2xl font-semibold text-foreground mb-2 text-center">
         {title}
       </h2>
-      <p className="text-lg text-muted-foreground max-w-md mb-4">
+      <p className="text-lg text-muted-foreground max-w-md mb-4 text-center">
         {description}
       </p>
       {button && <div className="mt-4">{button}</div>}

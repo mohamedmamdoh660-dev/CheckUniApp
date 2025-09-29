@@ -696,7 +696,7 @@ export default function ApplicationDetailPage() {
                           key={l.id}
                           className="group border hover:border-primary/30 transition-colors"
                         >
-                          <CardContent className="p-4 flex items-center justify-between">
+                          <CardContent className="px-4 flex items-center justify-between">
                             <div className="flex items-center gap-3 min-w-0">
                               <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center">
                                 <FileText className="w-5 h-5 text-muted-foreground" />
