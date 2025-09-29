@@ -41,6 +41,7 @@ import { downloadAttachment } from "@/utils/download-attachment";
 
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
+import { supabaseClient } from "@/lib/supabase-auth-client";
 import {
   Tooltip,
   TooltipContent,
@@ -94,6 +95,53 @@ export function StudentDetailPage() {
     if (studentId) {
       getStudent();
     }
+  }, [studentId]);
+
+  // Realtime updates for this student id and their applications
+  useEffect(() => {
+    if (!studentId) return;
+    const chStudent = supabaseClient
+      .channel(`rt-student-${studentId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "zoho_students",
+          filter: `id=eq.${studentId}`,
+        },
+        () => getStudent()
+      )
+      .subscribe();
+
+    const chApps = supabaseClient
+      .channel(`rt-student-apps-${studentId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "zoho_applications",
+          filter: `student=eq.${studentId}`,
+        },
+        async () => {
+          try {
+            const apps =
+              await zohoApplicationsService.getApplicationsByStudent(studentId);
+            setApplications(apps || []);
+          } catch {}
+        }
+      )
+      .subscribe();
+
+    return () => {
+      try {
+        supabaseClient.removeChannel(chStudent);
+      } catch {}
+      try {
+        supabaseClient.removeChannel(chApps);
+      } catch {}
+    };
   }, [studentId]);
 
   useEffect(() => {

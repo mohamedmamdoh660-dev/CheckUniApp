@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import InfoGraphic from "@/components/ui/info-graphic";
 import { Button } from "@/components/ui/button";
+import { supabaseClient } from "@/lib/supabase-auth-client";
 export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [listStudents, setListStudents] = useState<ZohoStudent[]>([]);
   const [recordCount, setRecordCount] = useState<number>(0);
@@ -61,6 +62,23 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   useEffect(() => {
     fetchStudents();
   }, [currentPage, pageSize, debouncedSearchTerm]);
+
+  // Realtime list updates for students table
+  useEffect(() => {
+    const channel = supabaseClient
+      .channel("rt-students-list")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "zoho_students" },
+        () => fetchStudents()
+      )
+      .subscribe();
+    return () => {
+      try {
+        supabaseClient.removeChannel(channel);
+      } catch {}
+    };
+  }, []);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {

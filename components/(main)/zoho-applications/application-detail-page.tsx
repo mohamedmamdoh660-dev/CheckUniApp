@@ -37,6 +37,7 @@ import { DropdownMenuContent } from "@/components/dropdown-menu";
 import { DocumentAttachmentDialog } from "@/components/ui/document-attachment-dialog";
 import { zohoAttachmentsService } from "@/modules/zoho-attachments/services/zoho-attachments-service";
 import { downloadAttachment } from "@/utils/download-attachment";
+import { supabaseClient } from "@/lib/supabase-auth-client";
 import {
   canUploadCard,
   canUploadPayment,
@@ -78,6 +79,29 @@ export default function ApplicationDetailPage() {
       getApplication();
     }
   }, [applicationId, getApplication]);
+
+  // Realtime updates for this application id
+  useEffect(() => {
+    if (!applicationId) return;
+    const channel = supabaseClient
+      .channel(`rt-app-${applicationId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "zoho_applications",
+          filter: `id=eq.${applicationId}`,
+        },
+        () => getApplication()
+      )
+      .subscribe();
+    return () => {
+      try {
+        supabaseClient.removeChannel(channel);
+      } catch {}
+    };
+  }, [applicationId]);
 
   useEffect(() => {
     const loadLetters = async () => {

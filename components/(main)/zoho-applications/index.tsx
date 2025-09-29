@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import InfoGraphic from "@/components/ui/info-graphic";
 import { Button } from "@/components/ui/button";
+import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export default function ZohoApplicationsManagementPage({
   type,
@@ -75,6 +76,23 @@ export default function ZohoApplicationsManagementPage({
   useEffect(() => {
     fetchApplications();
   }, [currentPage, pageSize, debouncedSearchTerm]);
+
+  // Realtime list updates for applications table
+  useEffect(() => {
+    const channel = supabaseClient
+      .channel("rt-applications-list")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "zoho_applications" },
+        () => fetchApplications()
+      )
+      .subscribe();
+    return () => {
+      try {
+        supabaseClient.removeChannel(channel);
+      } catch {}
+    };
+  }, []);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
