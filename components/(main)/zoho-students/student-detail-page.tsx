@@ -758,7 +758,7 @@ export function StudentDetailPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {applications.length > 0 ? (
+                    {applications.length === 0 ? (
                       <div className="text-center py-12 text-muted-foreground">
                         <InfoGraphic
                           icon={
