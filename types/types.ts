@@ -364,3 +364,11 @@ export interface ZohoStudent {
   
   academic_level_record?: ZohoDegree;
 }
+
+export interface ZohoAttachment {
+  id: string;
+  created_at?: string;
+  name?: string | null;
+  module?: string | null;
+  module_id?: string | null;
+}

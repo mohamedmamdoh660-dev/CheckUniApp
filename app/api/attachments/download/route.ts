@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 
     const rows: { id: string; name: string }[] = await res.json();
     console.log("🚀 ~ GET ~ rows:", rows)
-    const found = rows.find((r) => r.name === type) ;
+    const found = rows.find((r) => r.name.toLowerCase().includes(type.toLowerCase())) ;
 
     if(!found) {
       return new Response(JSON.stringify({ error: "Attachment not found" }), {
@@ -74,9 +74,8 @@ export async function GET(req: NextRequest) {
     // @ts-ignore - buffer is available in Node runtime
     const buffer = await (webhookRes as any).buffer?.();
     const arrayBuffer = buffer ? buffer : await webhookRes.arrayBuffer();
-    console.log("🚀 ~ GET ~ arrayBuffer:", arrayBuffer)
 
-    const filename = type || found?.name || "attachment.pdf";
+    const filename = found?.name || "attachment.pdf";
     const contentType = webhookRes.headers.get("content-type") || "application/pdf";
 
     return new Response(arrayBuffer, {

@@ -33,15 +33,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuContent } from "@/components/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+
 import { DocumentAttachmentDialog } from "@/components/ui/document-attachment-dialog";
+import { zohoAttachmentsService } from "@/modules/zoho-attachments/services/zoho-attachments-service";
+import { downloadAttachment } from "@/utils/download-attachment";
 import {
   canUploadCard,
   canUploadPayment,
@@ -87,23 +82,8 @@ export default function ApplicationDetailPage() {
   useEffect(() => {
     const loadLetters = async () => {
       try {
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
-        const res = await fetch(
-          `${supabaseUrl}/rest/v1/zoho_attachments?module_id=eq.${encodeURIComponent(
-            applicationId
-          )}&select=id,name`,
-          {
-            headers: {
-              apikey: supabaseKey,
-              Authorization: `Bearer ${supabaseKey}`,
-            },
-            cache: "no-store",
-          }
-        );
-        if (!res.ok) return;
-        const rows = (await res.json()) as Array<{ id: string; name: string }>;
-        setLetters(rows || []);
+        const rows = await zohoAttachmentsService.getByModuleId(applicationId);
+        setLetters(rows.map((r) => ({ id: r.id, name: r.name || "Letter" })));
       } catch {}
     };
     if (applicationId) loadLetters();
@@ -224,33 +204,6 @@ export default function ApplicationDetailPage() {
     }
   };
 
-  const handleDownload = async (filename: string) => {
-    try {
-      setDownloading(true);
-      const url = `/api/attachments/download?record_id=${encodeURIComponent(
-        application?.id || ""
-      )}&type=${encodeURIComponent(filename)}`;
-      const res = await fetch(url);
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}) as any);
-        throw new Error(err?.error || `Download failed (${res.status})`);
-      }
-      const blob = await res.blob();
-      const link = document.createElement("a");
-      const objectUrl = URL.createObjectURL(blob);
-      link.href = objectUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(objectUrl);
-    } catch (e: any) {
-      toast.error(e?.message || "Download failed");
-    } finally {
-      setDownloading(false);
-    }
-  };
-
   return (
     <div className=" bg-background">
       <div className="max-w-7xl mx-auto">
@@ -338,7 +291,9 @@ export default function ApplicationDetailPage() {
                   <Button
                     variant="outline"
                     disabled={downloading}
-                    onClick={() => handleDownload("Conditional Acceptance.pdf")}
+                    onClick={() =>
+                      downloadAttachment(application?.id || "", "conditional")
+                    }
                   >
                     {downloading ? (
                       <Loader2 className="w-4 h-4 mr-1 animate-spin" />
@@ -352,7 +307,9 @@ export default function ApplicationDetailPage() {
                   <Button
                     variant="outline"
                     disabled={downloading}
-                    onClick={() => handleDownload("Final Acceptance.pdf")}
+                    onClick={() =>
+                      downloadAttachment(application?.id || "", "final")
+                    }
                   >
                     {downloading ? (
                       <Loader2 className="w-4 h-4 mr-1 animate-spin" />
@@ -760,21 +717,16 @@ export default function ApplicationDetailPage() {
                               onClick={async () => {
                                 try {
                                   setLetterDownloadingId(l.id);
-                                  const url = `/api/attachments/download?record_id=${encodeURIComponent(
-                                    applicationId
-                                  )}&type=${encodeURIComponent(l.name || "Letter.pdf")}`;
-                                  const res = await fetch(url);
-                                  if (!res.ok)
-                                    throw new Error("Download failed");
-                                  const blob = await res.blob();
-                                  const link = document.createElement("a");
-                                  const objectUrl = URL.createObjectURL(blob);
-                                  link.href = objectUrl;
-                                  link.download = l.name || "Letter.pdf";
-                                  document.body.appendChild(link);
-                                  link.click();
-                                  link.remove();
-                                  URL.revokeObjectURL(objectUrl);
+                                  await downloadAttachment(
+                                    applicationId,
+                                    l.name.toLowerCase().includes("conditional")
+                                      ? "çonditional"
+                                      : l.name
+                                            .toLowerCase()
+                                            .includes("final acceptance")
+                                        ? "final"
+                                        : l.name
+                                  );
                                 } catch {
                                 } finally {
                                   setLetterDownloadingId(null);

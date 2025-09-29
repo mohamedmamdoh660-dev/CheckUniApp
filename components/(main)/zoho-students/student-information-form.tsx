@@ -97,7 +97,7 @@ const formSchema = z
     email: z
       .string({ required_error: "Email is required" })
       .email("Invalid email address"),
-    mobile: z.string().optional(),
+    mobile: z.string().min(8, "Mobile number must be at least 8 digits"),
 
     // Address Information
     address_line_1: z.string().optional(),
@@ -1148,7 +1148,9 @@ export default function StudentInformationForm({
                   name="mobile"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Mobile</FormLabel>
+                      <FormLabel>
+                        Mobile <RequiredStar />
+                      </FormLabel>
                       <FormControl>
                         {defaultPhoneCountry && (
                           <PhoneInput

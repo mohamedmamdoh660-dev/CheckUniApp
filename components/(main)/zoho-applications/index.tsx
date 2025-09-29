@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 import { getZohoApplicationsColumns } from "@/components/data-table/columns/column-zoho-applications";
 import { ZohoApplicationsDataTableToolbar } from "@/components/data-table/toolbars/zoho-applications-toolbar";
@@ -45,6 +45,11 @@ export default function ZohoApplicationsManagementPage({
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
   const { userProfile } = useAuth();
   const router = useRouter();
+
+  const [applicationDownloading, setApplicationDownloading] = useState({
+    id: "",
+    name: "",
+  });
 
   async function fetchApplications() {
     setIsRefetching(true);
@@ -103,7 +108,12 @@ export default function ZohoApplicationsManagementPage({
               setViewMode={setViewMode}
             />
           }
-          columns={getZohoApplicationsColumns(fetchApplications, router)}
+          columns={getZohoApplicationsColumns(
+            fetchApplications,
+            router,
+            applicationDownloading,
+            setApplicationDownloading
+          )}
           onGlobalFilterChange={handleGlobalFilterChange}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}

@@ -19,16 +19,18 @@ import {
   CreditCard,
   Home,
   Eye,
+  Loader2,
 } from "lucide-react";
 import { ZohoStudent } from "@/types/types";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loader from "@/components/loader";
 import InfoGraphic from "@/components/ui/info-graphic";
 import { getStudentById } from "@/supabase/actions/db-actions";
-import { DocumentIcon } from "@/utils/file-icons";
-import { useAuth } from "@/context/AuthContext";
-import { formatFileSize } from "@/utils/format-file-size";
+import { executeGraphQL } from "@/lib/graphql-client";
+import { zohoAttachmentsService } from "@/modules/zoho-attachments/services/zoho-attachments-service";
+import { downloadAttachment } from "@/utils/download-attachment";
+
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export function StudentDetailPage() {
@@ -36,6 +38,9 @@ export function StudentDetailPage() {
   const params = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const studentId = params.id as string;
+  const [letterDownloadingId, setLetterDownloadingId] = useState<string | null>(
+    null
+  );
 
   const getStudent = async () => {
     try {
@@ -49,6 +54,25 @@ export function StudentDetailPage() {
       console.log("🚀 ~ getStudent ~ error:", error);
     }
   };
+
+  const [attachments, setAttachments] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
+  useEffect(() => {
+    const loadAttachments = async () => {
+      try {
+        if (!studentId) return;
+        const rows = await zohoAttachmentsService.getByModuleAndId(
+          "Contacts",
+          studentId
+        );
+        setAttachments(
+          rows.map((r) => ({ id: r.id, name: r.name || "Document" }))
+        );
+      } catch {}
+    };
+    loadAttachments();
+  }, [studentId]);
 
   useEffect(() => {
     if (studentId) {
@@ -574,112 +598,58 @@ export function StudentDetailPage() {
                 <CardHeader className="pb-0">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <FileText className="w-5 h-5 text-primary" />
-                    Student Documents ({student?.documents?.length || 0})
+                    Student Documents ({attachments.length || 0})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {student?.documents?.length > 0 ? (
+                  {attachments.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                      {student?.documents?.map(
-                        (
-                          doc: {
-                            type: string;
-                            url: string;
-                            filename: string;
-                            size: string;
-                          },
-                          index: number
-                        ) => (
-                          <Card
-                            key={index}
-                            className="group relative overflow-hidden bg-gradient-to-br from-card to-card/50  border border-border/60 hover:border-primary/30 transition-all duration-500  rounded-2xl backdrop-blur-sm"
-                          >
-                            <CardContent className="p-6 py-2">
-                              {/* Animated background glow */}
-                              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                              {/* Header with enhanced badge */}
-                              <div className="relative flex items-center justify-between mb-4">
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs font-medium px-3 py-1 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 transition-colors duration-300"
-                                >
-                                  {doc?.type?.toUpperCase?.() || "DOCUMENT"}
-                                </Badge>
-
-                                {/* Status indicator */}
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                  <span className="text-xs text-muted-foreground">
-                                    Active
-                                  </span>
-                                </div>
+                      {attachments.map((doc) => (
+                        <Card
+                          key={doc.id}
+                          className="group border hover:border-primary/30 transition-colors"
+                        >
+                          <CardContent className="p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center">
+                                <FileText className="w-5 h-5 text-muted-foreground" />
                               </div>
-
-                              {/* Enhanced document info section */}
-                              <div className="relative mb-6 flex items-center gap-4">
-                                <div className="relative">
-                                  <div className="p-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl group-hover:from-primary/30 group-hover:to-accent/30 transition-all duration-300">
-                                    <DocumentIcon
-                                      fileType={doc?.type}
-                                      className="w-6 h-6"
-                                    />
-                                  </div>
-                                  {/* Floating indicator */}
-                                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <div className="w-2 h-2 bg-white rounded-full" />
-                                  </div>
-                                </div>
-
-                                <div className="flex-1 min-w-0">
-                                  <h3
-                                    className="font-bold text-lg text-foreground line-clamp-2 break-words leading-tight group-hover:text-primary transition-colors duration-300 mb-1"
-                                    title={doc?.filename}
-                                  >
-                                    {doc?.filename || "Untitled Document"}
-                                  </h3>
-
-                                  {/* File info */}
-                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <span className="px-2 py-1 bg-muted/50 rounded-md">
-                                      {formatFileSize(Number(doc?.size)) ||
-                                        "Unknown size"}
-                                    </span>
-                                  </div>
-                                </div>
+                              <div className="min-w-0">
+                                <p className="font-medium truncate">
+                                  {doc.name || "Letter"}
+                                </p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  Attachment ID: {doc.id}
+                                </p>
                               </div>
-
-                              {/* Enhanced action buttons */}
-                              <div className="relative flex gap-3">
-                                <Button
-                                  onClick={() =>
-                                    window.open(doc?.url, "_blank")
-                                  }
-                                  className="bg-background/80 text-foreground hover:bg-accent hover:text-accent-foreground justify-center h-11 px-4 text-sm font-medium rounded-xl border-1 w-[50%]"
-                                >
-                                  <Eye className="w-4 h-4 mr-2 " />
-                                  <span className=" font-semibold">
-                                    Preview
-                                  </span>
-                                </Button>
-
-                                <a
-                                  href={`/api/proxy-download?url=${encodeURIComponent(doc?.url)}&filename=${encodeURIComponent(doc?.filename || "document")}`}
-                                  download
-                                  className="w-[50%]"
-                                >
-                                  <Button className=" h-11 group/btn w-full">
-                                    <Download className="w-4 h-4 mr-2 " />
-                                    <span className=" font-semibold">
-                                      Download
-                                    </span>
-                                  </Button>
-                                </a>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        )
-                      )}
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={letterDownloadingId === doc.id}
+                              onClick={async () => {
+                                try {
+                                  setLetterDownloadingId(doc.id);
+                                  await downloadAttachment(
+                                    studentId,
+                                    doc.name || "Letter.pdf"
+                                  );
+                                } catch {
+                                } finally {
+                                  setLetterDownloadingId(null);
+                                }
+                              }}
+                            >
+                              {letterDownloadingId === doc.id ? (
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                              ) : (
+                                <Download className="h-4 w-4 mr-1" />
+                              )}
+                              Download
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
                   ) : (
                     <div className="text-center py-12">
