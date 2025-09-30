@@ -38,7 +38,7 @@ export function ZohoProgramsCards({
       {(programs || []).map((program) => (
         <Card
           key={program.id}
-          className="hover:shadow-md transition-shadow overflow-hidden pt-0 gap-4 relative"
+          className="hover:shadow-md transition-all duration-500 ease-in-out overflow-hidden pt-0 gap-4 relative hover:scale-102 will-change-transform"
         >
           <Tooltip>
             <TooltipTrigger asChild>
