@@ -12,6 +12,7 @@ import {
   Table as TableIcon,
   LayoutGrid,
   Upload,
+  ListFilterPlus,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -96,7 +97,7 @@ export function ZohoApplicationsDataTableToolbar<TData>({
         <Popover open={openFilters} onOpenChange={setOpenFilters}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-8">
-              <TableIcon className="mr-2 h-4 w-4" /> Advanced Filters
+              <ListFilterPlus className="mr-2 h-4 w-4" /> Advanced Filters
               {activeCount > 0 && (
                 <Badge
                   className="ml-2 h-5 px-1 text-[10px]"
