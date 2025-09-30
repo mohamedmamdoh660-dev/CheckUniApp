@@ -227,6 +227,21 @@ export const GET_APPLICATION_BY_ID = `
   }
 `;
 
+
+export const GET_APPLICATIONS_BY_FILTER = `
+  query GetApplicationsByFilter($filter: zoho_applicationsFilter) {
+    zoho_applicationsCollection(filter: $filter) {
+      edges {
+        node {
+          id
+  
+          }
+        }
+      }
+    }
+  
+`;
+
 export const INSERT_APPLICATION = `
   mutation InsertApplication($objects: [zoho_applicationsInsertInput!]!) {
     insertIntozoho_applicationsCollection(objects: $objects) {

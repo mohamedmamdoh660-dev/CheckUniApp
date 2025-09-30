@@ -581,6 +581,8 @@ export default function StudentInformationForm({
           selected={field.value}
           onSelect={field.onChange}
           captionLayout="dropdown"
+          fromYear={label === "Expiry Date" ? 2000 : undefined}
+          toYear={label === "Expiry Date" ? 2090 : undefined}
           disabled={(date) => {
             // Only apply date restrictions when it's not an expiry date field
             if (label !== "Expiry Date") {
@@ -596,12 +598,15 @@ export default function StudentInformationForm({
               }
               return date > today || date < new Date("1900-01-01");
             }
-            // For expiry dates, disable dates before the selected Issue Date
+            // For expiry dates, restrict to years 2000-2090 and after Issue Date
             const issueDate = form.getValues("passport_issue_date") as
               | Date
               | undefined;
-            const minDate = issueDate ?? new Date("1900-01-01");
-            return date < minDate || date < new Date("1900-01-01");
+            const lowerBound = new Date("2000-01-01");
+            const upperBound = new Date("2090-12-31");
+            const minDate =
+              issueDate && issueDate > lowerBound ? issueDate : lowerBound;
+            return date < minDate || date > upperBound;
           }}
           initialFocus
           defaultMonth={

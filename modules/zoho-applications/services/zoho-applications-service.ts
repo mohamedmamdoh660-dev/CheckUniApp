@@ -11,7 +11,8 @@ import {
   GET_ZOHO_SEMESTERS,
   GET_ZOHO_STUDENTS,
   GET_ZOHO_STUDENTS_SEARCH,
-  GET_APPLICATIONS_BY_STUDENT
+  GET_APPLICATIONS_BY_STUDENT,
+  GET_APPLICATIONS_BY_FILTER
 } from "./zoho-applications-graphql";
 import { ZohoAcademicYear, ZohoApplication, ZohoSemester } from "@/types/types";
 import { ZohoStudent } from "@/types/types";
@@ -41,6 +42,11 @@ export const zohoApplicationsService = {
       console.error('Error getting application by id:', error);
       throw error;
     }
+  },
+
+  getapplicationBasedonFilter: async (filter: any) => {
+    const response = await executeGraphQLBackend(GET_APPLICATIONS_BY_FILTER, { filter });
+    return response.zoho_applicationsCollection.edges.map((edge: any) => edge.node);
   },
 
   /**

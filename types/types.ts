@@ -157,6 +157,7 @@ export interface ZohoUniversity {
   created_at?: string;
   update_at?: string;
   year_founded?: string;
+  active_in_apps?: boolean;
   qs_rank?: string;
   times_higher_education_rank?: string;
   shanghai_ranking?: string;

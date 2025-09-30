@@ -279,11 +279,11 @@ export const zohoProgramsService = {
   /**
    * Get all universities
    */
-  getUniversities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, dependsOn: { field: string, value: string | number | null } | null = null): Promise<ZohoUniversity[]> => {
+  getUniversities: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, label?: string, dependsOn: { field: string, value: string | number | null } | null = null): Promise<ZohoUniversity[]> => {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      let filter: any = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+      let filter: any = { name: { ilike: searchPattern }, ...(label === 'University for Application' ? { active_in_apps: { eq: true } } : {}), ...(id ? { id: { eq: id } } : {}) };
             if (dependsOn && dependsOn.value) {
         filter = {
           ...filter,

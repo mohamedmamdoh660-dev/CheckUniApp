@@ -52,11 +52,16 @@ export default function ResetPassword() {
         type: "success",
         text: "Password reset successful. You may now log in.",
       });
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 2000);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(
+        "There was an error resetting your password. Please try again. and if the problem persists, please contact support."
+      );
       setPasswordMessage({
         type: "error",
-        text: err instanceof Error ? err.message : "Something went wrong",
+        text: "There was an error resetting your password. Please try again. and if the problem persists, please contact support.",
       });
     } finally {
       setIsLoading(false);

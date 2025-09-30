@@ -74,6 +74,7 @@ const fetchTableData = async ({
           page,
           pageSize,
           id,
+          label,
           dependsOn?.[0]
         );
 

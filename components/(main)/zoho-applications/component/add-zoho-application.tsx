@@ -166,6 +166,18 @@ export default function AddZohoApplication({
               : userProfile?.agency_id,
       };
 
+      const found = await zohoApplicationsService.getapplicationBasedonFilter({
+        student: { eq: values.student },
+        program: { eq: values.program },
+        acdamic_year: { eq: values.acdamic_year },
+        semester: { eq: values.semester },
+      });
+
+      if (found.length > 0) {
+        toast.error("Application already exists related to selected student");
+        return;
+      }
+
       // First, call the n8n webhook
       const webhookResponse = await createApplicationViaWebhook({
         ...applicationData,
@@ -352,6 +364,7 @@ export default function AddZohoApplication({
                         table="zoho-universities"
                         searchField="name"
                         displayField="name"
+                        label="University for Application"
                         initialValue={field.value}
                         bottom={false}
                         dependsOn={[
