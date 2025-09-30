@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
   pagination = true,
   type,
   handleRowClick,
-  pageSizeOptions = [10, 20, 30, 40, 50],
+  pageSizeOptions = [12, 20, 30, 40, 50],
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
