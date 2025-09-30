@@ -105,7 +105,7 @@ export function getZohoStudentsColumns(
           <div className="text-left">
             <div>{row.original.passport_number || "-"}</div>
             {row.original.passport_expiry_date && (
-              <div className="text-xs text-amber-600">
+              <div className="text-xs text-muted-foreground">
                 {" "}
                 Expires: {row.original.passport_expiry_date}
               </div>
@@ -139,13 +139,13 @@ export function getZohoStudentsColumns(
           <div className="text-left">
             {row.original.father_name && (
               <div className="text-xs">
-                <span className=" text-muted-foreground">Father:</span>{" "}
+                <span className=" font-semibold">Father:</span>{" "}
                 {row.original.father_name}
               </div>
             )}
             {row.original.mother_name && (
               <div className="text-xs">
-                <span className=" text-muted-foreground">Mother:</span>{" "}
+                <span className=" font-semibold">Mother:</span>{" "}
                 {row.original.mother_name}
               </div>
             )}
