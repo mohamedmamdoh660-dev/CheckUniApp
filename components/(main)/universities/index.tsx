@@ -14,7 +14,7 @@ export default function UniversitiesManagementPage({ type }: { type: string }) {
   );
   const [recordCount, setRecordCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState < number > 12;
+  const [pageSize, setPageSize] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);

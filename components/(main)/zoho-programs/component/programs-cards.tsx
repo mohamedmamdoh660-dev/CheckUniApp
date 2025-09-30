@@ -4,7 +4,6 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ZohoProgram } from "@/types/types";
-import { Button } from "@/components/ui/button";
 import { currentTimezone } from "@/lib/helper/current-timezone";
 import {
   Building2,
@@ -24,7 +23,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import img from "@/public/images/profile.jpg";
 
 export function ZohoProgramsCards({
   programs,
