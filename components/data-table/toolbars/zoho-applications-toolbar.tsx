@@ -254,12 +254,16 @@ export function ZohoApplicationsDataTableToolbar<TData>({
         <ToggleGroupItem
           value="table"
           aria-label="Table view"
-          className="gap-2"
+          className="gap-2 h-8"
         >
-          <TableIcon className="h-4 w-4" /> Table
+          <TableIcon className="h-4 w-4" />
         </ToggleGroupItem>
-        <ToggleGroupItem value="cards" aria-label="Card view" className="gap-2">
-          <LayoutGrid className="h-4 w-4" /> Cards
+        <ToggleGroupItem
+          value="cards"
+          aria-label="Card view"
+          className="gap-2 h-8"
+        >
+          <LayoutGrid className="h-4 w-4" />
         </ToggleGroupItem>
       </ToggleGroup> */}
       {tableName && (

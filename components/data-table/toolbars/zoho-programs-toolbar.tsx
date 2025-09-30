@@ -10,6 +10,7 @@ import {
   X,
   Search,
   Table as TableIcon,
+  LayoutGrid,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface DataTableToolbarProps<TData> {
   table?: Table<TData>;
@@ -38,8 +40,12 @@ interface DataTableToolbarProps<TData> {
   onGlobalFilterChange?: (value: string) => void;
   fetchRecords: () => void;
   type?: string;
+  viewMode: "table" | "cards";
+  setViewMode: (viewMode: "table" | "cards") => void;
   onFiltersChange?: (filters: Record<string, string>) => void;
   filters?: Record<string, string>;
+  globalFilter?: string;
+  setGlobalFilter?: (value: string) => void;
 }
 
 export function ZohoProgramsDataTableToolbar<TData>({
@@ -52,9 +58,11 @@ export function ZohoProgramsDataTableToolbar<TData>({
   type,
   onFiltersChange,
   filters = {},
+  viewMode,
+  setViewMode,
+  globalFilter,
+  setGlobalFilter,
 }: DataTableToolbarProps<TData>) {
-  const [globalFilter, setGlobalFilter] = useState<string>("");
-  const { userProfile } = useAuth();
   const [openFilters, setOpenFilters] = useState(false);
 
   // Advanced filter local state reflecting columns
@@ -74,7 +82,7 @@ export function ZohoProgramsDataTableToolbar<TData>({
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setGlobalFilter(value);
+    setGlobalFilter?.(value);
     onGlobalFilterChange?.(value);
   };
 
@@ -242,7 +250,7 @@ export function ZohoProgramsDataTableToolbar<TData>({
               variant="ghost"
               size="sm"
               onClick={() => {
-                setGlobalFilter("");
+                setGlobalFilter?.("");
                 onGlobalFilterChange?.("");
 
                 onFiltersChange?.({});
@@ -255,6 +263,28 @@ export function ZohoProgramsDataTableToolbar<TData>({
           )}
         </div>
       </div>
+      <ToggleGroup
+        type="single"
+        value={viewMode}
+        onValueChange={(v) => v && setViewMode(v as any)}
+        variant="outline"
+        className="hidden md:flex"
+      >
+        <ToggleGroupItem
+          value="table"
+          aria-label="Table view"
+          className="gap-2 h-8"
+        >
+          <TableIcon className="h-4 w-4" />
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="cards"
+          aria-label="Card view"
+          className="gap-2 h-8"
+        >
+          <LayoutGrid className="h-4 w-4" />
+        </ToggleGroupItem>
+      </ToggleGroup>
       {tableName && (
         <div className="px-2">
           <Button
