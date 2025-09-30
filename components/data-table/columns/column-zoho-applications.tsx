@@ -78,7 +78,11 @@ export function getZohoApplicationsColumns(
         const program = row.original.zoho_programs;
 
         return (
-          <div className="text-left">
+          <div
+            className="max-w-[400px] leading-tight cursor-pointer line-clamp-2 text-wrap w-[300px] hover:underline hover:text-primary"
+            title={program?.name || "-"}
+            onClick={() => router.push(`/programs/${row.original.program}`)}
+          >
             {program?.name ||
               (row.original.program ? `ID: ${row.original.program}` : "-")}
           </div>

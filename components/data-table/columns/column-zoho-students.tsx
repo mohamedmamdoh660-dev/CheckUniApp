@@ -36,7 +36,12 @@ export function getZohoStudentsColumns(
               />
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
-              <span className=" font-semibold">{fullName || "-"}</span>
+              <span
+                className=" font-semibold cursor-pointer hover:text-primary"
+                onClick={() => router.push(`/students/${row.original.id}`)}
+              >
+                {fullName || "-"}
+              </span>
               <span className=" text-xs text-muted-foreground">
                 {row.original.email || "-"}
               </span>
@@ -100,7 +105,8 @@ export function getZohoStudentsColumns(
           <div className="text-left">
             <div>{row.original.passport_number || "-"}</div>
             {row.original.passport_expiry_date && (
-              <div className="text-xs">
+              <div className="text-xs text-amber-600">
+                {" "}
                 Expires: {row.original.passport_expiry_date}
               </div>
             )}
@@ -132,10 +138,16 @@ export function getZohoStudentsColumns(
         return (
           <div className="text-left">
             {row.original.father_name && (
-              <div className="text-xs">Father: {row.original.father_name}</div>
+              <div className="text-xs">
+                <span className=" text-muted-foreground">Father:</span>{" "}
+                {row.original.father_name}
+              </div>
             )}
             {row.original.mother_name && (
-              <div className="text-xs">Mother: {row.original.mother_name}</div>
+              <div className="text-xs">
+                <span className=" text-muted-foreground">Mother:</span>{" "}
+                {row.original.mother_name}
+              </div>
             )}
           </div>
         );

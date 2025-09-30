@@ -26,7 +26,11 @@ export function getZohoProgramsColumns(
       ),
       cell: ({ row }) => {
         return (
-          <div className="text-left font-medium">
+          <div
+            className="max-w-[400px] cursor-pointer  hover:text-primary leading-tight line-clamp-2 text-wrap w-[270px]"
+            title={row.original.name || "-"}
+            onClick={() => router?.push(`/programs/${row.original.id}`)}
+          >
             {row.original.name || "-"}
           </div>
         );
@@ -55,7 +59,12 @@ export function getZohoProgramsColumns(
                 />
               </div>
             )} */}
-            <div className="text-left">{university?.name}</div>
+            <div
+              className="max-w-[400px]  leading-tight line-clamp-2 text-wrap w-[270px]"
+              title={university?.name || "-"}
+            >
+              {university?.name}
+            </div>
           </div>
         );
       },
@@ -70,7 +79,12 @@ export function getZohoProgramsColumns(
       ),
       cell: ({ row }) => {
         return (
-          <div className="text-left">{row.original.zoho_faculty?.name}</div>
+          <div
+            className="max-w-[400px] leading-tight line-clamp-2 text-wrap w-[270px]"
+            title={row.original.zoho_faculty?.name || "-"}
+          >
+            {row.original.zoho_faculty?.name}
+          </div>
         );
       },
       enableSorting: true,
@@ -84,7 +98,12 @@ export function getZohoProgramsColumns(
       ),
       cell: ({ row }) => {
         return (
-          <div className="text-left">{row.original.zoho_speciality?.name}</div>
+          <div
+            className="max-w-[400px] leading-tight line-clamp-2 text-wrap w-[270px]"
+            title={row.original.zoho_speciality?.name || "-"}
+          >
+            {row.original.zoho_speciality?.name}
+          </div>
         );
       },
       enableSorting: true,

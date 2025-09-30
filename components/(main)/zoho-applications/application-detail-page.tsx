@@ -252,12 +252,19 @@ export default function ApplicationDetailPage() {
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex-1 space-y-4">
+              <div className="flex-1 space-y-2">
                 <div>
                   <Tooltip>
                     <TooltipTrigger>
                       <h1
-                        className="text-3xl font-bold text-foreground"
+                        className={`text-3xl font-bold text-foreground ${studentFullName && !application?.application_name ? "hover:cursor-pointer hover:text-primary !flex flex-row items-center" : ""}`}
+                        onClick={() =>
+                          studentFullName &&
+                          !application?.application_name &&
+                          router.push(
+                            `/students/${application?.zoho_students?.id}`
+                          )
+                        }
                         style={{
                           display: "-webkit-box",
                           WebkitLineClamp: 2,
@@ -266,23 +273,29 @@ export default function ApplicationDetailPage() {
                           textAlign: "left",
                         }}
                       >
-                        {application?.application_name || "Application"}
+                        {application?.application_name || studentFullName}
+                        {!application?.application_name && (
+                          <ExternalLink className="!w-5 !h-5 ml-1" />
+                        )}
                       </h1>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {application?.application_name || "Application"}
+                      {application?.application_name || studentFullName}
                     </TooltipContent>
                   </Tooltip>
-
-                  <p
-                    className="text-lg text-muted-foreground mt-1 hover:cursor-pointer hover:text-primary flex flex-row items-center"
-                    onClick={() =>
-                      router.push(`/students/${application?.zoho_students?.id}`)
-                    }
-                  >
-                    {studentFullName}
-                    <ExternalLink className="w-3 h-3 ml-1" />
-                  </p>
+                  {application?.application_name && (
+                    <p
+                      className="text-lg text-muted-foreground  hover:cursor-pointer hover:text-primary flex flex-row items-center"
+                      onClick={() =>
+                        router.push(
+                          `/students/${application?.zoho_students?.id}`
+                        )
+                      }
+                    >
+                      {studentFullName}
+                      <ExternalLink className="w-3 h-3 ml-1" />
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap gap-2 items-center">
