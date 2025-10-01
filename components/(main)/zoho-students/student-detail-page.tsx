@@ -258,7 +258,7 @@ export function StudentDetailPage() {
                   ) : null}
                 </div>
               </div>
-              {userProfile?.crm_id && (
+              {(userProfile?.crm_id || userProfile?.agency?.crm_id) && (
                 <div className="flex gap-3">
                   <Button onClick={() => setAddOpen(true)}>
                     Add Application

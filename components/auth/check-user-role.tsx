@@ -21,6 +21,15 @@ interface CheckUserRoleProps {
     | ((props: WithUserRole) => React.ReactElement);
 }
 
+// Define public routes that don't require authentication
+const AUTH_ROUTES = [
+  "/auth/login",
+  "/auth/sign-up",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+  "/auth/accept-invite",
+];
+
 export default function CheckUserRole({ children }: CheckUserRoleProps) {
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
@@ -37,7 +46,7 @@ export default function CheckUserRole({ children }: CheckUserRoleProps) {
 
         if (
           res.user?.id &&
-          (pathname === "/auth/sign-up" || pathname === "/auth/login")
+          AUTH_ROUTES.some((route) => pathname.startsWith(route))
         ) {
           window.location.href = "/";
           return;

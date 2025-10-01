@@ -137,123 +137,119 @@ export function RecentApplications() {
       </CardHeader>
       <CardContent className="pl-4 pr-0 pb-0">
         <div className="">
-          <ScrollArea className="max-h-[400px]">
-            <div className="pr-4">
-              <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Program</TableHead>
-                      <TableHead>University</TableHead>
-                      <TableHead>Academic Year/Semester</TableHead>
-                      <TableHead>Created At</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="w-[70px]">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {applications.map((application) => (
-                      <TableRow key={application.id}>
-                        <TableCell className="font-medium">
-                          {application.zoho_students ? (
-                            <div className="flex items-center gap-2">
-                              <Avatar className="border-foreground/10 border-[1px]">
-                                <AvatarImage
-                                  src={
-                                    application.zoho_students.photo_url ||
-                                    generateNameAvatar(
-                                      application.zoho_students.first_name +
-                                        " " +
-                                        application.zoho_students.last_name
-                                    )
-                                  }
-                                />
-                              </Avatar>
-                              <div className="flex flex-col">
-                                <span>
-                                  {application.zoho_students.first_name}{" "}
-                                  {application.zoho_students.last_name}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {application.zoho_students.email}
-                                </span>
-                              </div>
-                            </div>
-                          ) : (
-                            "Unknown Student"
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {application.zoho_programs?.name || "Unknown Program"}
-                        </TableCell>
-                        <TableCell>
+          <div className="pr-4">
+            <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Student</TableHead>
+                    <TableHead>Program</TableHead>
+                    <TableHead>University</TableHead>
+                    <TableHead>Academic Year/Semester</TableHead>
+                    <TableHead>Created At</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-[70px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {applications.map((application) => (
+                    <TableRow key={application.id}>
+                      <TableCell className="font-medium">
+                        {application.zoho_students ? (
                           <div className="flex items-center gap-2">
-                            {application.zoho_universities?.logo && (
-                              <div className="w-6 h-6 relative overflow-hidden rounded-full">
-                                <Image
-                                  src={application.zoho_universities.logo}
-                                  alt={
-                                    application.zoho_universities.name ||
-                                    "University"
-                                  }
-                                  width={24}
-                                  height={24}
-                                  className="object-cover"
-                                />
-                              </div>
-                            )}
-                            {application.zoho_universities?.name ||
-                              "Unknown University"}
+                            <Avatar className="border-foreground/10 border-[1px]">
+                              <AvatarImage
+                                src={
+                                  application.zoho_students.photo_url ||
+                                  generateNameAvatar(
+                                    application.zoho_students.first_name +
+                                      " " +
+                                      application.zoho_students.last_name
+                                  )
+                                }
+                              />
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <span>
+                                {application.zoho_students.first_name}{" "}
+                                {application.zoho_students.last_name}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {application.zoho_students.email}
+                              </span>
+                            </div>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          {application.zoho_academic_years?.name || "-"} /{" "}
-                          {application.zoho_semesters?.name || "-"}
-                        </TableCell>
-                        <TableCell>
-                          {application.created_at
-                            ? format(
-                                new Date(application.created_at),
-                                "MMM d, yyyy"
-                              )
-                            : "-"}
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-[12px]">
-                            <StatusBadge status={application.stage || ""} />
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center justify-center">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info
-                                  className="!h-6 !w-6 hover:cursor-pointer hover:text-primary"
-                                  onClick={() =>
-                                    router.push(
-                                      `/applications/${application.id}`
-                                    )
-                                  }
-                                />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>View Details</p>
-                              </TooltipContent>
-                            </Tooltip>
-                            {/* <ZohoApplicationsTableRowActions
+                        ) : (
+                          "Unknown Student"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {application.zoho_programs?.name || "Unknown Program"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {application.zoho_universities?.logo && (
+                            <div className="w-6 h-6 relative overflow-hidden rounded-full">
+                              <Image
+                                src={application.zoho_universities.logo}
+                                alt={
+                                  application.zoho_universities.name ||
+                                  "University"
+                                }
+                                width={24}
+                                height={24}
+                                className="object-cover"
+                              />
+                            </div>
+                          )}
+                          {application.zoho_universities?.name ||
+                            "Unknown University"}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {application.zoho_academic_years?.name || "-"} /{" "}
+                        {application.zoho_semesters?.name || "-"}
+                      </TableCell>
+                      <TableCell>
+                        {application.created_at
+                          ? format(
+                              new Date(application.created_at),
+                              "MMM d, yyyy"
+                            )
+                          : "-"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-[12px]">
+                          <StatusBadge status={application.stage || ""} />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-center">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info
+                                className="!h-6 !w-6 hover:cursor-pointer hover:text-primary"
+                                onClick={() =>
+                                  router.push(`/applications/${application.id}`)
+                                }
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>View Details</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          {/* <ZohoApplicationsTableRowActions
             row={row}
             fetchApplications={fetchApplications}
           /> */}
-                          </div>{" "}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                        </div>{" "}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-          </ScrollArea>
+          </div>
         </div>
       </CardContent>
     </Card>
