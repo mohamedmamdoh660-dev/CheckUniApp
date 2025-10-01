@@ -140,7 +140,7 @@ export function ZohoProgramsDataTableToolbar<TData>({
           <LayoutGrid className="h-4 w-4" />
         </ToggleGroupItem>
       </ToggleGroup>
-      <div className="px-2">
+      <div className="pl-2">
         <Button
           variant="outline"
           size="sm"
