@@ -24,6 +24,7 @@ import {
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import DataTableSkeleton from "./data-table-skeleton";
+import { useEffect } from "react";
 // Add a new interface for toolbar props
 interface DataTableToolbarProps {
   onRefresh: () => void;
@@ -39,6 +40,7 @@ interface DataTableProps<TData, TValue> {
   onGlobalFilterChange: (filter: string) => void;
   onPageChange: (pageIndex: number) => void;
   onPageSizeChange: (size: number) => void;
+  onSortingChange?: (sortBy?: string, sortOrder?: "asc" | "desc") => void;
   pageSize: number;
   pageCount?: number;
   currentPage: number;
@@ -59,6 +61,7 @@ export function DataTable<TData, TValue>({
   onGlobalFilterChange,
   onPageChange,
   onPageSizeChange,
+  onSortingChange,
   pageSize,
   pageCount,
   currentPage,
@@ -79,6 +82,12 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  useEffect(() => {
+    if (sorting[0]?.id) {
+      onSortingChange?.(sorting[0]?.id, sorting[0]?.desc ? "desc" : "asc");
+    }
+  }, [sorting]);
 
   const table = useReactTable({
     data,

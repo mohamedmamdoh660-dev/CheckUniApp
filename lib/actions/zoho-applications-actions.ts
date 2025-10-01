@@ -102,8 +102,7 @@ export async function deleteApplicationViaWebhook(applicationId: string) {
  * Looks up attachment id from public.zoho_attachments by module_id = applicationId
  */
 export async function downloadApplicationAttachment(applicationId: string, type:string) {
-  console.log("🚀 ~ downloadApplicationAttachment ~ type:", type)
-  console.log("🚀 ~ downloadApplicationAttachment ~ applicationId:", applicationId)
+
   try {
     const webhookUrl = "https://n8n.browserautomations.com/webhook/13eca8cf-8742-4351-9ae6-eaace4fa10ce";
     // Query Supabase for an attachment linked to this application
@@ -118,9 +117,7 @@ export async function downloadApplicationAttachment(applicationId: string, type:
       throw new Error(`Attachment lookup failed: ${res.status}`);
     }
     const rows: { id: string, name: string }[] = await res.json();
-    console.log("🚀 ~ downloadApplicationAttachment ~ rows:", rows)
     const attachmentId = rows?.find((row) => row.name === type)?.id;
-    console.log("🚀 ~ downloadApplicationAttachment ~ attachmentId:", attachmentId)
 
     const payload = {
       id: attachmentId || applicationId, // fallback to record id if none stored yet
@@ -132,12 +129,10 @@ export async function downloadApplicationAttachment(applicationId: string, type:
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    console.log("🚀 ~ downloadApplicationAttachment ~ webhookRes:", webhookRes)
     if (!webhookRes.ok) {
       throw new Error(`n8n download webhook failed: ${webhookRes.status}`);
     }
     const webhookData = await webhookRes.json();
-    console.log("🚀 ~ downloadApplicationAttachment ~ webhookData:", webhookData)
     return webhookData;
   } catch (error) {
     console.error('Error in downloadApplicationAttachment:', error);

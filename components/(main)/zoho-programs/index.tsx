@@ -15,6 +15,7 @@ import { LayoutGrid } from "lucide-react";
 import InfoGraphic from "@/components/ui/info-graphic";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Loader from "@/components/loader";
+import { getProgramsPagination } from "@/supabase/actions/db-actions";
 
 export default function ZohoProgramsManagementPage({ type }: { type: string }) {
   const [listPrograms, setListPrograms] = useState<ZohoProgram[]>([]);
@@ -29,19 +30,23 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const router = useRouter();
   const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
   async function fetchPrograms() {
     setIsRefetching(true);
     try {
-      const programsResponse: any =
-        await zohoProgramsService.getProgramsPagination(
-          `%${debouncedSearchTerm}%`,
-          pageSize,
-          currentPage,
-          userProfile?.id || "",
-          userProfile?.roles?.name || "",
-          userProfile?.agency_id || "",
-          filters
-        );
+      const programsResponse: any = await getProgramsPagination(
+        `%${debouncedSearchTerm}%`,
+        pageSize,
+        currentPage,
+        userProfile?.id || "",
+        userProfile?.roles?.name || "",
+        userProfile?.agency_id || "",
+        filters,
+        sorting
+      );
 
       setListPrograms(programsResponse.programs);
       setRecordCount(programsResponse.totalCount);
@@ -54,7 +59,7 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
 
   useEffect(() => {
     fetchPrograms();
-  }, [currentPage, pageSize, debouncedSearchTerm, filters]);
+  }, [currentPage, pageSize, debouncedSearchTerm, filters, sorting]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
@@ -72,6 +77,11 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
+    setCurrentPage(0);
+  };
+
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
     setCurrentPage(0);
   };
 
@@ -102,6 +112,7 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
             onGlobalFilterChange={handleGlobalFilterChange}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
+            onSortingChange={handleSortingChange}
             pageSize={pageSize}
             currentPage={currentPage}
             loading={isRefetching}

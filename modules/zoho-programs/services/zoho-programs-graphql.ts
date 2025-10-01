@@ -18,12 +18,12 @@ export const GET_PROGRAMS = `
 `;
 
 export const GET_PROGRAMS_PAGINATION = `
-  query GetProgramsPagination($search: String!, $limit: Int!, $offset: Int!, $filter: zoho_programsFilter) {
+  query GetProgramsPagination($search: String!, $limit: Int!, $offset: Int!, $filter: zoho_programsFilter,$orderBy: [zoho_programsOrderBy!]) {
     zoho_programsCollection(
       filter: $filter
       first: $limit
       offset: $offset
-    orderBy: [{ created_at: DescNullsLast }]
+    orderBy: $orderBy
     ) {
       edges {
         node {

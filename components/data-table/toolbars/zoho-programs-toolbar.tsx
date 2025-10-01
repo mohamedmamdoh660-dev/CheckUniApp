@@ -32,6 +32,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import ProgramsExportDialog, {
+  ExportFormat,
+} from "@/components/(main)/zoho-programs/component/programs-export-dialog";
+import ProgramsFilters from "@/components/(main)/zoho-programs/component/programs-filters";
+import { exportProgramsToPDF } from "@/components/(main)/zoho-programs/component/programs-pdf";
+import { getProgramsAll } from "@/supabase/actions/db-actions";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+// PDF libs will be loaded dynamically when exporting to reduce bundle size
 
 interface DataTableToolbarProps<TData> {
   table?: Table<TData>;
@@ -64,22 +72,7 @@ export function ZohoProgramsDataTableToolbar<TData>({
   globalFilter,
   setGlobalFilter,
 }: DataTableToolbarProps<TData>) {
-  const [openFilters, setOpenFilters] = useState(false);
-
-  // Advanced filter local state reflecting columns
-  const [university, setUniversity] = useState(filters.university || "");
-  const [faculty, setFaculty] = useState(filters.faculty || "");
-  const [speciality, setSpeciality] = useState(filters.speciality || "");
-  const [degree, setDegree] = useState(filters.degree || "");
-  const [country, setCountry] = useState(filters.country || "");
-  const [city, setCity] = useState(filters.city || "");
-  const [language, setLanguage] = useState(filters.language || "");
-  const [tuitionMin, setTuitionMin] = useState(filters.tuition_min || "");
-  const [tuitionMax, setTuitionMax] = useState(filters.tuition_max || "");
-  const [active, setActive] = useState(filters.active || ""); // "true" | "false" | ""
-  const [appsOpen, setAppsOpen] = useState(filters.active_applications || ""); // "open" | "closed" | ""
-  const [createdFrom, setCreatedFrom] = useState(filters.created_from || "");
-  const [createdTo, setCreatedTo] = useState(filters.created_to || "");
+  const [openExport, setOpenExport] = useState(false);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -103,166 +96,27 @@ export function ZohoProgramsDataTableToolbar<TData>({
           />
         </div>
 
-        <div className="px-2 flex items-center gap-2">
-          <Popover open={openFilters} onOpenChange={setOpenFilters}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8">
-                <ListFilterPlus className="mr-2 !h-5 !w-5" /> Advanced Filters
-                {activeCount > 0 && (
-                  <Badge
-                    className="ml-2 h-5 px-1 text-[10px]"
-                    variant="secondary"
-                  >
-                    {activeCount}
-                  </Badge>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[780px] p-4" align="start">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <SearchableDropdown
-                  placeholder="University"
-                  table="zoho-universities"
-                  searchField="name"
-                  displayField="name"
-                  initialValue={university}
-                  onSelect={(it: any) => setUniversity(it?.id || "")}
-                />
-                <SearchableDropdown
-                  placeholder="Faculty"
-                  table="zoho-faculties"
-                  searchField="name"
-                  displayField="name"
-                  initialValue={faculty}
-                  onSelect={(it: any) => setFaculty(it?.id || "")}
-                />
-                <SearchableDropdown
-                  placeholder="Speciality"
-                  table="zoho-specialities"
-                  searchField="name"
-                  displayField="name"
-                  initialValue={speciality}
-                  onSelect={(it: any) => setSpeciality(it?.id || "")}
-                />
-                <SearchableDropdown
-                  placeholder="Degree"
-                  table="zoho-degrees"
-                  searchField="name"
-                  displayField="name"
-                  initialValue={degree}
-                  onSelect={(it: any) => setDegree(it?.id || "")}
-                />
-
-                <SearchableDropdown
-                  placeholder="Language"
-                  table="zoho-languages"
-                  searchField="name"
-                  displayField="name"
-                  initialValue={language}
-                  onSelect={(it: any) => setLanguage(it?.id || "")}
-                />
-                <Select
-                  value={active}
-                  onValueChange={(it: any) =>
-                    it === "null" ? setActive("") : setActive(it)
-                  }
-                >
-                  <SelectTrigger className="h-9">
-                    <SelectValue placeholder="Status (any)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="null">Status (any)</SelectItem>
-                    <SelectItem value="true">Active</SelectItem>
-                    <SelectItem value="false">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select
-                  value={appsOpen}
-                  onValueChange={(it: any) =>
-                    it === "null" ? setAppsOpen("") : setAppsOpen(it)
-                  }
-                >
-                  <SelectTrigger className="h-9">
-                    <SelectValue placeholder="Applications (any)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="null">Applications (any)</SelectItem>
-                    <SelectItem value="open">Open</SelectItem>
-                    <SelectItem value="closed">Closed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setUniversity("");
-                    setFaculty("");
-                    setSpeciality("");
-                    setDegree("");
-                    setCountry("");
-                    setCity("");
-                    setLanguage("");
-                    setTuitionMin("");
-                    setTuitionMax("");
-                    setActive("");
-                    setAppsOpen("");
-                    setCreatedFrom("");
-                    setCreatedTo("");
-                    onFiltersChange?.({});
-                    setOpenFilters(false);
-                  }}
-                >
-                  Clear
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    const next: Record<string, string> = {
-                      university,
-                      faculty,
-                      speciality,
-                      degree,
-                      country,
-                      city,
-                      language,
-                      active,
-                      active_applications: appsOpen,
-                      created_from: createdFrom,
-                      created_to: createdTo,
-                    };
-                    if (tuitionMin) next.tuition_min = tuitionMin;
-                    if (tuitionMax) next.tuition_max = tuitionMax;
-                    Object.keys(next).forEach((k) => {
-                      if (!next[k]) delete next[k];
-                    });
-                    onFiltersChange?.(next);
-                    setOpenFilters(false);
-                  }}
-                >
-                  Apply Filters
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-          {(activeCount > 0 || isFiltered) && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setGlobalFilter?.("");
-                onGlobalFilterChange?.("");
-
-                onFiltersChange?.({});
-              }}
-              className="h-8 px-2"
-            >
-              Clear Search
-              <X className="ml-2 h-4 w-4" />
-            </Button>
-          )}
-        </div>
+        <ProgramsFilters
+          filters={filters}
+          onFiltersChange={(f) => {
+            onFiltersChange?.(f);
+          }}
+        />
+        {(activeCount > 0 || isFiltered) && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setGlobalFilter?.("");
+              onGlobalFilterChange?.("");
+              onFiltersChange?.({});
+            }}
+            className="h-8 px-2"
+          >
+            Clear Search
+            <X className="ml-2 h-4 w-4" />
+          </Button>
+        )}
       </div>
       <ToggleGroup
         type="single"
@@ -286,19 +140,17 @@ export function ZohoProgramsDataTableToolbar<TData>({
           <LayoutGrid className="h-4 w-4" />
         </ToggleGroupItem>
       </ToggleGroup>
-      {tableName && (
-        <div className="px-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="ml-auto hidden h-8 lg:flex"
-            onClick={onExport}
-          >
-            <Download className="p-1" />
-            Export
-          </Button>
-        </div>
-      )}
+      <div className="px-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto hidden h-8 lg:flex"
+          onClick={() => setOpenExport(true)}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Export
+        </Button>
+      </div>
       <div className="px-2">
         <Button
           variant="outline"
@@ -311,6 +163,14 @@ export function ZohoProgramsDataTableToolbar<TData>({
       </div>
 
       {table && <DataTableViewOptions table={table} />}
+      <ProgramsExportDialog
+        open={openExport}
+        onOpenChange={setOpenExport}
+        globalFilter={globalFilter}
+        filters={filters}
+        table={table}
+        setOpenExport={setOpenExport}
+      />
       {/* {userProfile?.roles?.name === "admin" && (
         <div className="pl-2">
           <Button

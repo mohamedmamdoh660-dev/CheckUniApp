@@ -20,7 +20,7 @@ export function getZohoStudentsColumns(
 ): ColumnDef<ZohoStudent>[] {
   const columns: ColumnDef<ZohoStudent, unknown>[] = [
     {
-      accessorKey: "name",
+      accessorKey: "first_name",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Student Name" />
       ),
@@ -91,7 +91,7 @@ export function getZohoStudentsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -113,7 +113,7 @@ export function getZohoStudentsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -152,7 +152,7 @@ export function getZohoStudentsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
     {
@@ -185,7 +185,7 @@ export function getZohoStudentsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
     {

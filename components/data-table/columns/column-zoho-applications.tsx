@@ -88,7 +88,7 @@ export function getZohoApplicationsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -121,7 +121,7 @@ export function getZohoApplicationsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -138,7 +138,7 @@ export function getZohoApplicationsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -157,7 +157,7 @@ export function getZohoApplicationsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -174,7 +174,7 @@ export function getZohoApplicationsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -225,7 +225,7 @@ export function getZohoApplicationsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
     {
@@ -285,7 +285,7 @@ export function getZohoApplicationsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -329,7 +329,7 @@ export function getZohoApplicationsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 

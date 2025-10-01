@@ -37,6 +37,10 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
   const { userProfile } = useAuth();
   const router = useRouter();
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   async function fetchStudents() {
     setIsRefetching(true);
@@ -47,7 +51,8 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
         currentPage,
         userProfile?.id || "",
         userProfile?.roles?.name || "",
-        userProfile?.agency_id || ""
+        userProfile?.agency_id || "",
+        sorting
       );
 
       setListStudents(studentsResponse.students);
@@ -61,7 +66,7 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
 
   useEffect(() => {
     fetchStudents();
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   // Realtime list updates for students table
   useEffect(() => {
@@ -99,6 +104,11 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       {viewMode === "table" ? (
@@ -116,6 +126,7 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
           onGlobalFilterChange={handleGlobalFilterChange}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
+          onSortingChange={handleSortingChange}
           pageSize={pageSize}
           currentPage={currentPage}
           loading={isRefetching}

@@ -209,7 +209,8 @@ export default function Login() {
           <p className="text-center text-sm text-gray-600 dark:text-gray-400">
             Don't have an account?{" "}
             <Link
-              href="/auth/signup"
+              href="https://studyinturkiye.com/became-an-agent/"
+              target="_blank"
               className="text-primary hover:underline cursor-pointer"
             >
               Sign up

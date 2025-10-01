@@ -10,7 +10,6 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { getApplicationsPagination } from "@/supabase/actions/db-actions";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 import { LayoutGrid } from "lucide-react";
 import InfoGraphic from "@/components/ui/info-graphic";
@@ -37,6 +36,10 @@ export default function ZohoApplicationsManagementPage({
   const { userProfile } = useAuth();
   const router = useRouter();
   const [filters, setFilters] = useState<Record<string, string>>({});
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   const [applicationDownloading, setApplicationDownloading] = useState({
     id: "",
@@ -53,7 +56,8 @@ export default function ZohoApplicationsManagementPage({
         userProfile?.id || "",
         userProfile?.roles?.name || "",
         userProfile?.agency_id || "",
-        filters
+        filters,
+        sorting
       );
 
       setListApplications(applicationsResponse.applications);
@@ -71,6 +75,7 @@ export default function ZohoApplicationsManagementPage({
     userProfile?.roles?.name,
     userProfile?.agency_id,
     filters,
+    sorting,
   ]);
 
   useEffect(() => {
@@ -113,6 +118,11 @@ export default function ZohoApplicationsManagementPage({
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       {viewMode === "table" ? (
@@ -140,6 +150,7 @@ export default function ZohoApplicationsManagementPage({
           onGlobalFilterChange={handleGlobalFilterChange}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
+          onSortingChange={handleSortingChange}
           pageSize={pageSize}
           currentPage={currentPage}
           loading={isRefetching}

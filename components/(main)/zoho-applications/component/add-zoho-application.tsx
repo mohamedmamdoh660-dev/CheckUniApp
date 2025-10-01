@@ -174,7 +174,9 @@ export default function AddZohoApplication({
       });
 
       if (found.length > 0) {
-        toast.error("Application already exists related to selected student");
+        toast.error(
+          "It looks like you've already submitted an application with the same details. If you need any help or have questions, please contact our support team."
+        );
         return;
       }
 

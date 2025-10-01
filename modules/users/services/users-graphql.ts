@@ -164,6 +164,7 @@ query GetUsersById($id: UUID!) {
        crm_id
        agency: user_profile {
            crm_id
+           
          
        }
        agency_id

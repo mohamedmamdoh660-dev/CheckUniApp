@@ -119,18 +119,7 @@ export function ZohoApplicationsDataTableToolbar<TData>({
                 initialValue={student}
                 onSelect={(it: any) => setStudent(it?.id || "")}
               />
-              <SearchableDropdown
-                placeholder="Country"
-                table="zoho-countries"
-                searchField="name"
-                displayField="name"
-                initialValue={country}
-                onSelect={(it: any) => {
-                  setCountry(it?.id || "");
-                  setUniversity("");
-                  setProgram("");
-                }}
-              />
+
               <SearchableDropdown
                 placeholder="University"
                 table="zoho-universities"
@@ -172,6 +161,14 @@ export function ZohoApplicationsDataTableToolbar<TData>({
               <SearchableDropdown
                 placeholder="Academic Year"
                 table="zoho-academic-years"
+                searchField="name"
+                displayField="name"
+                initialValue={acdamic_year}
+                onSelect={(it: any) => setAcademicYear(it?.id || "")}
+              />
+              <SearchableDropdown
+                placeholder="Country"
+                table="zoho-countries"
                 searchField="name"
                 displayField="name"
                 initialValue={acdamic_year}

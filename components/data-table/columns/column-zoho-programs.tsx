@@ -13,6 +13,8 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export function getZohoProgramsColumns(
   fetchPrograms: () => void,
@@ -48,27 +50,23 @@ export function getZohoProgramsColumns(
         const university = row.original.zoho_universities;
 
         return (
-          <div className="flex items-center gap-2">
-            {/* {university?.logo && (
-              <div className="w-8 h-8 relative overflow-hidden rounded-full">
-                <Image
-                  src={generateNameAvatar(university?.name || "")}
-                  alt={university?.name || "University"}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )} */}
-            <div
-              className="max-w-[400px]  leading-tight line-clamp-2 text-wrap w-[270px]"
-              title={university?.name || "-"}
-            >
-              {university?.name}
+          <div className="flex items-center w-full">
+            <Avatar className="border-foreground/10 border-[1px]">
+              <AvatarImage
+                src={
+                  university?.logo?.includes("http")
+                    ? university.logo
+                    : generateNameAvatar(university?.name || "")
+                }
+              />
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight ml-3">
+              <span className=" font-semibold">{university?.name}</span>
             </div>
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -87,7 +85,7 @@ export function getZohoProgramsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -106,7 +104,7 @@ export function getZohoProgramsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -120,7 +118,7 @@ export function getZohoProgramsColumns(
           <div className="text-left">{row.original.zoho_degrees?.name}</div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -149,7 +147,7 @@ export function getZohoProgramsColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
@@ -163,12 +161,12 @@ export function getZohoProgramsColumns(
           <div className="text-left">{row.original.zoho_languages?.name}</div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
     {
-      accessorKey: "tuition",
+      accessorKey: "official_tuition",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Tuition" />
       ),

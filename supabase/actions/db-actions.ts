@@ -45,7 +45,11 @@ export const getApplicationsPagination = async (
     university?: string | null;
     degree?: string | null;
     stage?: string | null;
-  } = {}
+  } = {},
+  sorting?: {
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }
 ) => {
  
     try {
@@ -189,10 +193,13 @@ export const getApplicationsPagination = async (
         }
       }
 
-      // Apply pagination and ordering
+      // Apply sorting and pagination
+      const sortBy = sorting?.sortBy || "created_at";
+      const sortOrder = sorting?.sortOrder || "desc";
+      
       const { data, error, count } = await query
-        .order("created_at", { ascending: false })
-        .range(offset, offset + limit - 1);
+        .order(sortBy, { ascending: sortOrder === "asc" })
+        .range(offset * limit,limit * (offset + 1) - 1);
   
       if (error) throw error;
   
@@ -218,7 +225,11 @@ export const getStudentsPagination = async (    search: string,
   // filter: any = {}, // equivalent to zoho_studentsFilter
   user_id: string,
   userRole: string,
-  agency_id: string) => {
+  agency_id: string,
+  sorting?: {
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }) => {
  
     
       try {
@@ -278,26 +289,6 @@ export const getStudentsPagination = async (    search: string,
           `.replace(/\s+/g, ''));
         }
     
-        // Apply additional filters (equivalent to GraphQL filter parameter)
-        // if (filter) {
-        //   // Example filter applications:
-        //   if (filter.gender) {
-        //     query = query.eq('gender', filter.gender);
-        //   }
-        //   if (filter.nationality) {
-        //     query = query.eq('nationality', filter.nationality);
-        //   }
-        //   if (filter.country_of_residence) {
-        //     query = query.eq('country_of_residence', filter.country_of_residence);
-        //   }
-        //   if (filter.created_at_gte) {
-        //     query = query.gte('created_at', filter.created_at_gte);
-        //   }
-        //   if (filter.created_at_lte) {
-        //     query = query.lte('created_at', filter.created_at_lte);
-        //   }
-        //   // Add more filter conditions as needed
-        // }
     
         // Role-based filtering (if needed)
         if (userRole === "agent") {
@@ -307,9 +298,11 @@ export const getStudentsPagination = async (    search: string,
         }
     
         // Apply ordering and pagination
+        const sortBy = sorting?.sortBy || "created_at";
+        const sortOrder = sorting?.sortOrder || "desc";
         const { data, error, count } = await query
-          .order("created_at", { ascending: false }) // DescNullsLast equivalent
-          .range(offset, offset + limit - 1);
+          .order(sortBy, { ascending: sortOrder === "asc" })
+          .range(offset * limit,limit * (offset + 1) - 1);
     
         if (error) throw error;
     
@@ -330,4 +323,147 @@ export const getStudentsPagination = async (    search: string,
       }
     
 
+  }
+
+  export const getProgramsPagination = async (
+    search: string,
+    limit: number,
+    offset: number,
+    user_id: string,
+    userRole: string,
+    agency_id: string,
+    filters: Record<string, string> = {},
+    sorting: { sortBy?: string, sortOrder?: "asc" | "desc" } = {}
+  ) => {
+ 
+    
+    // Build the query
+    let query = supabaseClient
+      .from('zoho_programs')
+      .select(`
+        *,
+        zoho_countries (
+          id,
+          name,
+          country_code
+        ),
+        zoho_degrees (
+          id,
+          name
+        ),
+        zoho_faculty (
+          id,
+          name
+        ),
+        zoho_languages (
+          id,
+          name
+        ),
+        zoho_speciality (
+          id,
+          name
+        ),
+        zoho_cities (
+          id,
+          name
+        ),
+        zoho_universities (
+          id,
+          name,
+          sector,
+          logo
+        )
+      `, { count: 'exact' });
+ 
+    // Apply search filter if provided
+    if (search && search.trim() !== "") {
+      query = query.ilike('name', `%${search.trim()}%`);
+    }
+
+    // Apply advanced filters
+    if (filters.university) query = query.eq('university_id', filters.university);
+    if (filters.faculty) query = query.eq('faculty_id', filters.faculty);
+    if (filters.speciality) query = query.eq('speciality_id', filters.speciality);
+    if (filters.degree) query = query.eq('degree_id', filters.degree);
+    if (filters.country) query = query.eq('country_id', filters.country);
+    if (filters.city) query = query.eq('city_id', filters.city);
+    if (filters.language) query = query.eq('language_id', filters.language);
+
+    // Handle active filter
+    if (filters.active === 'true' || filters.active === 'false') {
+      query = query.eq('active', filters.active === 'true');
+    } else {
+      query = query.eq('active', true);
+    }
+    
+    // Handle applications filter
+    if (filters.active_applications === 'open' || filters.active_applications === 'closed') {
+      query = query.eq('active_applications', filters.active_applications === 'open');
+    }
+    
+    // Apply ordering and pagination
+    const { data, error, count } = await query.order(
+   sorting?.sortBy || "created_at",
+      { ascending: sorting?.sortOrder === "asc" }
+    )
+    .range(offset * limit,limit * (offset + 1) - 1)
+    
+    if (error) throw error;
+    
+    return {
+      programs: data,
+      totalCount: count || 0
+    };
+  }
+
+  export const getProgramsAll = async (
+    search: string,
+    user_id: string,
+    userRole: string,
+    agency_id: string,
+    filters: Record<string, string> = {},
+    sorting: { sortBy?: string; sortOrder?: "asc" | "desc" } = {}
+  ) => {
+    let query = supabaseClient
+      .from('zoho_programs')
+      .select(`
+        *,
+        zoho_countries ( id, name, country_code ),
+        zoho_degrees ( id, name ),
+        zoho_faculty ( id, name ),
+        zoho_languages ( id, name ),
+        zoho_speciality ( id, name ),
+        zoho_cities ( id, name ),
+        zoho_universities ( id, name, sector, logo )
+      `, { count: 'exact' });
+
+    if (search && search.trim() !== "") {
+      query = query.ilike('name', `%${search.trim()}%`);
+    }
+
+    if (filters.university) query = query.eq('university_id', filters.university);
+    if (filters.faculty) query = query.eq('faculty_id', filters.faculty);
+    if (filters.speciality) query = query.eq('speciality_id', filters.speciality);
+    if (filters.degree) query = query.eq('degree_id', filters.degree);
+    if (filters.country) query = query.eq('country_id', filters.country);
+    if (filters.city) query = query.eq('city_id', filters.city);
+    if (filters.language) query = query.eq('language_id', filters.language);
+
+    if (filters.active === 'true' || filters.active === 'false') {
+      query = query.eq('active', filters.active === 'true');
+    } else {
+      query = query.eq('active', true);
+    }
+
+    if (filters.active_applications === 'open' || filters.active_applications === 'closed') {
+      query = query.eq('active_applications', filters.active_applications === 'open');
+    }
+
+    const { data, error,count } = await query.order(
+      sorting?.sortBy || 'created_at',
+      { ascending: sorting?.sortOrder === 'asc' }
+    )  .range(0, 9999); // fetch up to 10,000 rows
+    ;
+    if (error) throw error;
+    return data || [];
   }

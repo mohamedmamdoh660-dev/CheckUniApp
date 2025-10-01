@@ -4,9 +4,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const recordId = searchParams.get("record_id");
-    console.log("🚀 ~ GET ~ recordId:", recordId)
     const type = searchParams.get("type");
-    console.log("🚀 ~ GET ~ type:", type)
 
     if (!recordId || !type) {
       return new Response(JSON.stringify({ error: "Missing record_id or type" }), {
@@ -40,7 +38,6 @@ export async function GET(req: NextRequest) {
     }
 
     const rows: { id: string; name: string }[] = await res.json();
-    console.log("🚀 ~ GET ~ rows:", rows)
     const found = rows.find((r) => r.name.toLowerCase().includes(type.toLowerCase())) ;
 
     if(!found) {
@@ -49,9 +46,7 @@ export async function GET(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
       });
     }
-    console.log("🚀 ~ GET ~ found:", found)
-    const attachmentId = found?.id || recordId;
-    console.log("🚀 ~ GET ~ attachmentId:", attachmentId)
+      const attachmentId = found?.id || recordId;
 
     // Call n8n webhook to fetch the actual file content
     const webhookUrl =

@@ -54,7 +54,8 @@ export const zohoProgramsService = {
     user_id: string,
     userRole: string,
     agency_id: string,
-    filters: Record<string, string> = {}
+    filters: Record<string, string> = {},
+    sorting: { sortBy?: string, sortOrder?: "asc" | "desc" } = {}
   ) => {
     let filterConditions: any = [
       { name: { ilike: search } },
@@ -89,41 +90,14 @@ export const zohoProgramsService = {
       search, 
       limit, 
       offset: limit * offset, 
-      filter: { and: filterConditions } 
+      filter: { and: filterConditions },
+      orderBy:[{ ...(sorting?.sortBy ? { [sorting?.sortBy]: sorting.sortOrder === "asc" ? 'AscNullsLast' : 'DescNullsLast' } : { created_at:  'AscNullsLast'}) }]
     });
     
-    // Build the count query
-    let countQuery = supabaseClient
-      .from('zoho_programs')
-      .select('id,name', { count: 'exact' })
-      .ilike('name', `${search}`);
-
-    // Apply same advanced filters to count query
-    if (filters.university) countQuery = countQuery.eq('university_id', filters.university);
-    if (filters.faculty) countQuery = countQuery.eq('faculty_id', filters.faculty);
-    if (filters.speciality) countQuery = countQuery.eq('speciality_id', filters.speciality);
-    if (filters.degree) countQuery = countQuery.eq('degree_id', filters.degree);
-    if (filters.country) countQuery = countQuery.eq('country_id', filters.country);
-    if (filters.city) countQuery = countQuery.eq('city_id', filters.city);
-    if (filters.language) countQuery = countQuery.eq('language_id', filters.language);
-
-    if (filters.active === 'true' || filters.active === 'false') countQuery = countQuery.eq('active', filters.active === 'true');
-    else countQuery = countQuery.eq('active', true);
-    if (filters.active_applications === 'open' || filters.active_applications === 'closed') countQuery = countQuery.eq('active_applications', filters.active_applications === 'open');
-
-    
-    // Apply role-based filtering to count query
-    // if (userRole === 'agency') {
-    //   countQuery = countQuery.eq('agency_id', agency_id);
-    // } else if (userRole !== 'admin') {
-    //   countQuery = countQuery.eq('user_id', user_id);
-    // }
-    
-    const countResponse = await countQuery;
     
     return {
       programs: response.zoho_programsCollection.edges.map((edge: any) => edge.node),
-      totalCount: countResponse.count
+      totalCount: 0
     };
   },
 
