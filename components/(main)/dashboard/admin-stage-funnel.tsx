@@ -128,6 +128,7 @@ export function AdminStageFunnel() {
                     fill="#9f9fa9"
                     stroke="none"
                     dataKey="name"
+                    fontSize={12}
                     formatter={(val: string, entry: any) => {
                       return `${val} ${chartData.find((item) => item.name === val)?.value}`;
                     }}

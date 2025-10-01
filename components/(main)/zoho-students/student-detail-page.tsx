@@ -49,6 +49,7 @@ import {
 } from "@/components/ui/tooltip";
 import { StatusBadge } from "@/components/ui/status-badge";
 import AddZohoApplication from "@/components/(main)/zoho-applications/component/add-zoho-application";
+import { useAuth } from "@/context/AuthContext";
 
 export function StudentDetailPage() {
   const [student, setStudent] = useState<ZohoStudent | null>(null);
@@ -60,6 +61,7 @@ export function StudentDetailPage() {
     null
   );
   const [addOpen, setAddOpen] = useState(false);
+  const { userProfile } = useAuth();
 
   const getStudent = async () => {
     try {
@@ -256,28 +258,29 @@ export function StudentDetailPage() {
                   ) : null}
                 </div>
               </div>
-
-              <div className="flex gap-3">
-                <Button onClick={() => setAddOpen(true)}>
-                  Add Application
-                </Button>
-                <AddZohoApplication
-                  open={addOpen}
-                  onOpenChange={setAddOpen}
-                  onRefresh={async () => {
-                    try {
-                      const apps =
-                        await zohoApplicationsService.getApplicationsByStudent(
-                          studentId
-                        );
-                      setApplications(apps || []);
-                    } catch {}
-                  }}
-                  presetStudentId={studentId}
-                  presetStudentName={`${student?.first_name || ""} ${student?.last_name || ""}`}
-                  lockStudent
-                />
-              </div>
+              {userProfile?.crm_id && (
+                <div className="flex gap-3">
+                  <Button onClick={() => setAddOpen(true)}>
+                    Add Application
+                  </Button>
+                  <AddZohoApplication
+                    open={addOpen}
+                    onOpenChange={setAddOpen}
+                    onRefresh={async () => {
+                      try {
+                        const apps =
+                          await zohoApplicationsService.getApplicationsByStudent(
+                            studentId
+                          );
+                        setApplications(apps || []);
+                      } catch {}
+                    }}
+                    presetStudentId={studentId}
+                    presetStudentName={`${student?.first_name || ""} ${student?.last_name || ""}`}
+                    lockStudent
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
