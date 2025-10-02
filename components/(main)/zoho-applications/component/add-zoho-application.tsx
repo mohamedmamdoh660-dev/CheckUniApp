@@ -71,6 +71,7 @@ export default function AddZohoApplication({
 }: AddZohoApplicationProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { userProfile } = useAuth();
+  const LOCATION = "add-application-form";
   const [academicYears, setAcademicYears] = useState<ZohoAcademicYear[]>([]);
   const [semesters, setSemesters] = useState<ZohoSemester[]>([]);
   const [studentName, setStudentName] = useState("");
@@ -242,6 +243,7 @@ export default function AddZohoApplication({
                       displayField2="last_name"
                       initialValue={field.value?.toString() || ""}
                       disabled={lockStudent}
+                      location={LOCATION}
                       onSelect={(item) => {
                         if (lockStudent) return;
                         field.onChange(item.id);
@@ -343,6 +345,7 @@ export default function AddZohoApplication({
                         displayField="name"
                         initialValue={field.value}
                         bottom={false}
+                        location={LOCATION}
                         onSelect={(item: { id: string }) => {
                           field.onChange(item.id);
                           // Reset dependent fields
@@ -369,6 +372,7 @@ export default function AddZohoApplication({
                         label="University for Application"
                         initialValue={field.value}
                         bottom={false}
+                        location={LOCATION}
                         dependsOn={[
                           {
                             field: "country",
@@ -424,6 +428,7 @@ export default function AddZohoApplication({
                         displayField="name"
                         bottom={false}
                         initialValue={field.value}
+                        location={LOCATION}
                         onSelect={(item: { id: string }) => {
                           form.setValue("program", "");
                           field.onChange(item.id);
@@ -468,6 +473,7 @@ export default function AddZohoApplication({
                           !form.watch("degree")
                         }
                         initialValue={field.value?.toString() || ""}
+                        location={LOCATION}
                         onSelect={(item) => {
                           field.onChange(item.id);
                           // @ts-ignore - item has name

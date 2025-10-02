@@ -1405,6 +1405,7 @@ export default function StudentInformationForm({
                         searchField="name"
                         displayField="name"
                         bottom={false}
+                        location={"student-information-form"}
                         initialValue={field.value}
                         onSelect={(item: { id: string; name?: string }) => {
                           field.onChange(item.id);

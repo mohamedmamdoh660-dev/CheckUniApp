@@ -16,18 +16,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import React from "react";
+import { useClearLocationSelections } from "@/context/SearchableDropdownContext";
+import React, { useEffect } from "react";
 
 export interface ProgramsFiltersProps {
   filters: Record<string, string>;
   onFiltersChange: (filters: Record<string, string>) => void;
+  clearFilters: boolean;
+  setClearFilters: (clearFilters: boolean) => void;
 }
 
 export default function ProgramsFilters({
   filters,
   onFiltersChange,
+  clearFilters,
+  setClearFilters,
 }: ProgramsFiltersProps) {
   const [openFilters, setOpenFilters] = React.useState(false);
+  const LOCATION = "programs-filters";
+  const clearLocationSelections = useClearLocationSelections();
   const [university, setUniversity] = React.useState(filters.university || "");
   const [faculty, setFaculty] = React.useState(filters.faculty || "");
   const [speciality, setSpeciality] = React.useState(filters.speciality || "");
@@ -45,6 +52,25 @@ export default function ProgramsFilters({
   const [createdTo, setCreatedTo] = React.useState(filters.created_to || "");
 
   const activeCount = Object.keys(filters || {}).length;
+
+  useEffect(() => {
+    console.log("🚀 ~ ProgramsFilters ~ clearFilters:", clearFilters);
+    if (clearFilters) {
+      setUniversity("");
+      setFaculty("");
+      setSpeciality("");
+      setDegree("");
+      setCountry("");
+      setCity("");
+      setLanguage("");
+      setActive("");
+      setAppsOpen("");
+      setCreatedFrom("");
+      setCreatedTo("");
+      clearLocationSelections(LOCATION);
+      setClearFilters(false);
+    }
+  }, [clearFilters]);
 
   return (
     <div className="px-2 flex items-center gap-2">
@@ -67,6 +93,7 @@ export default function ProgramsFilters({
               searchField="name"
               displayField="name"
               initialValue={university}
+              location={LOCATION}
               onSelect={(it: any) => setUniversity(it?.id || "")}
             />
             <SearchableDropdown
@@ -75,6 +102,7 @@ export default function ProgramsFilters({
               searchField="name"
               displayField="name"
               initialValue={faculty}
+              location={LOCATION}
               onSelect={(it: any) => setFaculty(it?.id || "")}
             />
             <SearchableDropdown
@@ -83,6 +111,7 @@ export default function ProgramsFilters({
               searchField="name"
               displayField="name"
               initialValue={speciality}
+              location={LOCATION}
               onSelect={(it: any) => setSpeciality(it?.id || "")}
             />
             <SearchableDropdown
@@ -91,6 +120,7 @@ export default function ProgramsFilters({
               searchField="name"
               displayField="name"
               initialValue={degree}
+              location={LOCATION}
               onSelect={(it: any) => setDegree(it?.id || "")}
             />
             <SearchableDropdown
@@ -100,6 +130,7 @@ export default function ProgramsFilters({
               searchField="name"
               displayField="name"
               initialValue={country}
+              location={LOCATION}
               onSelect={(it: any) => setCountry(it?.id || "")}
             />
             <SearchableDropdown
@@ -108,6 +139,7 @@ export default function ProgramsFilters({
               searchField="name"
               displayField="name"
               initialValue={language}
+              location={LOCATION}
               onSelect={(it: any) => setLanguage(it?.id || "")}
             />
             <Select
@@ -157,6 +189,7 @@ export default function ProgramsFilters({
                 setAppsOpen("");
                 setCreatedFrom("");
                 setCreatedTo("");
+                clearLocationSelections(LOCATION);
                 onFiltersChange({});
                 setOpenFilters(false);
               }}

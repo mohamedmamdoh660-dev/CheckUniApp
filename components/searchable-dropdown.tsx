@@ -11,6 +11,7 @@ import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-progr
 import { useDebounce } from "@/hooks/use-debounce";
 import { User, zohoApplicationsService } from "@/modules";
 import { useAuth } from "@/context/AuthContext";
+import { useDropdownTable } from "@/context/SearchableDropdownContext";
 
 export interface DropdownItem {
   id: string;
@@ -37,6 +38,7 @@ export interface SearchableDropdownProps {
   renderItem?: (item: DropdownItem) => React.ReactNode;
   disabled?: boolean;
   bottom?: boolean;
+  location?: string; // New prop for location-based state management
 }
 
 // Function to fetch data from services based on table name
@@ -261,28 +263,56 @@ export function SearchableDropdown({
   renderItem,
   disabled = false,
   bottom = true,
+  location, // New location prop
 }: SearchableDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [items, setItems] = useState<DropdownItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(0);
-  const [selectedItem, setSelectedItem] = useState<DropdownItem | null>(null);
   const [initialLoaded, setInitialLoaded] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const { userProfile } = useAuth();
+
+  // Use context for state management
+  const {
+    items,
+    loading,
+    hasMore,
+    page,
+    searchTerm,
+    selectedItem,
+    setLoading,
+    setItems,
+    addItems,
+    setHasMore,
+    setPage,
+    setSearchTerm,
+    setSelectedItem,
+    resetState,
+    isDataStale,
+  } = useDropdownTable(table, location);
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const dependsKey = useMemo(
     () => JSON.stringify(dependsOn || []),
     [dependsOn]
   );
-  // Load initial data or search results
+  // Load initial data or search results with caching
   const loadData = useCallback(
     async (currentPage = 0, search = "") => {
+      // Check if we have cached data and it's not stale
+      const cacheKey = `${table}-${search}-${JSON.stringify(dependsOn || [])}`;
+
+      // Only fetch if data is stale or doesn't exist
+      if (
+        !isDataStale &&
+        currentPage === 0 &&
+        items.length > 0 &&
+        search === searchTerm
+      ) {
+        return;
+      }
+
       setLoading(true);
       try {
         const result = await fetchTableData({
@@ -300,7 +330,7 @@ export function SearchableDropdown({
           setItems(result.data);
           setPage(0);
         } else {
-          setItems((prev) => [...prev, ...result.data]);
+          addItems(result.data);
         }
 
         setHasMore(result.hasMore);
@@ -310,72 +340,97 @@ export function SearchableDropdown({
         setLoading(false);
       }
     },
-    [table, searchField, dependsKey, label, userProfile]
+    [
+      table,
+      searchField,
+      label,
+      userProfile,
+      isDataStale,
+      items.length,
+      searchTerm,
+      setLoading,
+      setItems,
+      addItems,
+      setHasMore,
+      setPage,
+      dependsOn,
+    ]
   );
 
   // Load more data when scrolling to bottom
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     if (!loading && hasMore) {
-      setPage(page + 1);
-      loadData(page + 1, searchTerm);
+      const nextPage = page + 1;
+      setPage(nextPage);
+      loadData(nextPage, searchTerm);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, hasMore, page, setPage, searchTerm]); // loadData intentionally excluded to prevent infinite loops
 
   useEffect(() => {
     loadData(0, debouncedSearchTerm);
     setHighlightedIndex(-1);
-  }, [debouncedSearchTerm, loadData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchTerm]); // loadData intentionally excluded to prevent infinite loops
 
   // Reset list and selection when dependency values change
   useEffect(() => {
     // When dependsOn value changes, clear selection and reload from first page
     if (dependsOn) {
       setSelectedItem(null);
-      setItems([]);
-      setPage(0);
-      setSearchTerm("");
+      resetState();
       setInitialLoaded(false);
       loadData(0, "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dependsKey]);
+  }, [dependsKey]); // Other dependencies intentionally excluded to prevent infinite loops
 
-  // Handle initial value
+  // Handle initial value changes (including clearing)
   useEffect(() => {
-    if (initialValue && initialLoaded === false) {
-      const found = items.find((item) => item.id === initialValue);
+    if (initialValue) {
+      // Set initial value
+      if (initialLoaded === false) {
+        const found = items.find((item) => item.id === initialValue);
 
-      if (found) {
-        setSelectedItem(found);
-        setInitialLoaded(true);
-      } else {
-        const fetchInitialItem = async () => {
-          try {
-            const result = await fetchTableData({
-              table,
-              searchTerm: "",
-              searchField: "id",
-              page: 0,
-              pageSize: 1,
-              dependsOn: dependsOn || [],
-              id: initialValue as string,
-              label: "",
-              userProfile,
-            });
-
-            if (result.data.length > 0) {
-              setSelectedItem(result.data[0]);
-            }
-          } catch (error) {
-            console.error("Error fetching initial item:", error);
-          }
+        if (found) {
+          setSelectedItem(found);
           setInitialLoaded(true);
-        };
+        } else {
+          const fetchInitialItem = async () => {
+            try {
+              const result = await fetchTableData({
+                table,
+                searchTerm: "",
+                searchField: "id",
+                page: 0,
+                pageSize: 1,
+                dependsOn: dependsOn || [],
+                id: initialValue as string,
+                label: "",
+                userProfile,
+              });
 
-        fetchInitialItem();
+              if (result.data.length > 0) {
+                setSelectedItem(result.data[0]);
+              }
+            } catch (error) {
+              console.error("Error fetching initial item:", error);
+            }
+            setInitialLoaded(true);
+          };
+
+          fetchInitialItem();
+        }
       }
+    } else {
+      // Clear selection when initialValue becomes empty
+      setSelectedItem(null);
+      setInitialLoaded(false);
+      // Also clear the search term to reset the dropdown completely
+      setSearchTerm("");
     }
-  }, [initialValue, items, loading, initialLoaded, table, userProfile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValue, items, initialLoaded, table, userProfile]); // Other dependencies intentionally excluded to prevent infinite loops
 
   // Handle scroll for pagination
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -414,13 +469,16 @@ export function SearchableDropdown({
     }
   };
 
-  const handleSelect = (item: DropdownItem) => {
-    setSelectedItem(item);
-    setIsOpen(false);
-    setSearchTerm("");
-    setHighlightedIndex(-1);
-    onSelect(item);
-  };
+  const handleSelect = useCallback(
+    (item: DropdownItem) => {
+      setSelectedItem(item);
+      setIsOpen(false);
+      setSearchTerm("");
+      setHighlightedIndex(-1);
+      onSelect(item);
+    },
+    [setSelectedItem, setSearchTerm, onSelect]
+  );
 
   // Focus search input when dropdown opens
   useEffect(() => {
@@ -454,7 +512,7 @@ export function SearchableDropdown({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, setSearchTerm]);
 
   return (
     <div className={cn("w-full relative", className)} ref={containerRef}>

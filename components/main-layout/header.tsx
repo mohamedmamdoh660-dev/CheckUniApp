@@ -11,6 +11,7 @@ import {
 import { RiScanLine } from "@remixicon/react";
 import Link from "next/link";
 import { SidebarTrigger } from "../ui/sidebar";
+import NotificationsMenu from "./notifications-menu";
 
 export default function Header({ title, url }: { title: string; url: string }) {
   return (
@@ -37,6 +38,9 @@ export default function Header({ title, url }: { title: string; url: string }) {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+        <div className="ml-auto">
+          <NotificationsMenu />
+        </div>
       </div>
     </header>
   );

@@ -52,6 +52,7 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { uploadApplicationAttachment } from "@/lib/actions/zoho-applications-actions";
+import ApplicationNotes from "./component/application-notes";
 
 export default function ApplicationDetailPage() {
   const params = useParams();
@@ -836,23 +837,7 @@ export default function ApplicationDetailPage() {
 
             {/* University Letters Tab */}
             <TabsContent value="notes" className="space-y-6">
-              <Card className="shadow-sm">
-                <CardHeader className="pb-0">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <FileText className="w-5 h-5 text-primary" />
-                    Notes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <InfoGraphic
-                    icon={<FileText className="!w-16 !h-16 text-primary" />}
-                    title="No notes found"
-                    description="There are no notes found for this application."
-                    isLeftArrow={false}
-                    gradient={false}
-                  />
-                </CardContent>
-              </Card>
+              <ApplicationNotes applicationId={applicationId} />
             </TabsContent>
           </Tabs>
         </div>

@@ -10,17 +10,15 @@ import {
   X,
   Search,
   Table as TableIcon,
-  LayoutGrid,
-  Upload,
   ListFilterPlus,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import AddZohoApplication from "@/components/(main)/zoho-applications/component/add-zoho-application";
 import { useAuth } from "@/context/AuthContext";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { DocumentAttachmentDialog } from "@/components/ui/document-attachment-dialog";
+
 import { SearchableDropdown } from "@/components/searchable-dropdown";
+import { useClearLocationSelections } from "@/context/SearchableDropdownContext";
 import {
   Popover,
   PopoverContent,
@@ -57,7 +55,6 @@ export function ZohoApplicationsDataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const [attachOpen, setAttachOpen] = useState(false);
   const [openFilters, setOpenFilters] = useState(false);
 
   // Local filter state mirrors add-zoho-application form fields
@@ -78,6 +75,8 @@ export function ZohoApplicationsDataTableToolbar<TData>({
   };
   const { userProfile } = useAuth();
   const isCrmId = userProfile?.crm_id || userProfile?.agency?.crm_id;
+  const clearLocationSelections = useClearLocationSelections();
+  const LOCATION = "applications-toolbar";
 
   const isFiltered = globalFilter !== "";
 
@@ -117,9 +116,48 @@ export function ZohoApplicationsDataTableToolbar<TData>({
                 displayField="first_name"
                 displayField2="last_name"
                 initialValue={student}
+                location={LOCATION}
                 onSelect={(it: any) => setStudent(it?.id || "")}
               />
-
+              <SearchableDropdown
+                placeholder="Academic Year"
+                table="zoho-academic-years"
+                searchField="name"
+                displayField="name"
+                initialValue={acdamic_year}
+                location={LOCATION}
+                onSelect={(it: any) => setAcademicYear(it?.id || "")}
+              />
+              <SearchableDropdown
+                placeholder="Degree"
+                table="zoho-degrees"
+                searchField="name"
+                displayField="name"
+                initialValue={degree}
+                location={LOCATION}
+                onSelect={(it: any) => {
+                  setDegree(it?.id || "");
+                  setProgram("");
+                }}
+              />
+              <SearchableDropdown
+                placeholder="Country"
+                table="zoho-countries"
+                searchField="name"
+                displayField="name"
+                initialValue={country}
+                location={LOCATION}
+                onSelect={(it: any) => setCountry(it?.id || "")}
+              />
+              <SearchableDropdown
+                placeholder="Semester"
+                table="zoho-semesters"
+                searchField="name"
+                displayField="name"
+                initialValue={semester}
+                location={LOCATION}
+                onSelect={(it: any) => setSemester(it?.id || "")}
+              />
               <SearchableDropdown
                 placeholder="University"
                 table="zoho-universities"
@@ -128,22 +166,13 @@ export function ZohoApplicationsDataTableToolbar<TData>({
                 dependsOn={[{ field: "country", value: country || null }]}
                 disabled={!country}
                 initialValue={university}
+                location={LOCATION}
                 onSelect={(it: any) => {
                   setUniversity(it?.id || "");
                   setProgram("");
                 }}
               />
-              <SearchableDropdown
-                placeholder="Degree"
-                table="zoho-degrees"
-                searchField="name"
-                displayField="name"
-                initialValue={degree}
-                onSelect={(it: any) => {
-                  setDegree(it?.id || "");
-                  setProgram("");
-                }}
-              />
+
               <SearchableDropdown
                 placeholder="Program"
                 table="zoho-programs"
@@ -156,31 +185,8 @@ export function ZohoApplicationsDataTableToolbar<TData>({
                 ]}
                 disabled={!university || !country || !degree}
                 initialValue={program}
+                location={LOCATION}
                 onSelect={(it: any) => setProgram(it?.id || "")}
-              />
-              <SearchableDropdown
-                placeholder="Academic Year"
-                table="zoho-academic-years"
-                searchField="name"
-                displayField="name"
-                initialValue={acdamic_year}
-                onSelect={(it: any) => setAcademicYear(it?.id || "")}
-              />
-              <SearchableDropdown
-                placeholder="Country"
-                table="zoho-countries"
-                searchField="name"
-                displayField="name"
-                initialValue={acdamic_year}
-                onSelect={(it: any) => setAcademicYear(it?.id || "")}
-              />
-              <SearchableDropdown
-                placeholder="Semester"
-                table="zoho-semesters"
-                searchField="name"
-                displayField="name"
-                initialValue={semester}
-                onSelect={(it: any) => setSemester(it?.id || "")}
               />
             </div>
             <div className="flex justify-end gap-2 mt-4">
@@ -195,6 +201,7 @@ export function ZohoApplicationsDataTableToolbar<TData>({
                   setCountry("");
                   setUniversity("");
                   setDegree("");
+                  clearLocationSelections(LOCATION);
                   onFiltersChange?.({});
                 }}
               >
@@ -230,8 +237,16 @@ export function ZohoApplicationsDataTableToolbar<TData>({
             variant="ghost"
             size="sm"
             onClick={() => {
+              setStudent("");
+              setProgram("");
+              setAcademicYear("");
+              setSemester("");
+              setCountry("");
+              setUniversity("");
+              setDegree("");
               setGlobalFilter("");
               onGlobalFilterChange?.("");
+              clearLocationSelections(LOCATION);
               onFiltersChange?.({});
             }}
             className="h-8 px-2"

@@ -467,3 +467,21 @@ export const getStudentsPagination = async (    search: string,
     if (error) throw error;
     return data || [];
   }
+
+  export const markApplicationNotesAsRead = async (application_id: string) => {
+    const { data, error } = await supabaseClient
+      .from('zoho_application_notes')
+      .update({ is_read: true })
+      .eq('application_id', application_id);
+    if (error) throw error;
+    return data;
+  }
+
+  export const markNotificationsAsRead = async (agent_id: string) => {
+    const { data, error } = await supabaseClient
+      .from('zoho_notifications')
+      .update({ is_read: true })
+      .eq('agent_id', agent_id);
+    if (error) throw error;
+    return data;
+  }

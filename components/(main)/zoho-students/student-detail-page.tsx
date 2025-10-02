@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ZohoStudent } from "@/types/types";
+import { ZohoApplication, ZohoStudent } from "@/types/types";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loader from "@/components/loader";
@@ -79,7 +79,7 @@ export function StudentDetailPage() {
   const [attachments, setAttachments] = useState<
     Array<{ id: string; name: string }>
   >([]);
-  const [applications, setApplications] = useState<any[]>([]);
+  const [applications, setApplications] = useState<ZohoApplication[]>([]);
   useEffect(() => {
     const loadAttachments = async () => {
       try {
@@ -286,8 +286,14 @@ export function StudentDetailPage() {
         </div>
 
         <div className="p-8 pt-0">
-          <Tabs defaultValue="personal" className="space-y-4">
+          <Tabs defaultValue="applications" className="space-y-4">
             <TabsList className="grid w-full grid-cols-5 bg-muted/50">
+              <TabsTrigger
+                value="applications"
+                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
+              >
+                Applications
+              </TabsTrigger>
               <TabsTrigger
                 value="personal"
                 className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
@@ -311,12 +317,6 @@ export function StudentDetailPage() {
                 className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
               >
                 Documents
-              </TabsTrigger>
-              <TabsTrigger
-                value="applications"
-                className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
-              >
-                Applications
               </TabsTrigger>
             </TabsList>
 
@@ -821,14 +821,14 @@ export function StudentDetailPage() {
                         <TableBody>
                           {applications.map((a: any) => (
                             <TableRow
-                              key={a.id}
+                              key={a.app_id}
                               // className="cursor-pointer"
                               // onClick={() =>
                               //   router.push(`/applications/${a.id}`)
                               // }
                             >
                               <TableCell className="font-medium">
-                                {a.id}
+                                {a.app_id || "-"}
                               </TableCell>
                               <TableCell>
                                 {a.zoho_universities?.name ||

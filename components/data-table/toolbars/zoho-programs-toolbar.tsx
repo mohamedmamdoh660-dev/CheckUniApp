@@ -36,6 +36,7 @@ import ProgramsExportDialog, {
   ExportFormat,
 } from "@/components/(main)/zoho-programs/component/programs-export-dialog";
 import ProgramsFilters from "@/components/(main)/zoho-programs/component/programs-filters";
+import { useClearLocationSelections } from "@/context/SearchableDropdownContext";
 import { exportProgramsToPDF } from "@/components/(main)/zoho-programs/component/programs-pdf";
 import { getProgramsAll } from "@/supabase/actions/db-actions";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
@@ -73,7 +74,9 @@ export function ZohoProgramsDataTableToolbar<TData>({
   setGlobalFilter,
 }: DataTableToolbarProps<TData>) {
   const [openExport, setOpenExport] = useState(false);
-
+  const clearLocationSelections = useClearLocationSelections();
+  const LOCATION = "programs-toolbar";
+  const [clearFilters, setClearFilters] = useState(false);
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setGlobalFilter?.(value);
@@ -101,6 +104,8 @@ export function ZohoProgramsDataTableToolbar<TData>({
           onFiltersChange={(f) => {
             onFiltersChange?.(f);
           }}
+          clearFilters={clearFilters}
+          setClearFilters={setClearFilters}
         />
         {(activeCount > 0 || isFiltered) && (
           <Button
@@ -109,7 +114,9 @@ export function ZohoProgramsDataTableToolbar<TData>({
             onClick={() => {
               setGlobalFilter?.("");
               onGlobalFilterChange?.("");
+              clearLocationSelections(LOCATION);
               onFiltersChange?.({});
+              setClearFilters(true);
             }}
             className="h-8 px-2"
           >
