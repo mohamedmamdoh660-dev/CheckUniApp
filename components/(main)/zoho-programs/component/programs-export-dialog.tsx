@@ -187,8 +187,8 @@ export default function ProgramsExportDialog({
           loggedInName,
           loggedInEmail,
           loggedInPhone,
-          columns,
-          rows: mappedRows,
+          programs: allPrograms || [],
+          dateRangeText: `Generated on ${new Date().toLocaleString()}`,
         });
       }
 

@@ -39,6 +39,7 @@ import { zohoAttachmentsService } from "@/modules/zoho-attachments/services/zoho
 import { downloadAttachment } from "@/utils/download-attachment";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { generateApplicationPDF } from "@/utils/generate-application-pdf";
 import {
   canUploadCard,
   canUploadPayment,
@@ -50,6 +51,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { uploadApplicationAttachment } from "@/lib/actions/zoho-applications-actions";
 
 export default function ApplicationDetailPage() {
   const params = useParams();
@@ -66,6 +68,7 @@ export default function ApplicationDetailPage() {
   const [letters, setLetters] = useState<Array<{ id: string; name: string }>>(
     []
   );
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const getApplication = useCallback(async () => {
     try {
@@ -106,7 +109,7 @@ export default function ApplicationDetailPage() {
         supabaseClient.removeChannel(channel);
       } catch {}
     };
-  }, [applicationId]);
+  }, [applicationId, getApplication]);
 
   useEffect(() => {
     const loadLetters = async () => {
@@ -161,6 +164,28 @@ export default function ApplicationDetailPage() {
 
   const stage = (application?.stage || "").toLowerCase();
 
+  let toastId: any = null;
+
+  const handleGeneratePDF = async () => {
+    if (!application) return;
+
+    try {
+      toastId = toast.loading("Generating PDF...");
+      setIsGeneratingPDF(true);
+      await generateApplicationPDF(application, {
+        filename: `application-${application.id}.pdf`,
+        quality: 0.98,
+        scale: 2,
+      });
+      toast.success("PDF generated successfully", { id: toastId });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate PDF", { id: toastId });
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   const handleUpload = async (type: "card" | "payment") => {
     try {
       const input = document.createElement("input");
@@ -199,21 +224,12 @@ export default function ApplicationDetailPage() {
             setIsUploading(false);
             return;
           }
-          const res = await fetch(
-            "https://n8n.browserautomations.com/webhook/58e479b5-ea43-42ee-abdd-b50815dfa4d9",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                id: application?.id,
-                file_url: fileUrl,
-                type,
-              }),
-            }
+          await uploadApplicationAttachment(
+            application?.id || "",
+            type,
+            fileUrl
           );
-          if (!res.ok) {
-            throw new Error("Webhook upload failed");
-          }
+
           toast.success(
             type === "card"
               ? "Student card uploaded"
@@ -237,7 +253,7 @@ export default function ApplicationDetailPage() {
     <div className=" bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="bg-card ">
-          <div className="p-8">
+          <div className="p-8 pb-6">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
               <Avatar className="h-24 w-24 ring-4 ring-accent/20">
                 <AvatarImage
@@ -411,12 +427,15 @@ export default function ApplicationDetailPage() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
-                      onClick={() =>
-                        router.push(`/applications/print/${application.id}`)
-                      }
+                      onClick={handleGeneratePDF}
+                      disabled={isGeneratingPDF}
                     >
-                      <Printer className="mr-2 h-4 w-4" />
-                      <span>Print</span>
+                      {isGeneratingPDF ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <FileText className="mr-2 h-4 w-4" />
+                      )}
+                      <span>{isGeneratingPDF ? "Generating..." : "Print"}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -426,8 +445,8 @@ export default function ApplicationDetailPage() {
         </div>
 
         <div className="p-8 pt-0">
-          <Tabs defaultValue="application" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 bg-muted/50">
+          <Tabs defaultValue="application" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-5 bg-muted/50 ">
               <TabsTrigger
                 value="application"
                 className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"

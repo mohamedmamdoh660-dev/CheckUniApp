@@ -196,18 +196,68 @@ export const zohoProgramsService = {
   /**
    * Get all countries
    */
-  getCountries: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, label?: string, dependsOn: { field: string, value: string | number | null } | null = null, activeOnNationalities?: boolean, activeOnUniversity?: boolean): Promise<ZohoCountry[]> => {
+  getCountries: async (
+    search: string = "",
+    page: number = 1,
+    pageSize: number = 10,
+    id: string | null = null,
+    label?: string,
+    dependsOn: { field: string, value: string | number | null } | null = null,
+    activeOnNationalities?: boolean,
+    activeOnUniversity?: boolean
+  ): Promise<ZohoCountry[]> => {
     try {
-      const offset = (page ) * pageSize;
+      const offset = page * pageSize;
       const searchPattern = `%${search}%`;
-      let filter = label === 'Nationality'? { name: { ilike: searchPattern }, active_on_nationalities: { eq: true }, ...(id ? { id: { eq: id } } : {}) } : label === 'Country of Residence'? { name: { ilike: searchPattern }, active_on_university: { eq: true }, ...(id ? { id: { eq: id } } : {}) } : { name: { ilike: searchPattern }, ...(activeOnNationalities ? { active_on_nationalities: { eq: activeOnNationalities } } : {}), ...(activeOnUniversity ? { active_on_university: { eq: activeOnUniversity } } : {}) };
-            if (dependsOn && dependsOn.value) {
-        filter = {
-          ...filter,
-          [dependsOn.field]: { eq: dependsOn.value }
-        };
+      
+      // Base filter that's always applied
+      const baseFilter = {
+        name: { ilike: searchPattern },
+        ...(id ? { id: { eq: id } } : {})
+      };
+      
+      // Apply filters based on label
+      let filter;
+      switch (label) {
+        case 'filter countries':
+          filter = {
+            ...baseFilter,
+            ...(activeOnNationalities ? { active_on_nationalities: { eq: activeOnNationalities } } : {}),
+            ...(activeOnUniversity ? { active_on_university: { eq: activeOnUniversity } } : {})
+          };
+          break;
+        case 'Nationality':
+          filter = {
+            ...baseFilter,
+            active_on_nationalities: { eq: true }
+          };
+          break;
+        case 'Country of Residence':
+          filter = {
+            ...baseFilter,
+            active_on_university: { eq: true }
+          };
+          break;
+        default:
+          filter = {
+            ...baseFilter,
+            ...(activeOnNationalities ? { active_on_nationalities: { eq: activeOnNationalities } } : {}),
+            ...(activeOnUniversity ? { active_on_university: { eq: activeOnUniversity } } : {})
+          };
       }
-      const response = await executeGraphQLBackend(GET_ZOHO_COUNTRIES, { filter, limit: pageSize, offset });
+      
+      // Add dependency filter if provided
+      if (dependsOn?.value) {
+        // @ts-ignore
+        filter[dependsOn.field as keyof typeof filter] = { eq: dependsOn.value };
+      }
+      
+      const response = await executeGraphQLBackend(GET_ZOHO_COUNTRIES, { 
+        filter, 
+        limit: pageSize, 
+        offset 
+      });
+      
       return response.zoho_countriesCollection.edges.map((edge: any) => edge.node);
     } catch (error) {
       console.error('Error getting countries:', error);

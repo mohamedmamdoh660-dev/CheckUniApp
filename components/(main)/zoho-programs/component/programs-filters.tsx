@@ -96,6 +96,7 @@ export default function ProgramsFilters({
             <SearchableDropdown
               placeholder="Country"
               table="zoho-countries"
+              label="filter countries"
               searchField="name"
               displayField="name"
               initialValue={country}
