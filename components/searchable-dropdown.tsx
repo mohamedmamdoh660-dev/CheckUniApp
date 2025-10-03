@@ -272,6 +272,9 @@ export function SearchableDropdown({
   const listRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { userProfile } = useAuth();
+  const [searchValue, setSearchValue] = useState("");
+  const [searchTempData, setSearchTempData] = useState<DropdownItem[]>([]);
+  const [againFetch, setAgainFetch] = useState(false);
 
   // Use context for state management
   const {
@@ -292,7 +295,7 @@ export function SearchableDropdown({
     isDataStale,
   } = useDropdownTable(table, location);
 
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchValue, 500);
   const dependsKey = useMemo(
     () => JSON.stringify(dependsOn || []),
     [dependsOn]
@@ -300,16 +303,9 @@ export function SearchableDropdown({
   // Load initial data or search results with caching
   const loadData = useCallback(
     async (currentPage = 0, search = "") => {
-      // Check if we have cached data and it's not stale
-      const cacheKey = `${table}-${search}-${JSON.stringify(dependsOn || [])}`;
-
       // Only fetch if data is stale or doesn't exist
-      if (
-        !isDataStale &&
-        currentPage === 0 &&
-        items.length > 0 &&
-        search === searchTerm
-      ) {
+      if (!isDataStale && items.length > 0 && !search) {
+        setLoading(false);
         return;
       }
 
@@ -327,10 +323,20 @@ export function SearchableDropdown({
         });
 
         if (currentPage === 0) {
-          setItems(result.data);
+          if (search) {
+            setSearchTempData(result?.data);
+          } else {
+            setSearchTempData([]);
+            setItems(result.data);
+          }
           setPage(0);
         } else {
-          addItems(result.data);
+          if (search) {
+            setSearchTempData([...searchTempData, ...(result?.data || [])]);
+          } else {
+            setSearchTempData([]);
+            addItems(result.data);
+          }
         }
 
         setHasMore(result.hasMore);
@@ -347,7 +353,7 @@ export function SearchableDropdown({
       userProfile,
       isDataStale,
       items.length,
-      searchTerm,
+      searchValue,
       setLoading,
       setItems,
       addItems,
@@ -368,22 +374,34 @@ export function SearchableDropdown({
   }, [loading, hasMore, page, setPage, searchTerm]); // loadData intentionally excluded to prevent infinite loops
 
   useEffect(() => {
+    // Indicate loading immediately to avoid flashing 'No results found'
+    setLoading(true);
+    // Reset list when search term changes so we fetch fresh results
+    // resetState();
+    setSearchTempData([]);
     loadData(0, debouncedSearchTerm);
-    setHighlightedIndex(-1);
+    // setHighlightedIndex(-1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm]); // loadData intentionally excluded to prevent infinite loops
 
   // Reset list and selection when dependency values change
   useEffect(() => {
     // When dependsOn value changes, clear selection and reload from first page
-    if (dependsOn) {
+    if (dependsOn && !dependsOn.find((item) => item.value === null)) {
       setSelectedItem(null);
       resetState();
       setInitialLoaded(false);
-      loadData(0, "");
+      setAgainFetch(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dependsKey]); // Other dependencies intentionally excluded to prevent infinite loops
+
+  useEffect(() => {
+    if (againFetch) {
+      loadData(0, "");
+      setAgainFetch(false);
+    }
+  }, [againFetch]);
 
   // Handle initial value changes (including clearing)
   useEffect(() => {
@@ -564,8 +582,11 @@ export function SearchableDropdown({
                 ref={searchInputRef}
                 type="text"
                 placeholder={`Search ${table}...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchValue}
+                onChange={(e) => {
+                  setSearchValue(e.target.value);
+                  // setSearchTerm(e.target.value);
+                }}
                 onKeyDown={handleKeyDown}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -585,107 +606,114 @@ export function SearchableDropdown({
               className="max-h-54 scroll-py-1 overflow-x-hidden overflow-y-auto"
               onScroll={handleScroll}
             >
-              {/* Empty State */}
-              {!loading && items.length === 0 && (
-                <div className="py-6 text-center text-sm">No results found</div>
-              )}
-
               {/* Loading State */}
-              {loading && items.length === 0 && (
+              {loading &&
+              (items.length === 0 ||
+                (searchValue && searchTempData.length === 0)) ? (
                 <div className="flex items-center justify-center p-4">
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   <span className="text-sm text-muted-foreground">
                     Loading...
                   </span>
                 </div>
-              )}
-
-              {/* Items */}
-              <div className="overflow-hidden p-1">
-                {items.map((item, index) => (
-                  <div
-                    key={item.id}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleSelect(item);
-                    }}
-                    onMouseEnter={() => setHighlightedIndex(index)}
-                    className={cn(
-                      "relative flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none cursor-pointer",
-                      highlightedIndex === index
-                        ? "bg-accent text-accent-foreground"
-                        : "hover:bg-accent hover:text-accent-foreground"
-                    )}
-                  >
-                    <div className="flex items-center w-full">
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedItem?.id === item.id
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
-                      <div className="flex-1">
-                        {renderItem ? (
-                          renderItem(item)
-                        ) : (
-                          <>
-                            <div className="font-medium">
-                              {item[displayField]}
-                            </div>
-                            {item.email && (
-                              <div className="text-sm text-muted-foreground">
-                                {item.email}
+              ) : !loading &&
+                (items.length === 0 ||
+                  (searchValue && searchTempData.length === 0)) ? (
+                <div className="py-6 text-center text-sm">No results found</div>
+              ) : (
+                <div className="overflow-hidden p-1">
+                  {(searchTempData.length > 0 && searchValue
+                    ? searchTempData
+                    : items
+                  ).map((item, index) => (
+                    <div
+                      key={item.id}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSelect(item);
+                      }}
+                      onMouseEnter={() => setHighlightedIndex(index)}
+                      className={cn(
+                        "relative flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none cursor-pointer",
+                        highlightedIndex === index
+                          ? "bg-accent text-accent-foreground"
+                          : "hover:bg-accent hover:text-accent-foreground"
+                      )}
+                    >
+                      <div className="flex items-center w-full">
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedItem?.id === item.id
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        <div className="flex-1">
+                          {renderItem ? (
+                            renderItem(item)
+                          ) : (
+                            <>
+                              <div className="font-medium">
+                                {item[displayField]}
                               </div>
-                            )}
-                            {item.category && (
-                              <div className="text-sm text-muted-foreground">
-                                {item.category}
-                              </div>
-                            )}
-                            {item.logo && (
-                              <div className="flex items-center gap-2 mt-1">
-                                <div className="w-5 h-5 relative overflow-hidden rounded-full bg-muted">
-                                  <div className="w-full h-full">
-                                    {typeof item.logo === "string" &&
-                                      item.logo.startsWith("http") && (
-                                        <div
-                                          className="w-full h-full bg-cover bg-center"
-                                          style={{
-                                            backgroundImage: `url(${item.logo})`,
-                                          }}
-                                        />
-                                      )}
+                              {item.email && (
+                                <div className="text-sm text-muted-foreground">
+                                  {item.email}
+                                </div>
+                              )}
+                              {item.category && (
+                                <div className="text-sm text-muted-foreground">
+                                  {item.category}
+                                </div>
+                              )}
+                              {item.logo && (
+                                <div className="flex items-center gap-2 mt-1">
+                                  <div className="w-5 h-5 relative overflow-hidden rounded-full bg-muted">
+                                    <div className="w-full h-full">
+                                      {typeof item.logo === "string" &&
+                                        item.logo.startsWith("http") && (
+                                          <div
+                                            className="w-full h-full bg-cover bg-center"
+                                            style={{
+                                              backgroundImage: `url(${item.logo})`,
+                                            }}
+                                          />
+                                        )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            )}
-                          </>
-                        )}
+                              )}
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
 
-                {/* Loading More */}
-                {loading && items.length > 0 && (
-                  <div className="flex items-center justify-center p-4">
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    <span className="text-sm text-muted-foreground">
-                      Loading...
-                    </span>
-                  </div>
-                )}
+                  {/* Loading More */}
+                  {loading &&
+                    (items.length > 0 ||
+                      (searchValue && searchTempData.length > 0)) && (
+                      <div className="flex items-center justify-center p-4">
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        <span className="text-sm text-muted-foreground">
+                          Loading...
+                        </span>
+                      </div>
+                    )}
 
-                {/* No More Results */}
-                {!hasMore && items.length > 0 && (
-                  <div className="p-2 text-center text-sm text-muted-foreground">
-                    No more results
-                  </div>
-                )}
-              </div>
+                  {/* No More Results */}
+                  {!hasMore &&
+                    (items.length > 0 ||
+                      (searchValue && searchTempData.length > 0)) && (
+                      <div className="p-2 text-center text-sm text-muted-foreground">
+                        No more results
+                      </div>
+                    )}
+                </div>
+              )}
             </div>
           </div>
         </div>
