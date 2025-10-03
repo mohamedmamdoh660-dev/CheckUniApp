@@ -387,7 +387,7 @@ export function SearchableDropdown({
   // Reset list and selection when dependency values change
   useEffect(() => {
     // When dependsOn value changes, clear selection and reload from first page
-    if (dependsOn && !dependsOn.find((item) => item.value === null)) {
+    if (dependsOn && dependsOn.every((item) => item.value !== null)) {
       setSelectedItem(null);
       resetState();
       setInitialLoaded(false);
