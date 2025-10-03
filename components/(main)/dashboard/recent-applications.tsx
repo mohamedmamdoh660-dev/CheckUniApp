@@ -170,7 +170,14 @@ export function RecentApplications() {
                               />
                             </Avatar>
                             <div className="flex flex-col">
-                              <span>
+                              <span
+                                onClick={() =>
+                                  router.push(
+                                    `/students/${application.zoho_students?.id}`
+                                  )
+                                }
+                                className="hover:cursor-pointer hover:text-primary"
+                              >
                                 {application.zoho_students.first_name}{" "}
                                 {application.zoho_students.last_name}
                               </span>
@@ -183,7 +190,14 @@ export function RecentApplications() {
                           "Unknown Student"
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell
+                        onClick={() =>
+                          router.push(
+                            `/programs/${application.zoho_programs?.id}`
+                          )
+                        }
+                        className="hover:cursor-pointer hover:text-primary"
+                      >
                         {application.zoho_programs?.name || "Unknown Program"}
                       </TableCell>
                       <TableCell>

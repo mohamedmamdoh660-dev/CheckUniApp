@@ -168,8 +168,8 @@ export default function ApplicationNotes({ applicationId }: Props) {
                   key={n.id}
                   className={`flex gap-3 items-start p-3 rounded-md border ${
                     n.is_read
-                      ? "bg-background border-muted"
-                      : "bg-primary/5 border-primary/30 border-l-4"
+                      ? "bg-background border-muted hover:bg-muted"
+                      : "bg-primary/5 border-primary/30 border-l-4 hover:bg-primary/10"
                   }`}
                 >
                   <Avatar className="h-8 w-8">

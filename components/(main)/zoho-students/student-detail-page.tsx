@@ -213,7 +213,7 @@ export function StudentDetailPage() {
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex-1 space-y-4">
+              <div className="flex-1 space-y-2">
                 <div>
                   <h1 className="text-3xl font-bold text-foreground text-balance">
                     {student?.first_name} {student?.last_name}
@@ -835,7 +835,14 @@ export function StudentDetailPage() {
                                   a.university ||
                                   "-"}
                               </TableCell>
-                              <TableCell>
+                              <TableCell
+                                onClick={() =>
+                                  router.push(
+                                    `/programs/${a.zoho_programs?.id}`
+                                  )
+                                }
+                                className="hover:cursor-pointer hover:text-primary"
+                              >
                                 {a.zoho_programs?.name || a.program || "-"}
                               </TableCell>
 
