@@ -302,9 +302,9 @@ export function SearchableDropdown({
   );
   // Load initial data or search results with caching
   const loadData = useCallback(
-    async (currentPage = 0, search = "") => {
+    async (currentPage = 0, search = "", loadMore = false) => {
       // Only fetch if data is stale or doesn't exist
-      if (!isDataStale && items.length > 0 && !search) {
+      if (!isDataStale && items.length > 0 && !search && !loadMore) {
         setLoading(false);
         return;
       }
@@ -368,17 +368,16 @@ export function SearchableDropdown({
     if (!loading && hasMore) {
       const nextPage = page + 1;
       setPage(nextPage);
-      loadData(nextPage, searchTerm);
+      loadData(nextPage, searchValue, true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, hasMore, page, setPage, searchTerm]); // loadData intentionally excluded to prevent infinite loops
+  }, [loading, hasMore, page, setPage, searchValue]); // loadData intentionally excluded to prevent infinite loops
 
   useEffect(() => {
     // Indicate loading immediately to avoid flashing 'No results found'
     setLoading(true);
     // Reset list when search term changes so we fetch fresh results
     // resetState();
-    setSearchTempData([]);
     loadData(0, debouncedSearchTerm);
     // setHighlightedIndex(-1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -454,6 +453,7 @@ export function SearchableDropdown({
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     if (scrollHeight - scrollTop <= clientHeight + 5) {
+      console.log("loadMore....");
       loadMore();
     }
   };
