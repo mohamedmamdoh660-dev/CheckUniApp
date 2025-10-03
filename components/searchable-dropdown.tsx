@@ -453,7 +453,6 @@ export function SearchableDropdown({
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     if (scrollHeight - scrollTop <= clientHeight + 5) {
-      console.log("loadMore....");
       loadMore();
     }
   };

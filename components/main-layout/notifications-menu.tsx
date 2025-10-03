@@ -18,6 +18,12 @@ import { useAuth } from "@/context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { markNotificationsAsRead } from "@/supabase/actions/db-actions";
 import { supabaseClient } from "@/lib/supabase-auth-client";
+import { Avatar } from "../ui/avatar";
+import { AvatarImage } from "../ui/avatar";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { useRouter } from "next/navigation";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { toast } from "sonner";
 
 export default function NotificationsMenu() {
   const { userProfile } = useAuth();
@@ -25,6 +31,10 @@ export default function NotificationsMenu() {
   const [loading, setLoading] = useState(false);
   const [marking, setMarking] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
+  const router = useRouter();
+  const [markRead, setMarkRead] = useState<{ id: string; loading: boolean }[]>(
+    []
+  );
 
   const unreadCount = useMemo(
     () => items.filter((i) => !i.is_read).length,
@@ -37,7 +47,7 @@ export default function NotificationsMenu() {
         setLoading(true);
         const rows = await notificationsService.listByUser(
           agentId,
-          20,
+          100,
           0,
           false
         );
@@ -109,31 +119,39 @@ export default function NotificationsMenu() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 p-0">
+      <DropdownMenuContent align="end" className="w-100 p-0">
         <DropdownMenuLabel className="flex items-center justify-between px-3 py-2">
-          <span>Notifications</span>
           <div className="flex items-center gap-2">
+            <span>Notifications</span>
+
+            {unreadCount > 0 && (
+              <Badge variant={unreadCount > 0 ? "default" : "outline"}>
+                {unreadCount} unread
+              </Badge>
+            )}
+          </div>
+
+          {unreadCount > 0 ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={markAllRead}
+              disabled={marking}
+            >
+              {marking ? (
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4 mr-1" />
+              )}
+              Mark read
+            </Button>
+          ) : (
             <Badge variant={unreadCount > 0 ? "default" : "outline"}>
               {unreadCount} unread
             </Badge>
-            {unreadCount > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={markAllRead}
-                disabled={marking}
-              >
-                {marking ? (
-                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                ) : (
-                  <Check className="h-4 w-4 mr-1" />
-                )}
-                Mark read
-              </Button>
-            )}
-          </div>
+          )}
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="mb-0" />
         <div className="max-h-96 overflow-auto">
           {loading ? (
             <div className="px-3 py-8 text-center text-sm text-muted-foreground">
@@ -147,14 +165,17 @@ export default function NotificationsMenu() {
             items.map((n) => (
               <div
                 key={n.id}
-                className={`px-3 py-2 border-b last:border-b-0 ${n.is_read ? "bg-background" : "bg-primary/5"}`}
+                className={`px-3 py-2 border-b cursor-pointer last:border-b-0 ${n.is_read ? "bg-background hover:bg-muted" : "bg-primary/5 hover:bg-primary/10"}`}
+                onClick={() => {
+                  router.push(`/${n.module_name}/${n.module_id}`);
+                }}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-2">
                     <div className="mt-1">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        {n.module_name.charAt(0).toUpperCase()}
-                      </div>
+                      <Avatar>
+                        <AvatarImage src={generateNameAvatar(n.module_name)} />
+                      </Avatar>
                     </div>
                     <div className="min-w-0">
                       <div className="font-medium truncate">{n.title}</div>
@@ -163,10 +184,51 @@ export default function NotificationsMenu() {
                           {n.content}
                         </div>
                       ) : null}
-                      <div className="text-[11px] text-muted-foreground mt-1">
-                        {n.module_name}
-                      </div>
                     </div>
+                  </div>
+                  <div className="shrink-0">
+                    {!n.is_read && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={
+                              markRead.find((i) => i.id === n.id)?.loading
+                            }
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                setMarkRead((prev) => [
+                                  ...prev,
+                                  { id: n.id, loading: true },
+                                ]);
+                                await notificationsService.markOneRead(n.id);
+                                setItems((prev) =>
+                                  prev.map((i) =>
+                                    i.id === n.id ? { ...i, is_read: true } : i
+                                  )
+                                );
+                                toast.success("Marked as read");
+                              } catch {
+                                toast.error("Failed to mark as read");
+                              } finally {
+                                setMarkRead((prev) =>
+                                  prev.filter((i) => i.id !== n.id)
+                                );
+                              }
+                            }}
+                          >
+                            {markRead.find((i) => i.id === n.id)?.loading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Check className="h-4 w-4 " />
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Mark as read</TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
                 </div>
               </div>

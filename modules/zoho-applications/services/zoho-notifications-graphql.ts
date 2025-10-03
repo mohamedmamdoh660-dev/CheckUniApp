@@ -4,8 +4,7 @@ export const GET_NOTIFICATIONS = `
     zoho_notificationsCollection(
       filter: {
         and: [
-          { agent_id: { eq: $agent_id } },
-          { is_read: { eq: false }  }
+          { agent_id: { eq: $agent_id } }
         ]
       }
       first: $limit
@@ -46,6 +45,17 @@ export const MARK_NOTIFICATIONS_READ = `
   mutation MarkNotificationsRead($agent_id: UUID!) {
     updatezoho_notificationsCollection(
       filter: { agent_id: { eq: $agent_id }, is_read: { eq: false } }
+      set: { is_read: true }
+    ) {
+      records { id is_read }
+    }
+  }
+`;
+
+export const MARK_NOTIFICATION_READ = `
+  mutation MarkNotificationRead($id: String!) {
+    updatezoho_notificationsCollection(
+      filter: { id: { eq: $id } }
       set: { is_read: true }
     ) {
       records { id is_read }

@@ -3,6 +3,7 @@ import {
   GET_NOTIFICATIONS,
   INSERT_NOTIFICATION,
   MARK_NOTIFICATIONS_READ,
+  MARK_NOTIFICATION_READ,
 } from "./zoho-notifications-graphql";
 
 export type NotificationItem = {
@@ -48,6 +49,15 @@ class NotificationsService {
       id: string;
       is_read: boolean;
     }>;
+  }
+
+  async markOneRead(id: string) {
+    const data = await executeGraphQLBackend(MARK_NOTIFICATION_READ, {
+      id,
+    });
+    return data?.updatezoho_notificationsCollection?.records?.[0] as
+      | { id: string; is_read: boolean }
+      | undefined;
   }
 }
 
