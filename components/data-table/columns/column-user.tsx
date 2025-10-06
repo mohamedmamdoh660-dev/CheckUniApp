@@ -19,7 +19,7 @@ export function getUserColumns(
 ): ColumnDef<User>[] {
   const columns: ColumnDef<User, unknown>[] = [
     {
-      accessorKey: "name",
+      accessorKey: "first_name",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Name" />
       ),
@@ -68,12 +68,12 @@ export function getUserColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 
     {
-      accessorKey: "status",
+      accessorKey: "is_active",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Status" />
       ),

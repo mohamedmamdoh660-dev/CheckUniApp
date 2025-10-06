@@ -40,7 +40,10 @@ export const usersService = {
     const response = await executeGraphQLBackend(GET_USERS);
     return response.user_profileCollection.edges.map((edge: any) => edge.node);
   },
-  getUsersPagination: async (search: string, limit: number, offset: number, roleName: string, agency_id: string, role_id: string) => {
+  getUsersPagination: async (search: string, limit: number, offset: number, roleName: string, agency_id: string, role_id: string, sorting?: {
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }) => {
     // Create a filter object based on role
     const filter: any = { email: { ilike: search } };
     
@@ -52,7 +55,9 @@ export const usersService = {
     const response = await executeGraphQLBackend(GET_USERS_PAGINATION, { 
       filter, 
       limit, 
-      offset: offset * limit
+      offset: offset * limit,
+      // @ts-ignore
+      sorting: Object.keys(sorting || {}).length > 0 ? { [sorting?.sortBy || 'created_at']: sorting.sortOrder === "asc" ? 'AscNullsLast' : 'DescNullsLast' } : { created_at: 'DescNullsLast' }
     });
     
     const countResponse = await executeGraphQLBackend(GET_USERS_COUNT, { 

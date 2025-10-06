@@ -20,6 +20,10 @@ export default function UserManagementPage({ type }: { type: string }) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   const { userProfile } = useAuth();
 
@@ -32,7 +36,8 @@ export default function UserManagementPage({ type }: { type: string }) {
         currentPage,
         userProfile?.roles?.name || "",
         userProfile?.id || "",
-        userProfile?.role_id || ""
+        userProfile?.role_id || "",
+        sorting
       );
 
       setListUsers(usersResponse.users);
@@ -50,8 +55,7 @@ export default function UserManagementPage({ type }: { type: string }) {
 
   useEffect(() => {
     fetchUsers();
-    fetchRoles();
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
@@ -69,6 +73,15 @@ export default function UserManagementPage({ type }: { type: string }) {
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
+    setCurrentPage(0);
+  };
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
     setCurrentPage(0);
   };
 
@@ -90,6 +103,7 @@ export default function UserManagementPage({ type }: { type: string }) {
           userProfile?.roles?.name === "admin"
         )}
         onGlobalFilterChange={handleGlobalFilterChange}
+        onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         pageSize={pageSize}

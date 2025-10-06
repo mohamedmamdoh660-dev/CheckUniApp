@@ -44,7 +44,7 @@ query GetUsers($filter: user_profileFilter, $limit: Int = 10, $offset: Int = 0) 
     filter: $filter
     first: $limit
     offset: $offset
-    orderBy: [{created_at: DescNullsLast}]
+    orderBy: $sorting
   ) {
     edges {
       node {
