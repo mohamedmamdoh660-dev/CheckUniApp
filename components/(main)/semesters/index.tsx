@@ -28,17 +28,7 @@ export default function SemestersManagementPage({ type }: { type: string }) {
         page: currentPage,
         pageSize: pageSize,
         searchQuery: debouncedSearchTerm,
-        orderBy:
-          Object.keys(sorting || {}).length > 0
-            ? [
-                {
-                  [sorting?.sortBy || "created_at"]:
-                    sorting.sortOrder === "asc"
-                      ? "AscNullsLast"
-                      : "DescNullsLast",
-                },
-              ]
-            : [{ created_at: "DescNullsLast" }],
+        orderBy: sorting,
       });
 
       setListSemesters(semestersResponse.semesters);
