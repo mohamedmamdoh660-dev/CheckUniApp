@@ -6,6 +6,8 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { UniversitiesActions } from "../actions/universities-actions";
 import { Globe } from "lucide-react";
 import { currentTimezone } from "@/lib/helper/current-timezone";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 
 export const columnsUniversities: ColumnDef<ZohoUniversity>[] = [
   {
@@ -15,13 +17,22 @@ export const columnsUniversities: ColumnDef<ZohoUniversity>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="flex flex-col">
-          <span className="font-medium">{row.getValue("name")}</span>
-          {row.original.sector && (
-            <span className="text-xs text-muted-foreground">
-              {row.original.sector}
+        <div className="flex items-center w-full">
+          <Avatar className="border-foreground/10 border-[1px]">
+            <AvatarImage
+              src={
+                row.original.logo || generateNameAvatar(row.original.name || "")
+              }
+            />
+          </Avatar>
+          <div className="grid flex-1 text-left text-sm leading-tight ml-3">
+            <span className="truncate font-semibold">
+              {row.original.name || ""}
             </span>
-          )}
+            <span className="truncate text-xs">
+              {row.original.sector || ""}
+            </span>
+          </div>
         </div>
       );
     },
@@ -39,6 +50,8 @@ export const columnsUniversities: ColumnDef<ZohoUniversity>[] = [
         </div>
       );
     },
+    enableSorting: false,
+    enableHiding: true,
   },
   {
     accessorKey: "zoho_cities",
@@ -51,6 +64,8 @@ export const columnsUniversities: ColumnDef<ZohoUniversity>[] = [
         <div className="flex items-center">{city ? city.name : "N/A"}</div>
       );
     },
+    enableSorting: false,
+    enableHiding: true,
   },
   {
     accessorKey: "phone",
@@ -66,7 +81,7 @@ export const columnsUniversities: ColumnDef<ZohoUniversity>[] = [
     },
   },
   {
-    accessorKey: "wesbite",
+    accessorKey: "website",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Website" />
     ),
@@ -90,6 +105,8 @@ export const columnsUniversities: ColumnDef<ZohoUniversity>[] = [
         </div>
       );
     },
+    enableSorting: false,
+    enableHiding: true,
   },
   {
     accessorKey: "created_at",

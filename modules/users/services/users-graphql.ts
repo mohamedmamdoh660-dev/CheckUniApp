@@ -39,7 +39,7 @@ query GetUsersByEmail($filter: user_profileFilter) {
 `;
 
 export const GET_USERS_PAGINATION = `
-query GetUsers($filter: user_profileFilter, $limit: Int = 10, $offset: Int = 0) {
+query GetUsers($filter: user_profileFilter, $limit: Int = 10, $offset: Int = 0, $sorting: user_profileOrderBy) {
   user_profileCollection(
     filter: $filter
     first: $limit

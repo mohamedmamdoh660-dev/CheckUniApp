@@ -38,7 +38,7 @@ export function getZohoSpecialityColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 

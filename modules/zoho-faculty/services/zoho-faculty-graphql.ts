@@ -15,8 +15,8 @@ export const GET_FACULTIES = `
 `;
 
 export const GET_FACULTIES_PAGINATION = `
-  query GetFacultiesPagination($search: String!, $limit: Int!, $offset: Int!) {
-    zoho_facultyCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset) {
+  query GetFacultiesPagination($search: String!, $limit: Int!, $offset: Int!, $orderBy: [zoho_facultyOrderBy!]) {
+    zoho_facultyCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset, orderBy: $orderBy) {
       edges {
         node {
           id

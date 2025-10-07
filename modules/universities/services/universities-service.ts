@@ -9,7 +9,7 @@ import {
   UPDATE_UNIVERSITY,
 } from "./universities-graphql";
 import { ZohoUniversity } from "@/types/types";
-import { supabaseClient } from "@/lib/supabase-auth-client";
+import { getTableCount } from "@/supabase/actions/db-actions";
 
 class UniversitiesService {
   // Get universities with pagination, search, and sorting
@@ -17,10 +17,15 @@ class UniversitiesService {
     page = 0,
     pageSize = 10,
     searchQuery = "",
+    orderBy = { sortBy: "created_at", sortOrder: "desc" },
   }: {
     page?: number;
     pageSize?: number;
     searchQuery?: string;
+    orderBy?: {
+      sortBy?: string;
+      sortOrder?: "asc" | "desc";
+    };
   }) {
     try {
       const offset = page * pageSize;
@@ -31,17 +36,17 @@ class UniversitiesService {
         filter,
         limit: pageSize,
         offset,
+        orderBy: Object.keys(orderBy || {}).length > 0 ? { [orderBy?.sortBy || 'created_at']: orderBy.sortOrder === "asc" ? 'AscNullsLast' : 'DescNullsLast' } : { name: 'AscNullsLast' }
       });
 
-      // Get total count
-      const countResponse = await supabaseClient
-        .from('zoho_universities')
-        .select('id', { count: 'exact' })
-        .ilike('name', searchPattern);
+      // Get total count via RPC
+      const raw = searchQuery || "";
+      const term = raw.replace(/^%|%$/g, "");
+      const totalCount = await getTableCount('zoho_universities', { name: term });
 
       return {
         universities: response.zoho_universitiesCollection.edges.map((edge: any) => edge.node),
-        totalCount: countResponse.count || 0
+        totalCount
       };
     } catch (error) {
       console.error("Error fetching universities:", error);

@@ -14,8 +14,8 @@ export const GET_LANGUAGES = `
 `;
 
 export const GET_LANGUAGES_PAGINATION = `
-  query GetLanguagesPagination($search: String!, $limit: Int!, $offset: Int!) {
-    zoho_languagesCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset) {
+  query GetLanguagesPagination($search: String!, $limit: Int!, $offset: Int!, $orderBy: [zoho_languagesOrderBy!]) {
+    zoho_languagesCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset, orderBy: $orderBy) {
       edges {
         node {
           id

@@ -485,3 +485,16 @@ export const getStudentsPagination = async (    search: string,
     if (error) throw error;
     return data;
   }
+
+// RPC-based generic table count helper using get_table_count(table_name, search_json)
+export const getTableCount = async (
+  tableName: string,
+  searchObject: Record<string, string>
+): Promise<number> => {
+  const { data, error } = await supabaseClient.rpc('get_table_count', {
+    table_name: tableName,
+    search_filters: searchObject,
+  });
+  if (error) throw error;
+  return (data as number) || 0;
+};

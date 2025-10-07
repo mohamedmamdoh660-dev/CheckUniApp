@@ -20,6 +20,10 @@ export default function ZohoLanguagesManagementPage({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   async function fetchLanguages() {
     setIsRefetching(true);
@@ -28,7 +32,8 @@ export default function ZohoLanguagesManagementPage({
         await zohoLanguagesService.getLanguagesPagination(
           `%${debouncedSearchTerm}%`,
           pageSize,
-          currentPage
+          currentPage,
+          sorting
         );
 
       setListLanguages(languagesResponse.languages);
@@ -42,7 +47,7 @@ export default function ZohoLanguagesManagementPage({
 
   useEffect(() => {
     fetchLanguages();
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
@@ -63,6 +68,11 @@ export default function ZohoLanguagesManagementPage({
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       <DataTable
@@ -75,6 +85,7 @@ export default function ZohoLanguagesManagementPage({
         }
         columns={getZohoLanguagesColumns(fetchLanguages)}
         onGlobalFilterChange={handleGlobalFilterChange}
+        onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         pageSize={pageSize}

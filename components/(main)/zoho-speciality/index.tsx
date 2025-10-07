@@ -23,6 +23,10 @@ export default function ZohoSpecialityManagementPage({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   async function fetchSpecialities() {
     setIsRefetching(true);
@@ -31,7 +35,8 @@ export default function ZohoSpecialityManagementPage({
         await zohoSpecialityService.getSpecialitiesPagination(
           `%${debouncedSearchTerm}%`,
           pageSize,
-          currentPage
+          currentPage,
+          sorting
         );
 
       setListSpecialities(specialitiesResponse.specialities);
@@ -45,7 +50,7 @@ export default function ZohoSpecialityManagementPage({
 
   useEffect(() => {
     fetchSpecialities();
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
@@ -66,6 +71,11 @@ export default function ZohoSpecialityManagementPage({
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       <DataTable
@@ -78,6 +88,7 @@ export default function ZohoSpecialityManagementPage({
         }
         columns={getZohoSpecialityColumns(fetchSpecialities)}
         onGlobalFilterChange={handleGlobalFilterChange}
+        onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         pageSize={pageSize}

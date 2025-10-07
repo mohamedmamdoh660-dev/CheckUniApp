@@ -20,8 +20,8 @@ export const GET_SPECIALITIES = `
 `;
 
 export const GET_SPECIALITIES_PAGINATION = `
-  query GetSpecialitiesPagination($search: String!, $limit: Int!, $offset: Int!) {
-    zoho_specialityCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset) {
+  query GetSpecialitiesPagination($search: String!, $limit: Int!, $offset: Int!, $orderBy: [zoho_specialityOrderBy!]) {
+    zoho_specialityCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset, orderBy: $orderBy) {
       edges {
         node {
           id

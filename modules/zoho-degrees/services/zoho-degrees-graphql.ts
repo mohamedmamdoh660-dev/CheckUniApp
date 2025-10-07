@@ -16,8 +16,8 @@ export const GET_DEGREES = `
 `;
 
 export const GET_DEGREES_PAGINATION = `
-  query GetDegreesPagination($search: String!, $limit: Int!, $offset: Int!) {
-    zoho_degreesCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset) {
+  query GetDegreesPagination($search: String!, $limit: Int!, $offset: Int!, $orderBy: [zoho_degreesOrderBy!]) {
+    zoho_degreesCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset, orderBy: $orderBy) {
       edges {
         node {
           id

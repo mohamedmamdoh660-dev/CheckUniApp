@@ -38,7 +38,7 @@ export function getZohoCitiesColumns(
           </div>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       enableHiding: true,
     },
 

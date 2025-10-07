@@ -16,6 +16,10 @@ export default function ZohoDegreesManagementPage({ type }: { type: string }) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   async function fetchDegrees() {
     setIsRefetching(true);
@@ -24,7 +28,8 @@ export default function ZohoDegreesManagementPage({ type }: { type: string }) {
         await zohoDegreesService.getDegreesPagination(
           `%${debouncedSearchTerm}%`,
           pageSize,
-          currentPage
+          currentPage,
+          sorting
         );
 
       setListDegrees(degreesResponse.degrees);
@@ -38,7 +43,7 @@ export default function ZohoDegreesManagementPage({ type }: { type: string }) {
 
   useEffect(() => {
     fetchDegrees();
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
@@ -59,6 +64,11 @@ export default function ZohoDegreesManagementPage({ type }: { type: string }) {
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       <DataTable
@@ -71,6 +81,7 @@ export default function ZohoDegreesManagementPage({ type }: { type: string }) {
         }
         columns={getZohoDegreesColumns(fetchDegrees)}
         onGlobalFilterChange={handleGlobalFilterChange}
+        onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         pageSize={pageSize}

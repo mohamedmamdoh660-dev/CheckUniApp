@@ -22,6 +22,10 @@ export default function AcademicYearsManagementPage({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   const fetchAcademicYears = useCallback(async () => {
     setIsRefetching(true);
@@ -31,7 +35,17 @@ export default function AcademicYearsManagementPage({
           page: currentPage,
           pageSize: pageSize,
           searchQuery: debouncedSearchTerm,
-          orderBy: [{ created_at: "desc" }],
+          orderBy:
+            Object.keys(sorting || {}).length > 0
+              ? [
+                  {
+                    [sorting?.sortBy || "created_at"]:
+                      sorting.sortOrder === "asc"
+                        ? "AscNullsLast"
+                        : "DescNullsLast",
+                  },
+                ]
+              : [{ name: "AscNullsLast" }],
         }
       );
 
@@ -42,7 +56,7 @@ export default function AcademicYearsManagementPage({
     } finally {
       setIsRefetching(false);
     }
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   useEffect(() => {
     fetchAcademicYears();
@@ -67,6 +81,11 @@ export default function AcademicYearsManagementPage({
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       <DataTable
@@ -76,6 +95,7 @@ export default function AcademicYearsManagementPage({
         }
         columns={columnsAcademicYears}
         onGlobalFilterChange={handleGlobalFilterChange}
+        onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         pageSize={pageSize}

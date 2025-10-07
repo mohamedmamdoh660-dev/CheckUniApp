@@ -7,7 +7,7 @@ import {
   UPDATE_COUNTRY,
 } from "./countries-graphql";
 import { ZohoCountry } from "@/types/types";
-import { supabaseClient } from "@/lib/supabase-auth-client";
+import { getTableCount } from "@/supabase/actions/db-actions";
 
 class CountriesService {
   // Get countries with pagination, search, and sorting
@@ -39,15 +39,14 @@ class CountriesService {
         orderBy
       });
 
-      // Get total count
-      const countResponse = await supabaseClient
-        .from('zoho_countries')
-        .select('id', { count: 'exact' })
-        .or(`name.ilike.${searchPattern},country_code.ilike.${searchPattern}`);
+      // Get total count via RPC
+      const raw = searchQuery || "";
+      const term = raw.replace(/^%|%$/g, "");
+      const totalCount = await getTableCount('zoho_countries', { name: term, country_code: term });
 
       return {
         countries: response.zoho_countriesCollection.edges.map((edge: any) => edge.node),
-        totalCount: countResponse.count || 0
+        totalCount
       };
     } catch (error) {
       console.error("Error fetching countries:", error);

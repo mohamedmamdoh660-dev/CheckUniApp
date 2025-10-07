@@ -25,8 +25,11 @@ export const zohoSpecialityService = {
   /**
    * Get specialities with pagination
    */
-  getSpecialitiesPagination: async (search: string, limit: number, offset: number) => {
-    const response = await executeGraphQLBackend(GET_SPECIALITIES_PAGINATION, { search, limit, offset: limit * offset });
+  getSpecialitiesPagination: async (search: string, limit: number, offset: number, sorting?: { sortBy?: string; sortOrder?: "asc" | "desc" }) => {
+    const orderBy = (sorting && sorting.sortBy)
+      ? [{ [sorting.sortBy]: sorting.sortOrder === "asc" ? 'AscNullsLast' : 'DescNullsLast' }]
+      : [{ name: 'AscNullsLast' }];
+    const response = await executeGraphQLBackend(GET_SPECIALITIES_PAGINATION, { search, limit, offset: limit * offset, orderBy });
     const countResponse = await supabaseClient
       .from('zoho_speciality')
       .select('id,name', { count: 'exact' })

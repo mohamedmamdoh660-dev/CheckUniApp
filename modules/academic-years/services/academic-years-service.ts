@@ -6,7 +6,7 @@ import {
   GET_ACADEMIC_YEAR_BY_ID,
   UPDATE_ACADEMIC_YEAR,
 } from "./academic-years-graphql";
-import { supabaseClient } from "@/lib/supabase-auth-client";
+import { getTableCount } from "@/supabase/actions/db-actions";
 import { ZohoAcademicYear } from "@/types/types";
 
 class AcademicYearsService {
@@ -34,15 +34,14 @@ class AcademicYearsService {
         orderBy
       });
 
-      // Get total count
-      const countResponse = await supabaseClient
-        .from('zoho_academic_years')
-        .select('id', { count: 'exact' })
-        .ilike('name', searchPattern);
+      // Get total count via RPC
+      const raw = searchQuery || "";
+      const term = raw.replace(/^%|%$/g, "");
+      const totalCount = await getTableCount('zoho_academic_years', { name: term });
 
       return {
         academicYears: response.zoho_academic_yearsCollection.edges.map((edge: any) => edge.node),
-        totalCount: countResponse.count || 0
+        totalCount
       };
     } catch (error) {
       console.error("Error fetching academic years:", error);

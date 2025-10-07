@@ -8,7 +8,7 @@ import {
   UPDATE_FACULTY
 } from "./zoho-faculty-graphql";
 import { ZohoFaculty } from "@/types/types";
-import { supabaseClient } from "@/lib/supabase-auth-client";
+import { getTableCount } from "@/supabase/actions/db-actions";
 
 export const zohoFacultyService = {
   /**
@@ -25,15 +25,17 @@ export const zohoFacultyService = {
   /**
    * Get faculties with pagination
    */
-  getFacultiesPagination: async (search: string, limit: number, offset: number) => {
-    const response = await executeGraphQLBackend(GET_FACULTIES_PAGINATION, { search, limit, offset: limit * offset});
-    const countResponse = await supabaseClient
-      .from('zoho_faculty')
-      .select('id,name', { count: 'exact' })
-      .ilike('name', `${search}`);
+  getFacultiesPagination: async (search: string, limit: number, offset: number, sorting?: { sortBy?: string; sortOrder?: "asc" | "desc" }) => {
+    const orderBy = (sorting && sorting.sortBy)
+      ? [{ [sorting.sortBy]: sorting.sortOrder === "asc" ? 'AscNullsLast' : 'DescNullsLast' }]
+      : [{ name: 'AscNullsLast' }];
+    const response = await executeGraphQLBackend(GET_FACULTIES_PAGINATION, { search, limit, offset: limit * offset, orderBy});
+    const raw = search || "";
+    const term = raw.replace(/^%|%$/g, "");
+    const totalCount = await getTableCount('zoho_faculty', { name: term });
     return {
       faculties: response.zoho_facultyCollection.edges.map((edge: any) => edge.node),
-      totalCount: countResponse.count
+      totalCount
     };
   },
 

@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../data-table-column-header";
-import { ZohoDegreesTableRowActions } from "../actions/zoho-degrees-actions";
 import { currentTimezone } from "@/lib/helper/current-timezone";
 import { ZohoDegree } from "@/types/types";
 import { StatusBadge } from "@/components/ui/status-badge";

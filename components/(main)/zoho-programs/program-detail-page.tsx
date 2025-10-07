@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { formatNumber } from "@/utils/format-number";
 
 export default function ProgramDetailPage() {
   const params = useParams();
@@ -236,7 +237,7 @@ export default function ProgramDetailPage() {
                         Tuition
                       </p>
                       <p className="font-medium">
-                        {program.official_tuition || "N/A"}{" "}
+                        {formatNumber(Number(program?.official_tuition || 0))}{" "}
                         {program.tuition_currency || ""}
                       </p>
                     </div>
@@ -245,7 +246,7 @@ export default function ProgramDetailPage() {
                         Discounted Tuition
                       </p>
                       <p className="font-medium">
-                        {program.discounted_tuition || "N/A"}{" "}
+                        {formatNumber(Number(program?.discounted_tuition || 0))}{" "}
                         {program.tuition_currency || ""}
                       </p>
                     </div>

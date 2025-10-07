@@ -16,6 +16,10 @@ export default function SemestersManagementPage({ type }: { type: string }) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   const fetchSemesters = useCallback(async () => {
     setIsRefetching(true);
@@ -24,6 +28,17 @@ export default function SemestersManagementPage({ type }: { type: string }) {
         page: currentPage,
         pageSize: pageSize,
         searchQuery: debouncedSearchTerm,
+        orderBy:
+          Object.keys(sorting || {}).length > 0
+            ? [
+                {
+                  [sorting?.sortBy || "created_at"]:
+                    sorting.sortOrder === "asc"
+                      ? "AscNullsLast"
+                      : "DescNullsLast",
+                },
+              ]
+            : [{ created_at: "DescNullsLast" }],
       });
 
       setListSemesters(semestersResponse.semesters);
@@ -33,7 +48,7 @@ export default function SemestersManagementPage({ type }: { type: string }) {
     } finally {
       setIsRefetching(false);
     }
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   useEffect(() => {
     fetchSemesters();
@@ -58,6 +73,11 @@ export default function SemestersManagementPage({ type }: { type: string }) {
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       <DataTable
@@ -65,6 +85,7 @@ export default function SemestersManagementPage({ type }: { type: string }) {
         toolbar={<SemestersToolbar fetchRecords={fetchSemesters} type={type} />}
         columns={columnsSemesters}
         onGlobalFilterChange={handleGlobalFilterChange}
+        onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         pageSize={pageSize}

@@ -127,7 +127,7 @@ export function getUserColumns(
                 </div>
               ) : null;
             },
-            enableSorting: true,
+            enableSorting: false,
             enableHiding: true,
           },
         ]

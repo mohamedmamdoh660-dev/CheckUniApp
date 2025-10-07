@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { getZohoCitiesColumns } from "@/components/data-table/columns/column-zoho-cities";
 import { ZohoCitiesDataTableToolbar } from "@/components/data-table/toolbars/zoho-cities-toolbar";
@@ -17,14 +17,19 @@ export default function ZohoCitiesManagementPage({ type }: { type: string }) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
-  async function fetchCities() {
+  const fetchCities = useCallback(async () => {
     setIsRefetching(true);
     try {
       const citiesResponse: any = await zohoCitiesService.getCitiesPagination(
         `%${debouncedSearchTerm}%`,
         pageSize,
-        currentPage
+        currentPage,
+        sorting
       );
 
       setListCities(citiesResponse.cities);
@@ -34,11 +39,11 @@ export default function ZohoCitiesManagementPage({ type }: { type: string }) {
     } finally {
       setIsRefetching(false);
     }
-  }
+  }, [debouncedSearchTerm, pageSize, currentPage, sorting]);
 
   useEffect(() => {
     fetchCities();
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [fetchCities]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
@@ -59,6 +64,11 @@ export default function ZohoCitiesManagementPage({ type }: { type: string }) {
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       <DataTable
@@ -68,6 +78,7 @@ export default function ZohoCitiesManagementPage({ type }: { type: string }) {
         }
         columns={getZohoCitiesColumns(fetchCities)}
         onGlobalFilterChange={handleGlobalFilterChange}
+        onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         pageSize={pageSize}

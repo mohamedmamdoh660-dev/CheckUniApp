@@ -4,7 +4,7 @@ export const GET_COUNTRIES = `
       filter: $filter
       first: $limit
       offset: $offset
-    orderBy: [{ created_at: DescNullsLast }]
+    orderBy: $orderBy
     ) {
       edges {
         node {

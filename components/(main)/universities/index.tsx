@@ -18,6 +18,10 @@ export default function UniversitiesManagementPage({ type }: { type: string }) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   const fetchUniversities = useCallback(async () => {
     setIsRefetching(true);
@@ -26,6 +30,7 @@ export default function UniversitiesManagementPage({ type }: { type: string }) {
         page: currentPage,
         pageSize: pageSize,
         searchQuery: debouncedSearchTerm,
+        orderBy: sorting,
       });
 
       setListUniversities(universitiesResponse.universities);
@@ -35,7 +40,7 @@ export default function UniversitiesManagementPage({ type }: { type: string }) {
     } finally {
       setIsRefetching(false);
     }
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   useEffect(() => {
     fetchUniversities();
@@ -60,6 +65,11 @@ export default function UniversitiesManagementPage({ type }: { type: string }) {
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       <DataTable
@@ -69,6 +79,7 @@ export default function UniversitiesManagementPage({ type }: { type: string }) {
         }
         columns={columnsUniversities}
         onGlobalFilterChange={handleGlobalFilterChange}
+        onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         pageSize={pageSize}

@@ -19,8 +19,8 @@ export const GET_CITIES = `
 `;
 
 export const GET_CITIES_PAGINATION = `
-  query GetCitiesPagination($search: String!, $limit: Int!, $offset: Int!) {
-    zoho_citiesCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset) {
+  query GetCitiesPagination($search: String!, $limit: Int!, $offset: Int!, $orderBy: [zoho_citiesOrderBy!]) {
+    zoho_citiesCollection(filter: {name: {ilike: $search}}, first: $limit, offset: $offset, orderBy: $orderBy) {
       edges {
         node {
           id

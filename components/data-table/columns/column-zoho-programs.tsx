@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { formatNumber } from "@/utils/format-number";
 
 export function getZohoProgramsColumns(
   fetchPrograms: () => void,
@@ -172,14 +173,14 @@ export function getZohoProgramsColumns(
       ),
       cell: ({ row }) => {
         const currency = row.original.tuition_currency || "";
-        const tuition = row.original.official_tuition || "-";
+        const tuition = row.original.official_tuition || 0;
         const discounted = row.original.discounted_tuition;
 
         return (
           <div className="text-left">
-            <div>{`${tuition} ${currency}`}</div>
+            <div>{`${formatNumber(Number(tuition))} ${currency}`}</div>
             {discounted && (
-              <div className="text-xs text-green-600">{`Discounted: ${discounted} ${currency}`}</div>
+              <div className="text-xs text-green-600">{`Discounted: ${formatNumber(Number(discounted))} ${currency}`}</div>
             )}
           </div>
         );

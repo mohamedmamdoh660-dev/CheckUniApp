@@ -17,6 +17,10 @@ export default function ZohoFacultyManagementPage({ type }: { type: string }) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [sorting, setSorting] = useState<{
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>({});
 
   async function fetchFaculties() {
     setIsRefetching(true);
@@ -25,7 +29,8 @@ export default function ZohoFacultyManagementPage({ type }: { type: string }) {
         await zohoFacultyService.getFacultiesPagination(
           `%${debouncedSearchTerm}%`,
           pageSize,
-          currentPage
+          currentPage,
+          sorting
         );
 
       setListFaculties(facultiesResponse.faculties);
@@ -39,7 +44,7 @@ export default function ZohoFacultyManagementPage({ type }: { type: string }) {
 
   useEffect(() => {
     fetchFaculties();
-  }, [currentPage, pageSize, debouncedSearchTerm]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
@@ -60,6 +65,11 @@ export default function ZohoFacultyManagementPage({ type }: { type: string }) {
     setCurrentPage(0);
   };
 
+  const handleSortingChange = (sortBy?: string, sortOrder?: "asc" | "desc") => {
+    setSorting({ sortBy, sortOrder });
+    setCurrentPage(0);
+  };
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 ">
       <DataTable
@@ -72,6 +82,7 @@ export default function ZohoFacultyManagementPage({ type }: { type: string }) {
         }
         columns={getZohoFacultyColumns(fetchFaculties)}
         onGlobalFilterChange={handleGlobalFilterChange}
+        onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         pageSize={pageSize}
