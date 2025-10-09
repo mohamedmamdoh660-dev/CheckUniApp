@@ -86,7 +86,7 @@ export function ZohoApplicationsDataTableToolbar<TData>({
         <div className="relative w-1/2">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by Program, Application or Stage"
+            placeholder="Search by Program, Application, Student or Stage"
             value={globalFilter}
             onChange={handleFilterChange}
             className="h-8 pl-8 w-full focus-visible:ring-0"

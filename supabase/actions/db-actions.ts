@@ -54,8 +54,8 @@ export const getApplicationsPagination = async (
  
     try {
       let programIds = [];
+      let studentIds = [];
       const searchPattern = `%${search.trim()}%`;
-
       // If search is provided, get matching IDs first
       if (search && search.trim() !== "") {
         // Get matching program IDs  
@@ -65,6 +65,14 @@ export const getApplicationsPagination = async (
           .ilike("name", searchPattern);
         
         programIds = programs?.map(p => p.id) || [];
+
+        const { data: students } = await supabaseClient
+          .from("zoho_students")
+          .select("id")
+       .or(`email.ilike.${searchPattern},passport_number.ilike.${searchPattern}`);
+         
+
+        studentIds = students?.map(s => s.id) || [];
       }
   
       // Main query
@@ -84,6 +92,8 @@ export const getApplicationsPagination = async (
           stage,
           degree,
           application_name,
+          online_application_id,
+          app_id,
   
           agent:user_profile!zoho_applications_user_id_fkey (
             id,
@@ -99,6 +109,7 @@ export const getApplicationsPagination = async (
             last_name,
             email,
             mobile,
+            passport_number,
             photo_url
           ),
   
@@ -151,15 +162,26 @@ export const getApplicationsPagination = async (
       // Apply search filter using IN clause and text fields
       if (search && search.trim() !== "") {
         const orConditions = [];
+        const trimmedSearch = search.trim();
+        const searchPattern = `%${trimmedSearch}%`;
         
         if (programIds.length > 0) {
           orConditions.push(`program.in.(${programIds.join(',')})`);
         }
 
-        orConditions.push(`application_name.ilike.${searchPattern}`);
+        if (studentIds.length > 0) {
+          orConditions.push(`student.in.(${studentIds.join(',')})`);
+        }
 
+        // Application fields
+        orConditions.push(`application_name.ilike.${searchPattern}`);
+        orConditions.push(`online_application_id.ilike.${searchPattern}`);
+        orConditions.push(`app_id.ilike.${searchPattern}`);
         orConditions.push(`stage.ilike.${searchPattern}`);
+          orConditions.push(`id.eq.${trimmedSearch}`);
         
+        
+       
         if (orConditions.length > 0) {
           query = query.or(orConditions.join(','));
         }
