@@ -16,9 +16,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Props = {
   applicationId: string;
+  onCountChange?: (count: number) => void;
 };
 
-export default function ApplicationNotes({ applicationId }: Props) {
+export default function ApplicationNotes({
+  applicationId,
+  onCountChange,
+}: Props) {
   const { userProfile } = useAuth();
   const [notes, setNotes] = useState<any[]>([]);
   const [notesLoading, setNotesLoading] = useState(false);
@@ -41,6 +45,7 @@ export default function ApplicationNotes({ applicationId }: Props) {
         const rows =
           await zohoApplicationNotesService.listByApplicationId(applicationId);
         setNotes(rows);
+        if (onCountChange) onCountChange(rows.length);
       } catch (e) {
         console.error(e);
       } finally {
@@ -48,7 +53,7 @@ export default function ApplicationNotes({ applicationId }: Props) {
       }
     };
     if (applicationId) loadNotes();
-  }, [applicationId]);
+  }, [applicationId, onCountChange]);
 
   const handleSend = async () => {
     if (!noteContent.trim()) return;
@@ -63,6 +68,7 @@ export default function ApplicationNotes({ applicationId }: Props) {
         is_read: true,
       });
       setNotes((prev) => [created, ...prev]);
+      if (onCountChange) onCountChange(notes.length + 1);
       setNoteContent("");
     } catch (e) {
       console.error(e);

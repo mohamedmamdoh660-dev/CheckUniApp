@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Bell, Check, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { Bell, Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -36,6 +36,70 @@ export default function NotificationsMenu() {
     []
   );
 
+  const showNotificationToast = useCallback(
+    (row: any, variant: "new" | "update" = "new") => {
+      const isUpdate = variant === "update";
+      const idSuffix = isUpdate ? "update" : "insert";
+      const accentClasses = isUpdate
+        ? "bg-amber-500/15 text-amber-700"
+        : "bg-primary/10 text-primary";
+      const titleText = isUpdate
+        ? row.title || "Notification updated"
+        : row.title || "New notification";
+
+      toast.custom(
+        (t) => (
+          <div className="w-[380px] rounded-lg border bg-background shadow-lg p-3">
+            <div className="flex items-start gap-3">
+              <div
+                className={`shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full ${accentClasses}`}
+              >
+                <Bell className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-medium leading-6 truncate">
+                  {titleText}
+                </div>
+                {row.content ? (
+                  <div className="mt-0.5 text-sm text-muted-foreground break-words">
+                    {row.content}
+                  </div>
+                ) : null}
+                {/* <div className="mt-3 flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      try {
+                        router.push(`/${row.module_name}/${row.module_id}`);
+                      } finally {
+                        toast.dismiss(t);
+                      }
+                    }}
+                  >
+                    Open
+                  </Button>
+                </div> */}
+              </div>
+              <button
+                onClick={() => toast.dismiss(t)}
+                className="ml-1 text-muted-foreground hover:text-foreground"
+                aria-label="Dismiss"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          id: `notif-${row.id}-${idSuffix}`,
+          duration: 15000,
+        }
+      );
+    },
+    [router]
+  );
+
   const unreadCount = useMemo(
     () => items.filter((i) => !i.is_read).length,
     [items]
@@ -57,7 +121,7 @@ export default function NotificationsMenu() {
       }
     };
     if (agentId) load();
-  }, [agentId]);
+  }, [agentId, showNotificationToast]);
 
   // Realtime updates for notifications
   useEffect(() => {
@@ -76,7 +140,9 @@ export default function NotificationsMenu() {
 
           if (payload.eventType === "INSERT") {
             setItems((prev) => [row, ...prev.filter((i) => i.id !== row.id)]);
+            showNotificationToast(row, "new");
           } else if (payload.eventType === "UPDATE") {
+            showNotificationToast(row, "update");
             setItems((prev) =>
               prev.map((i) => (i.id === row.id ? { ...i, ...row } : i))
             );

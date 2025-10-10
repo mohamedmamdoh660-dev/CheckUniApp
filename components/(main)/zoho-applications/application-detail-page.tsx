@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -57,6 +57,7 @@ import ApplicationNotes from "./component/application-notes";
 export default function ApplicationDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const applicationId = params.id as string;
   const [isLoading, setIsLoading] = useState(false);
   const [application, setApplication] = useState<ZohoApplication | null>(null);
@@ -70,6 +71,29 @@ export default function ApplicationDetailPage() {
     []
   );
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("application");
+  const [notesCount, setNotesCount] = useState<number>(0);
+
+  // Initialize tab from querystring (?tab=...)
+  useEffect(() => {
+    const tabParam = (searchParams?.get("tab") || "").toLowerCase();
+    if (!tabParam) return;
+    if (
+      ["application", "student", "university", "letters", "notes"].includes(
+        tabParam
+      )
+    ) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  const updateQueryForTab = useCallback(
+    (tab: string) => {
+      const query = `?tab=${tab}`;
+      router.replace(`${window.location.pathname}${query}`);
+    },
+    [router]
+  );
 
   const getApplication = useCallback(async () => {
     try {
@@ -446,7 +470,14 @@ export default function ApplicationDetailPage() {
         </div>
 
         <div className="p-8 pt-0">
-          <Tabs defaultValue="application" className="space-y-4">
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => {
+              setActiveTab(v);
+              updateQueryForTab(v);
+            }}
+            className="space-y-4"
+          >
             <TabsList className="grid w-full grid-cols-5 bg-muted/50 ">
               <TabsTrigger
                 value="application"
@@ -476,7 +507,7 @@ export default function ApplicationDetailPage() {
                 value="notes"
                 className="data-[state=active]:bg-accent dark:data-[state=active]:text-primary-foreground"
               >
-                Notes
+                Notes {`(${notesCount})`}
               </TabsTrigger>
             </TabsList>
 
@@ -837,7 +868,10 @@ export default function ApplicationDetailPage() {
 
             {/* University Letters Tab */}
             <TabsContent value="notes" className="space-y-6">
-              <ApplicationNotes applicationId={applicationId} />
+              <ApplicationNotes
+                applicationId={applicationId}
+                onCountChange={setNotesCount}
+              />
             </TabsContent>
           </Tabs>
         </div>
