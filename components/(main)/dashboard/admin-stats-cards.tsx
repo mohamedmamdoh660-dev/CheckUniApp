@@ -73,24 +73,6 @@ export function AdminStatsCards() {
             </CardAction>
           </CardHeader>
         </Card>
-        <Card className="@container/card">
-          <CardHeader>
-            <CardDescription>Paid Students</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {isLoading ? (
-                <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
-              ) : (
-                stats.paidStudents.toLocaleString()
-              )}
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline">
-                <TrendingUp className="mr-1 h-4 w-4" />
-                Active
-              </Badge>
-            </CardAction>
-          </CardHeader>
-        </Card>
 
         <Card className="@container/card">
           <CardHeader>
@@ -119,6 +101,24 @@ export function AdminStatsCards() {
                 <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
               ) : (
                 stats.weekStudents.toLocaleString()
+              )}
+            </CardTitle>
+            <CardAction>
+              <Badge variant="outline">
+                <TrendingUp className="mr-1 h-4 w-4" />
+                Active
+              </Badge>
+            </CardAction>
+          </CardHeader>
+        </Card>
+        <Card className="@container/card">
+          <CardHeader>
+            <CardDescription>Paid Students</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {isLoading ? (
+                <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
+              ) : (
+                stats.paidStudents.toLocaleString()
               )}
             </CardTitle>
             <CardAction>

@@ -38,6 +38,14 @@ export interface User {
   roles?: {
     name: string
     description?: string
+    role_accessCollection?: {
+      edges: Array<{
+        node: {
+          resource: string
+          action: string
+        }
+      }>
+    }
   }
   
  
@@ -97,15 +105,76 @@ export interface ZohoCountry {
   user_id?: User
 
 }
-
 export interface Role {
   id: string;
   name: string;
   description?: string;
   created_at?: string;
   updated_at?: string;
+}
 
-} 
+export interface RoleAccess {
+  id: string;
+  role_id: string;
+  resource: ResourceType;
+  action: ActionType;
+  created_at?: string;
+  updated_at?: string;
+  roles: Role;
+}
+
+export enum ResourceType {
+  // Core
+  DASHBOARD = "dashboard",
+  SEARCH = "search",
+  
+  // User Management
+  USERS = "users",
+  ROLES = "roles",
+  PERMISSIONS = "permissions",
+  
+  // Student & Application Management
+  STUDENTS = "students",
+  APPLICATIONS = "applications",
+  
+  // Academic Resources
+  UNIVERSITIES = "universities",
+  PROGRAMS = "programs",
+  COUNTRIES = "countries",
+  CITIES = "cities",
+  DEGREES = "degrees",
+  FACULTIES = "faculties",
+  SPECIALITIES = "specialities",
+  LANGUAGES = "languages",
+  
+  // Academic Settings
+  ACADEMIC_YEARS = "academic_years",
+  SEMESTERS = "semesters",
+  
+  // Communication & Content
+  ANNOUNCEMENTS = "announcements",
+  KNOWLEDGE_BASE = "knowledge_base",
+  
+  // System
+  SETTINGS = "settings",
+  REPORTS = "reports",
+  
+  // Legacy/Other (keep for backward compatibility)
+  
+}
+
+export enum ActionType {
+  CREATE = "create",
+  READ = "read",
+  EDIT = "edit",
+  DELETE = "delete",
+  VIEW = "view",
+  EXPORT = "export",
+  GENERATE = "generate",
+  SEND_MESSAGE = "send_message",
+  SEND_MESSAGE_THROUGH_CHANNEL = "send_message_through_channel",
+}
+
 
 export interface ZohoSemester {
   id: string;

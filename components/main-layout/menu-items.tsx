@@ -15,6 +15,8 @@ import {
   RiGraduationCapLine,
   RiCommunityLine,
   RiTranslate,
+  RiUserStarLine,
+  RiShieldUserLine,
 } from "@remixicon/react";
 import { SearchIcon } from "lucide-react";
 
@@ -167,6 +169,20 @@ export const getNavData = (user: { roles?: string }) => {
           icon: RiTeamLine,
           isActive: false,
           resource: "users",
+        },
+        {
+          title: "Roles",
+          url: "/roles",
+          icon: RiUserStarLine,
+          isActive: false,
+          resource: "roles",
+        },
+        {
+          title: "Permissions",
+          url: "/permissions",
+          icon: RiShieldUserLine,
+          isActive: false,
+          resource: "permissions",
         },
       ],
     },
