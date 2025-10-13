@@ -26,6 +26,7 @@ import {
 import InfoGraphic from "@/components/ui/info-graphic";
 import { Button } from "@/components/ui/button";
 import { supabaseClient } from "@/lib/supabase-auth-client";
+import { toast } from "sonner";
 export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [listStudents, setListStudents] = useState<ZohoStudent[]>([]);
   const [recordCount, setRecordCount] = useState<number>(0);
@@ -75,7 +76,27 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "zoho_students" },
-        () => fetchStudents()
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            fetchStudents();
+
+            toast.success(
+              `${payload.new.first_name} ${payload.new.last_name} has been added successfully`
+            );
+          } else if (payload.eventType === "UPDATE") {
+            if (listStudents.find((student) => student.id === payload.new.id)) {
+              fetchStudents();
+            }
+            toast.success(
+              `${payload.new.first_name} ${payload.new.last_name} has been updated successfully`
+            );
+          } else if (payload.eventType === "DELETE") {
+            fetchStudents();
+            toast.success(
+              `${payload.old.first_name} ${payload.old.last_name} has been deleted successfully`
+            );
+          }
+        }
       )
       .subscribe();
     return () => {
