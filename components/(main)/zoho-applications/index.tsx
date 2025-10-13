@@ -17,6 +17,7 @@ import { supabaseClient } from "@/lib/supabase-auth-client";
 
 import { ZohoApplicationsCards } from "./component/applications-cards";
 import Loader from "@/components/loader";
+import { toast } from "sonner";
 
 export default function ZohoApplicationsManagementPage({
   type,
@@ -89,7 +90,33 @@ export default function ZohoApplicationsManagementPage({
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "zoho_applications" },
-        () => fetchApplications()
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            if (currentPage === 0) {
+              fetchApplications();
+            }
+
+            toast.success(`${payload.new.name} has been added successfully`);
+          } else if (payload.eventType === "UPDATE") {
+            if (
+              listApplications.find(
+                (application) => application.id === payload.new.id
+              )
+            ) {
+              fetchApplications();
+            }
+            toast.success(`${payload.new.name} has been updated successfully`);
+          } else if (payload.eventType === "DELETE") {
+            if (
+              listApplications.find(
+                (application) => application.id === payload.old.id
+              )
+            ) {
+              fetchApplications();
+            }
+            toast.success(`${payload.old.name} has been deleted successfully`);
+          }
+        }
       )
       .subscribe();
     return () => {

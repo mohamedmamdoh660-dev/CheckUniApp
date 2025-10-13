@@ -78,7 +78,9 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
         { event: "*", schema: "public", table: "zoho_students" },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            fetchStudents();
+            if (currentPage === 0) {
+              fetchStudents();
+            }
 
             toast.success(
               `${payload.new.first_name} ${payload.new.last_name} has been added successfully`
@@ -91,7 +93,9 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
               `${payload.new.first_name} ${payload.new.last_name} has been updated successfully`
             );
           } else if (payload.eventType === "DELETE") {
-            fetchStudents();
+            if (listStudents.find((student) => student.id === payload.old.id)) {
+              fetchStudents();
+            }
             toast.success(
               `${payload.old.first_name} ${payload.old.last_name} has been deleted successfully`
             );
