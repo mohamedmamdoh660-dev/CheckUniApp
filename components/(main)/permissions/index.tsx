@@ -7,9 +7,7 @@ import { rolesService, Role } from "@/modules/roles";
 import { RoleAccess } from "@/types/types";
 import { PermissionDataTableToolbar } from "@/components/data-table/toolbars/permission-toolbar";
 import { useDebounce } from "@/hooks/use-debounce";
-import { UserRoles } from "@/types/types";
 import PermissionMatrix from "./permission-matrix";
-import { Button } from "@/components/ui/button";
 import { LayoutGrid, List } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 

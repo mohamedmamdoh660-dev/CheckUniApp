@@ -62,20 +62,20 @@ export function getRoleColumns(fetchRoles: () => void): ColumnDef<Role>[] {
       enableSorting: true,
       enableHiding: true,
     },
-    {
-      id: "actions",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actions" />
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">
-          <RoleTableRowActions
-            row={row as unknown as Row<Role>}
-            fetchRoles={fetchRoles}
-          />
-        </div>
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Actions" />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-center">
+    //       <RoleTableRowActions
+    //         row={row as unknown as Row<Role>}
+    //         fetchRoles={fetchRoles}
+    //       />
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;

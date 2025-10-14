@@ -51,6 +51,23 @@ export interface User {
  
 } 
 
+
+export interface MenuItem {
+  title: string;
+  url: string;
+  icon?: any;
+  isActive?: boolean;
+  resource?: ResourceType;
+  unreadCount?: number;
+  items?: MenuItem[];
+}
+
+export interface MenuSection {
+  title: string;
+  url: string;
+  items: MenuItem[];
+}
+
 export enum UserRoles {
   ADMIN = "admin",
   AGENT = "agent",
@@ -126,7 +143,6 @@ export interface RoleAccess {
 export enum ResourceType {
   // Core
   DASHBOARD = "dashboard",
-  SEARCH = "search",
   
   // User Management
   USERS = "users",
@@ -153,13 +169,10 @@ export enum ResourceType {
   
   // Communication & Content
   ANNOUNCEMENTS = "announcements",
-  KNOWLEDGE_BASE = "knowledge_base",
   
   // System
   SETTINGS = "settings",
-  REPORTS = "reports",
   
-  // Legacy/Other (keep for backward compatibility)
   
 }
 
@@ -170,9 +183,6 @@ export enum ActionType {
   DELETE = "delete",
   VIEW = "view",
   EXPORT = "export",
-  GENERATE = "generate",
-  SEND_MESSAGE = "send_message",
-  SEND_MESSAGE_THROUGH_CHANNEL = "send_message_through_channel",
 }
 
 

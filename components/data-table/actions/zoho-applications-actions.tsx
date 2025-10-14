@@ -18,7 +18,7 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
-import { ZohoApplication } from "@/types/types";
+import { ResourceType, ZohoApplication } from "@/types/types";
 import { zohoApplicationsService } from "@/modules/zoho-applications/services/zoho-applications-service";
 import {
   deleteApplicationViaWebhook,
@@ -27,6 +27,7 @@ import {
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
 import EditZohoApplication from "@/components/(main)/zoho-applications/component/edit-zoho-application";
 import { useAuth } from "@/context/AuthContext";
+import { canDelete, canEdit } from "@/lib/permissions";
 // import EditZohoApplication from "@/components/(main)/zoho-applications/component/edit-zoho-application";
 
 interface ZohoApplicationsTableRowActionsProps {
@@ -157,7 +158,7 @@ export function ZohoApplicationsTableRowActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-max">
-          {isCrmId && (
+          {isCrmId && canEdit(userProfile, ResourceType.APPLICATIONS) && (
             <DropdownMenuItem
               onClick={() => {
                 setIsEditDialogOpen(true);
@@ -169,13 +170,15 @@ export function ZohoApplicationsTableRowActions({
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem
-            onClick={() => handleConfirmation("delete")}
-            className="cursor-pointer flex items-center"
-          >
-            <Trash className="mr-1 h-4 w-4" />
-            Remove
-          </DropdownMenuItem>
+          {canDelete(userProfile, ResourceType.APPLICATIONS) && (
+            <DropdownMenuItem
+              onClick={() => handleConfirmation("delete")}
+              className="cursor-pointer flex items-center"
+            >
+              <Trash className="mr-1 h-4 w-4" />
+              Remove
+            </DropdownMenuItem>
+          )}
 
           {/* <DropdownMenuItem
             onClick={() => handleConfirmation("complete")}

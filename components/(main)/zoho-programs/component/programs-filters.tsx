@@ -54,7 +54,6 @@ export default function ProgramsFilters({
   const activeCount = Object.keys(filters || {}).length;
 
   useEffect(() => {
-    console.log("🚀 ~ ProgramsFilters ~ clearFilters:", clearFilters);
     if (clearFilters) {
       setUniversity("");
       setFaculty("");

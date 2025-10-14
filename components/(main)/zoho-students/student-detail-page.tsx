@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ZohoApplication, ZohoStudent } from "@/types/types";
+import { ResourceType, ZohoApplication, ZohoStudent } from "@/types/types";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loader from "@/components/loader";
@@ -50,6 +50,7 @@ import {
 import { StatusBadge } from "@/components/ui/status-badge";
 import AddZohoApplication from "@/components/(main)/zoho-applications/component/add-zoho-application";
 import { useAuth } from "@/context/AuthContext";
+import { canCreate } from "@/lib/permissions";
 
 export function StudentDetailPage() {
   const [student, setStudent] = useState<ZohoStudent | null>(null);
@@ -258,29 +259,30 @@ export function StudentDetailPage() {
                   ) : null}
                 </div>
               </div>
-              {(userProfile?.crm_id || userProfile?.agency?.crm_id) && (
-                <div className="flex gap-3">
-                  <Button onClick={() => setAddOpen(true)}>
-                    Add Application
-                  </Button>
-                  <AddZohoApplication
-                    open={addOpen}
-                    onOpenChange={setAddOpen}
-                    onRefresh={async () => {
-                      try {
-                        const apps =
-                          await zohoApplicationsService.getApplicationsByStudent(
-                            studentId
-                          );
-                        setApplications(apps || []);
-                      } catch {}
-                    }}
-                    presetStudentId={studentId}
-                    presetStudentName={`${student?.first_name || ""} ${student?.last_name || ""}`}
-                    lockStudent
-                  />
-                </div>
-              )}
+              {(userProfile?.crm_id || userProfile?.agency?.crm_id) &&
+                canCreate(userProfile, ResourceType.APPLICATIONS) && (
+                  <div className="flex gap-3">
+                    <Button onClick={() => setAddOpen(true)}>
+                      Add Application
+                    </Button>
+                    <AddZohoApplication
+                      open={addOpen}
+                      onOpenChange={setAddOpen}
+                      onRefresh={async () => {
+                        try {
+                          const apps =
+                            await zohoApplicationsService.getApplicationsByStudent(
+                              studentId
+                            );
+                          setApplications(apps || []);
+                        } catch {}
+                      }}
+                      presetStudentId={studentId}
+                      presetStudentName={`${student?.first_name || ""} ${student?.last_name || ""}`}
+                      lockStudent
+                    />
+                  </div>
+                )}
             </div>
           </div>
         </div>

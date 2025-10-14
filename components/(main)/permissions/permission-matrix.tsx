@@ -17,7 +17,8 @@ import { toast } from "sonner";
 import { rolesService } from "@/modules/roles";
 import { Role, RoleAccess } from "@/types/types";
 import { ResourceType, ActionType } from "@/types/types";
-import { Loader2, Save, X, Check } from "lucide-react";
+import { Loader2, Save, X, Check, InfoIcon, Search } from "lucide-react";
+import InfoGraphic from "@/components/ui/info-graphic";
 
 interface PermissionMatrixProps {
   roles: Role[];
@@ -26,7 +27,7 @@ interface PermissionMatrixProps {
 
 // Resource categories for better organization
 const RESOURCE_CATEGORIES = {
-  Core: [ResourceType.DASHBOARD, ResourceType.SEARCH],
+  Core: [ResourceType.DASHBOARD],
   "User Management": [
     ResourceType.USERS,
     ResourceType.ROLES,
@@ -44,8 +45,8 @@ const RESOURCE_CATEGORIES = {
     ResourceType.LANGUAGES,
   ],
   "Academic Settings": [ResourceType.ACADEMIC_YEARS, ResourceType.SEMESTERS],
-  Communication: [ResourceType.ANNOUNCEMENTS, ResourceType.KNOWLEDGE_BASE],
-  System: [ResourceType.SETTINGS, ResourceType.REPORTS],
+  Communication: [ResourceType.ANNOUNCEMENTS],
+  System: [ResourceType.SETTINGS],
 };
 
 // Main CRUD actions for the matrix
@@ -60,12 +61,18 @@ export default function PermissionMatrix({
   roles,
   onPermissionsUpdated,
 }: PermissionMatrixProps) {
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [selectedRole, setSelectedRole] = useState<Role | null>(
+    roles[0] || null
+  );
   const [permissions, setPermissions] = useState<RoleAccess[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    setSelectedRole(roles[0] || null);
+  }, [roles]);
 
   // Load permissions when role changes
   useEffect(() => {
@@ -255,88 +262,85 @@ export default function PermissionMatrix({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <CardTitle>Permission Matrix</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Manage role-based permissions for your application
-              </p>
-            </div>
-            {hasChanges && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (selectedRole) {
-                      rolesService
-                        .getRoleAccess(selectedRole.id)
-                        .then(setPermissions);
-                      setHasChanges(false);
-                    }
-                  }}
-                  disabled={saving}
-                >
-                  <X className="mr-1 h-4 w-4" />
-                  Discard
-                </Button>
-                <Button size="sm" onClick={savePermissions} disabled={saving}>
-                  {saving ? (
-                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="mr-1 h-4 w-4" />
-                  )}
-                  Save Changes
-                </Button>
-              </div>
-            )}
+
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-4">
+          <div className="relative ">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8 w-[400px] bg-background"
+              autoComplete="off"
+              disabled={!selectedRole}
+            />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <label className="text-sm font-medium mb-2 block">
-                Select Role / Group
-              </label>
-              <Select
-                value={selectedRole?.id || ""}
-                onValueChange={(value) => {
-                  const role = roles.find((r) => r.id === value);
-                  setSelectedRole(role || null);
-                }}
+          <div className="flex-1">
+            <Select
+              value={selectedRole?.id || ""}
+              onValueChange={(value) => {
+                const role = roles.find((r) => r.id === value);
+                setSelectedRole(role || null);
+              }}
+            >
+              <SelectTrigger
+                className={`${!selectedRole ? "!w-[300px]" : "w-max"}`}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a role to manage permissions" />
-                </SelectTrigger>
-                <SelectContent>
-                  {roles.map((role) => (
-                    <SelectItem key={role.id} value={role.id}>
-                      {role.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium mb-2 block">
-                Search Resources
-              </label>
-              <Input
-                placeholder="Search resources..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                disabled={!selectedRole}
-              />
-            </div>
+                <SelectValue placeholder="Choose a role to manage permissions" />
+              </SelectTrigger>
+              <SelectContent>
+                {roles.map((role) => (
+                  <SelectItem
+                    key={role.id}
+                    value={role.id}
+                    className="capitalize"
+                  >
+                    {role.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="flex items-center gap-2">
+          {hasChanges && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={saving}
+              onClick={() => {
+                if (selectedRole) {
+                  rolesService
+                    .getRoleAccess(selectedRole.id)
+                    .then(setPermissions);
+                  setHasChanges(false);
+                }
+              }}
+            >
+              <X className="mr-1 h-4 w-4" />
+              Discard
+            </Button>
+          )}
+
+          <Button
+            size="sm"
+            onClick={savePermissions}
+            disabled={saving || !hasChanges}
+          >
+            {saving ? (
+              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-1 h-4 w-4" />
+            )}
+            Save Changes
+          </Button>
+        </div>
+      </div>
 
       {/* Permission Matrix */}
       {selectedRole && (
-        <Card>
+        <Card className="pt-0">
           <CardContent className="p-0">
             {loading ? (
               <div className="flex items-center justify-center py-12">
@@ -348,29 +352,29 @@ export default function PermissionMatrix({
                   <thead>
                     <tr className="border-b bg-muted/50">
                       <th className="p-4 text-left font-semibold min-w-[250px] sticky left-0 bg-muted/50 z-10">
-                        Resource / Ability
+                        Resource
                       </th>
                       {MATRIX_ACTIONS.map((action) => (
                         <th
                           key={action}
-                          className="p-4 text-center font-semibold min-w-[120px]"
+                          className="p-4 text-center font-semibold min-w-[120px] hover:bg-muted/50"
                         >
                           <div className="flex flex-col items-center gap-2">
                             <span className="capitalize">{action}</span>
                             <div className="flex gap-1">
                               <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
-                                className="h-6 px-2 text-xs"
+                                className="h-6 px-2 text-xs "
                                 onClick={() => selectAllForAction(action)}
                               >
                                 <Check className="h-3 w-3 mr-1" />
                                 All
                               </Button>
                               <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
-                                className="h-6 px-2 text-xs"
+                                className="h-6 px-2 text-xs "
                                 onClick={() => deselectAllForAction(action)}
                               >
                                 <X className="h-3 w-3 mr-1" />
@@ -389,28 +393,15 @@ export default function PermissionMatrix({
                     {Object.entries(filteredCategories).map(
                       ([category, resources]) => (
                         <>
-                          <tr key={category} className="border-b bg-muted/30">
-                            <td
-                              colSpan={MATRIX_ACTIONS.length + 2}
-                              className="p-3"
-                            >
-                              <Badge
-                                variant="outline"
-                                className="font-semibold"
-                              >
-                                {category}
-                              </Badge>
-                            </td>
-                          </tr>
                           {resources.map((resource) => (
                             <tr
                               key={resource}
-                              className="border-b hover:bg-muted/50 transition-colors"
+                              className="border-b hover:bg-muted/50 transition-color"
                             >
                               <td className="p-4 sticky left-0 bg-background">
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium capitalize">
-                                    {resource.replace(/_/g, " ")}
+                                    {resource?.replace(/_/g, " ") || ""}
                                   </span>
                                 </div>
                               </td>
@@ -449,18 +440,16 @@ export default function PermissionMatrix({
       )}
 
       {!selectedRole && (
-        <Card>
-          <CardContent className="py-12">
-            <div className="text-center text-muted-foreground">
-              <p className="text-lg font-medium mb-2">No Role Selected</p>
-              <p className="text-sm">
-                Please select a role above to manage its permissions
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex items-center justify-center h-[calc(100vh-400px)]">
+          <InfoGraphic
+            icon={<InfoIcon className="!h-14 !w-14 text-primary" />}
+            title="No Role Selected"
+            description="Please select a role above to manage its permissions"
+            isLeftArrow={false}
+            gradient={false}
+          />
+        </div>
       )}
     </div>
   );
 }
-
