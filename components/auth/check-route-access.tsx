@@ -17,9 +17,7 @@ export const checkRoutePermission = async (
     }
 
     // Get navigation data based on user role
-    const { navMain } = getNavData({
-      roles: user.roles?.name || "",
-    });
+    const { navMain } = getNavData(user);
 
     // Check if current path is accessible based on user's navigation items
     const isAuthorized = checkRouteAccess(pathname, navMain);
