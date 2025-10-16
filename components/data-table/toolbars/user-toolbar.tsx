@@ -7,7 +7,9 @@ import { Download, Plus, RefreshCcw, X, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import AddUser from "@/components/(main)/user/component/add-user";
-import type { Role } from "@/types/types";
+import { ResourceType, type Role } from "@/types/types";
+import { canCreate } from "@/lib/permissions";
+import { useAuth } from "@/context/AuthContext";
 // import UserSettingsDialogBox from "@/components/dashboard/user-management/manage-user-settings";
 
 interface DataTableToolbarProps<TData> {
@@ -33,6 +35,7 @@ export function UserDataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [globalFilter, setGlobalFilter] = useState<string>("");
+  const { userProfile } = useAuth();
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setGlobalFilter(value);
@@ -90,16 +93,18 @@ export function UserDataTableToolbar<TData>({
         </Button>
       </div>
       {table && <DataTableViewOptions table={table} />}
-      <div className="pl-2">
-        <Button
-          variant="default"
-          size="sm"
-          className="ml-auto h-8"
-          onClick={() => setIsDialogOpen(true)}
-        >
-          <Plus className="mr-1 h-4 w-4" /> Add User
-        </Button>
-      </div>
+      {canCreate(userProfile, ResourceType.USERS) && (
+        <div className="pl-2">
+          <Button
+            variant="default"
+            size="sm"
+            className="ml-auto h-8"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Plus className="mr-1 h-4 w-4" /> Add User
+          </Button>
+        </div>
+      )}
       <AddUser
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}

@@ -59,7 +59,7 @@ const toSafeId = (value: string): string =>
 
 export function ApplicationChart() {
   const isMobile = useIsMobile();
-  const [timeRange, setTimeRange] = React.useState("30");
+  const [timeRange, setTimeRange] = React.useState("7");
   const [chartData, setChartData] = React.useState<any[]>([]);
   const [stages, setStages] = React.useState<string[]>([]);
   const [chartConfig, setChartConfig] = React.useState<ChartConfig>({});
@@ -84,7 +84,6 @@ export function ApplicationChart() {
           userProfile?.agency_id,
           userProfile?.roles?.name
         );
-
         // Set chart data and stages
         setChartData(result.data);
         setStages(result.stages);

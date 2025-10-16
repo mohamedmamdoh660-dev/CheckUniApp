@@ -16,6 +16,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { canCreate } from "@/lib/permissions";
+import { ResourceType } from "@/types/types";
 
 interface DataTableToolbarProps<TData> {
   table?: Table<TData>;
@@ -123,7 +125,7 @@ export function ZohoStudentsDataTableToolbar<TData>({
         </Button>
       </div>
       {table && <DataTableViewOptions table={table} />}
-      {isCrmId && (
+      {isCrmId && canCreate(userProfile, ResourceType.STUDENTS) && (
         <div className="pl-2">
           <Button
             variant="default"

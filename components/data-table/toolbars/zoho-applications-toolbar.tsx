@@ -25,6 +25,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
+import { ResourceType } from "@/types/types";
+import { canCreate } from "@/lib/permissions";
 
 interface DataTableToolbarProps<TData> {
   table?: Table<TData>;
@@ -314,7 +316,7 @@ export function ZohoApplicationsDataTableToolbar<TData>({
         </Button> */}
       </div>
       {table && <DataTableViewOptions table={table} />}
-      {isCrmId && (
+      {isCrmId && canCreate(userProfile, ResourceType.APPLICATIONS) && (
         <>
           <div className="pl-2">
             <Button

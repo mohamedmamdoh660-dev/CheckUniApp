@@ -38,10 +38,35 @@ export interface User {
   roles?: {
     name: string
     description?: string
+    role_accessCollection?: {
+      edges: Array<{
+        node: {
+          resource: string
+          action: string
+        }
+      }>
+    }
   }
   
  
 } 
+
+
+export interface MenuItem {
+  title: string;
+  url: string;
+  icon?: any;
+  isActive?: boolean;
+  resource?: ResourceType;
+  unreadCount?: number;
+  items?: MenuItem[];
+}
+
+export interface MenuSection {
+  title: string;
+  url: string;
+  items: MenuItem[];
+}
 
 export enum UserRoles {
   ADMIN = "admin",
@@ -97,15 +122,68 @@ export interface ZohoCountry {
   user_id?: User
 
 }
-
 export interface Role {
   id: string;
   name: string;
   description?: string;
   created_at?: string;
   updated_at?: string;
+}
 
-} 
+export interface RoleAccess {
+  id: string;
+  role_id: string;
+  resource: ResourceType;
+  action: ActionType;
+  created_at?: string;
+  updated_at?: string;
+  roles: Role;
+}
+
+export enum ResourceType {
+  // Core
+  DASHBOARD = "dashboard",
+  
+  // User Management
+  USERS = "users",
+  ROLES = "roles",
+  PERMISSIONS = "permissions",
+  
+  // Student & Application Management
+  STUDENTS = "students",
+  APPLICATIONS = "applications",
+  
+  // Academic Resources
+  UNIVERSITIES = "universities",
+  PROGRAMS = "programs",
+  COUNTRIES = "countries",
+  CITIES = "cities",
+  DEGREES = "degrees",
+  FACULTIES = "faculties",
+  SPECIALITIES = "specialities",
+  LANGUAGES = "languages",
+  
+  // Academic Settings
+  ACADEMIC_YEARS = "academic_years",
+  SEMESTERS = "semesters",
+  
+  // Communication & Content
+  ANNOUNCEMENTS = "announcements",
+  
+  // System
+  SETTINGS = "settings",
+  
+  
+}
+
+export enum ActionType {
+  CREATE = "create",
+  EDIT = "edit",
+  DELETE = "delete",
+  VIEW = "view",
+  EXPORT = "export",
+}
+
 
 export interface ZohoSemester {
   id: string;

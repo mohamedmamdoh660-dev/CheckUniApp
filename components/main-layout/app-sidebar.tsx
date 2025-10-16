@@ -98,7 +98,7 @@ export default function SideBarLayout({
   // Get navigation data based on user's role
   useEffect(() => {
     if (userProfile) {
-      const navData = getNavData({ roles: userProfile?.roles?.name });
+      const navData = getNavData(userProfile);
       setNavItems(navData.navMain as NavSection[]);
     }
   }, [userProfile]);

@@ -40,6 +40,8 @@ import { useClearLocationSelections } from "@/context/SearchableDropdownContext"
 import { exportProgramsToPDF } from "@/components/(main)/zoho-programs/component/programs-pdf";
 import { getProgramsAll } from "@/supabase/actions/db-actions";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { ResourceType } from "@/types/types";
+import { canExport } from "@/lib/permissions";
 // PDF libs will be loaded dynamically when exporting to reduce bundle size
 
 interface DataTableToolbarProps<TData> {
@@ -85,6 +87,7 @@ export function ZohoProgramsDataTableToolbar<TData>({
 
   const isFiltered = globalFilter !== "";
   const activeCount = Object.keys(filters || {}).length;
+  const { userProfile } = useAuth();
 
   return (
     <div className="flex items-center justify-between">
@@ -147,17 +150,19 @@ export function ZohoProgramsDataTableToolbar<TData>({
           <LayoutGrid className="h-4 w-4" />
         </ToggleGroupItem>
       </ToggleGroup>
-      <div className="pl-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="ml-auto hidden h-8 lg:flex"
-          onClick={() => setOpenExport(true)}
-        >
-          <Download className="mr-2 h-4 w-4" />
-          Export
-        </Button>
-      </div>
+      {canExport(userProfile, ResourceType.PROGRAMS) && (
+        <div className="pl-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto hidden h-8 lg:flex"
+            onClick={() => setOpenExport(true)}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        </div>
+      )}
       <div className="px-2">
         <Button
           variant="outline"

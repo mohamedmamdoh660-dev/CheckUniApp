@@ -12,7 +12,6 @@ import {
 
 export { 
   rolesService,
-  // Export GraphQL queries
   GET_ALL_ROLES,
   GET_ROLE_BY_ID,
   GET_ROLES_WITH_ACCESS,

@@ -11,12 +11,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { Ellipsis, Edit, Trash, Eye } from "lucide-react";
-import { ZohoStudent } from "@/types/types";
+import { ResourceType, ZohoStudent } from "@/types/types";
 import { zohoStudentsService } from "@/modules/zoho-students/services/zoho-students-service";
 import { deleteStudentViaWebhook } from "@/lib/actions/zoho-students-actions";
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { canDelete, canEdit } from "@/lib/permissions";
 
 interface ZohoStudentsTableRowActionsProps {
   row: Row<ZohoStudent>;
@@ -96,7 +97,7 @@ export function ZohoStudentsTableRowActions({
             <Eye className="mr-1 h-4 w-4" />
             View Details
           </DropdownMenuItem>
-          {isCrmId && (
+          {isCrmId && canEdit(userProfile, ResourceType.STUDENTS) && (
             <DropdownMenuItem
               onClick={() => {
                 router.push(`/students/edit/${values.id}`);
@@ -108,13 +109,15 @@ export function ZohoStudentsTableRowActions({
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem
-            onClick={() => handleConfirmation("delete")}
-            className="cursor-pointer flex items-center"
-          >
-            <Trash className="mr-1 h-4 w-4" />
-            Remove
-          </DropdownMenuItem>
+          {canDelete(userProfile, ResourceType.STUDENTS) && (
+            <DropdownMenuItem
+              onClick={() => handleConfirmation("delete")}
+              className="cursor-pointer flex items-center"
+            >
+              <Trash className="mr-1 h-4 w-4" />
+              Remove
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
