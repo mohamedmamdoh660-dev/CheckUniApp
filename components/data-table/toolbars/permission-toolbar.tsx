@@ -296,15 +296,17 @@ export function PermissionDataTableToolbar<TData>({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Roles</SelectItem>
-                {roles.map((role) => (
-                  <SelectItem
-                    key={role.id}
-                    value={role.id}
-                    className="capitalize"
-                  >
-                    {role.name}
-                  </SelectItem>
-                ))}
+                {roles
+                  .filter((role) => role.name !== "admin")
+                  .map((role) => (
+                    <SelectItem
+                      key={role.id}
+                      value={role.id}
+                      className="capitalize"
+                    >
+                      {role.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -434,15 +436,17 @@ export function PermissionDataTableToolbar<TData>({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {roles.map((role) => (
-                              <SelectItem
-                                key={role.id}
-                                value={role.id}
-                                className="capitalize"
-                              >
-                                {role.name}
-                              </SelectItem>
-                            ))}
+                            {roles
+                              .filter((role) => role.name !== "admin")
+                              .map((role) => (
+                                <SelectItem
+                                  key={role.id}
+                                  value={role.id}
+                                  className="capitalize"
+                                >
+                                  {role.name}
+                                </SelectItem>
+                              ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />

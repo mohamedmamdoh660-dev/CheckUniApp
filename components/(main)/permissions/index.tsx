@@ -81,7 +81,8 @@ export default function PermissionManagementPage({ type }: { type: string }) {
         permissions.filter(
           (permission) =>
             permission.resource !== ResourceType.ROLES &&
-            permission.resource !== ResourceType.PERMISSIONS
+            permission.resource !== ResourceType.PERMISSIONS &&
+            permission.roles.name !== "admin"
         )
       );
     } catch (error) {

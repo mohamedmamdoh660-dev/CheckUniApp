@@ -140,7 +140,7 @@ export function RoleDataTableToolbar<TData>({
       </div>
       {table && <DataTableViewOptions table={table} />}
       {/* <CreateProtected resource={ResourceType.ROLES}> */}
-      {/* <div className="pl-2">
+      <div className="pl-2">
         <Button
           variant="default"
           size="sm"
@@ -149,7 +149,7 @@ export function RoleDataTableToolbar<TData>({
         >
           <Plus className="mr-1 h-4 w-4" /> Add Role
         </Button>
-      </div> */}
+      </div>
       {/* </CreateProtected> */}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
