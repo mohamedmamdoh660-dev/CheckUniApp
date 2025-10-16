@@ -178,7 +178,6 @@ export enum ResourceType {
 
 export enum ActionType {
   CREATE = "create",
-  READ = "read",
   EDIT = "edit",
   DELETE = "delete",
   VIEW = "view",

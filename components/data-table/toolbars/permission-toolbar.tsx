@@ -38,13 +38,44 @@ import { Role } from "@/types/types";
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import { rolesService } from "@/modules";
 
-// Convert enum to options array
-const resourceOptions: Option[] = Object.values(ResourceType).map(
-  (resource) => ({
+// Resource-specific actions mapping
+const RESOURCE_ACTIONS: Record<ResourceType, ActionType[]> = {
+  [ResourceType.DASHBOARD]: [ActionType.VIEW],
+  [ResourceType.STUDENTS]: [ActionType.CREATE, ActionType.VIEW],
+  [ResourceType.APPLICATIONS]: [ActionType.VIEW, ActionType.CREATE],
+  [ResourceType.PROGRAMS]: [ActionType.VIEW, ActionType.EXPORT],
+  // All other resources: only VIEW
+  [ResourceType.USERS]: [
+    ActionType.VIEW,
+    ActionType.CREATE,
+    ActionType.DELETE,
+    ActionType.EDIT,
+  ],
+  [ResourceType.ROLES]: [ActionType.VIEW],
+  [ResourceType.PERMISSIONS]: [ActionType.VIEW],
+  [ResourceType.UNIVERSITIES]: [ActionType.VIEW],
+  [ResourceType.COUNTRIES]: [ActionType.VIEW],
+  [ResourceType.CITIES]: [ActionType.VIEW],
+  [ResourceType.DEGREES]: [ActionType.VIEW],
+  [ResourceType.FACULTIES]: [ActionType.VIEW],
+  [ResourceType.SPECIALITIES]: [ActionType.VIEW],
+  [ResourceType.LANGUAGES]: [ActionType.VIEW],
+  [ResourceType.ACADEMIC_YEARS]: [ActionType.VIEW],
+  [ResourceType.SEMESTERS]: [ActionType.VIEW],
+  [ResourceType.ANNOUNCEMENTS]: [ActionType.VIEW],
+  [ResourceType.SETTINGS]: [ActionType.VIEW],
+};
+
+// Convert enum to options array, excluding ROLES and PERMISSIONS
+const resourceOptions: Option[] = Object.values(ResourceType)
+  .filter(
+    (resource) =>
+      resource !== ResourceType.ROLES && resource !== ResourceType.PERMISSIONS
+  )
+  .map((resource) => ({
     value: resource,
     label: resource,
-  })
-);
+  }));
 
 const actionOptions: Option[] = Object.values(ActionType).map((action) => ({
   value: action,
@@ -113,6 +144,25 @@ export function PermissionDataTableToolbar<TData>({
 
   const formSelectedRole = form.watch("role");
   const formSelectedAction = form.watch("actions");
+  const formSelectedResources = form.watch("resources");
+
+  // Get available resources based on selected action
+  const getAvailableResources = (action: ActionType | string): Option[] => {
+    if (!action) {
+      return resourceOptions;
+    }
+
+    // Filter resources that support the selected action
+    const availableResourceTypes = Object.entries(RESOURCE_ACTIONS)
+      .filter(([_, actions]) => actions.includes(action as ActionType))
+      .map(([resource]) => resource);
+
+    return resourceOptions.filter((option) =>
+      availableResourceTypes.includes(option.value)
+    );
+  };
+
+  const availableResources = getAvailableResources(formSelectedAction);
 
   // Load existing permissions when role changes
   useEffect(() => {
@@ -134,7 +184,12 @@ export function PermissionDataTableToolbar<TData>({
       // Filter resources that have the selected action
       const resourcesForAction = existingPermissions
         .filter((p) => p.action === formSelectedAction)
-        .map((p) => p.resource);
+        .map((p) => p.resource)
+        .filter(
+          (resource) =>
+            resource !== ResourceType.ROLES &&
+            resource !== ResourceType.PERMISSIONS
+        );
 
       form.setValue("resources", resourcesForAction);
     } else {
@@ -236,13 +291,17 @@ export function PermissionDataTableToolbar<TData>({
               onValueChange={handleRoleChange}
               disabled={roles.length === 0}
             >
-              <SelectTrigger>
+              <SelectTrigger className="capitalize">
                 <SelectValue placeholder="Filter by Role" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Roles</SelectItem>
                 {roles.map((role) => (
-                  <SelectItem key={role.id} value={role.id}>
+                  <SelectItem
+                    key={role.id}
+                    value={role.id}
+                    className="capitalize"
+                  >
                     {role.name}
                   </SelectItem>
                 ))}
@@ -256,16 +315,26 @@ export function PermissionDataTableToolbar<TData>({
                 handleResourceFilterChange(value || null)
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="capitalize">
                 <SelectValue placeholder="Filter by Resource" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Resources</SelectItem>
-                {Object.values(ResourceType).map((resource) => (
-                  <SelectItem key={resource} value={resource}>
-                    {resource}
-                  </SelectItem>
-                ))}
+                {Object.values(ResourceType)
+                  .filter(
+                    (resource) =>
+                      resource !== ResourceType.ROLES &&
+                      resource !== ResourceType.PERMISSIONS
+                  )
+                  .map((resource) => (
+                    <SelectItem
+                      key={resource}
+                      value={resource}
+                      className="capitalize"
+                    >
+                      {resource}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -274,13 +343,17 @@ export function PermissionDataTableToolbar<TData>({
               value={filterSelectedAction || ""}
               onValueChange={(value) => handleActionFilterChange(value || null)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="capitalize">
                 <SelectValue placeholder="Filter by Action" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Actions</SelectItem>
                 {Object.values(ActionType).map((action) => (
-                  <SelectItem key={action} value={action}>
+                  <SelectItem
+                    key={action}
+                    value={action}
+                    className="capitalize"
+                  >
                     {action}
                   </SelectItem>
                 ))}
@@ -331,8 +404,8 @@ export function PermissionDataTableToolbar<TData>({
               <DialogHeader>
                 <DialogTitle>Manage Permissions</DialogTitle>
                 <DialogDescription>
-                  Select a role and action to manage resources. Resources will
-                  be automatically loaded based on your selection.
+                  Select a role and action first. Available resources will be
+                  shown based on your action selection.
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -349,20 +422,24 @@ export function PermissionDataTableToolbar<TData>({
                         <Select
                           onValueChange={(value) => {
                             field.onChange(value);
-                            // Reset action when role changes
+                            // Reset action and resources when role changes
                             form.setValue("actions", "");
                             form.setValue("resources", []);
                           }}
                           value={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="capitalize">
                               <SelectValue placeholder="Select a role" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {roles.map((role) => (
-                              <SelectItem key={role.id} value={role.id}>
+                              <SelectItem
+                                key={role.id}
+                                value={role.id}
+                                className="capitalize"
+                              >
                                 {role.name}
                               </SelectItem>
                             ))}
@@ -390,13 +467,11 @@ export function PermissionDataTableToolbar<TData>({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {Object.values(ActionType)
-
-                              .map((action) => (
-                                <SelectItem key={action} value={action}>
-                                  {action}
-                                </SelectItem>
-                              ))}
+                            {Object.values(ActionType).map((action) => (
+                              <SelectItem key={action} value={action}>
+                                {action}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -409,8 +484,16 @@ export function PermissionDataTableToolbar<TData>({
                     name="resources"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Resources</FormLabel>
+                        <FormLabel>
+                          Resources
+                          {formSelectedAction && (
+                            <span className="text-xs text-muted-foreground ml-2">
+                              (Resources that support {formSelectedAction})
+                            </span>
+                          )}
+                        </FormLabel>
                         <MultipleSelector
+                          key={formSelectedAction || "no-action"}
                           value={field.value.map((value) => ({
                             value,
                             label: value,
@@ -418,7 +501,7 @@ export function PermissionDataTableToolbar<TData>({
                           onChange={(options) =>
                             field.onChange(options.map((opt) => opt.value))
                           }
-                          defaultOptions={resourceOptions}
+                          defaultOptions={availableResources}
                           placeholder={
                             !formSelectedRole || !formSelectedAction
                               ? "Select a role and action first"
@@ -437,7 +520,7 @@ export function PermissionDataTableToolbar<TData>({
                               </p>
                             ) : (
                               <p className="text-center text-sm">
-                                No resources found
+                                No resources found for this action
                               </p>
                             )
                           }
@@ -462,7 +545,10 @@ export function PermissionDataTableToolbar<TData>({
                     <Button
                       type="submit"
                       disabled={
-                        loading || !formSelectedRole || !formSelectedAction
+                        loading ||
+                        !formSelectedRole ||
+                        !formSelectedAction ||
+                        formSelectedResources.length === 0
                       }
                     >
                       {loading ? "Updating..." : "Update Permissions"}

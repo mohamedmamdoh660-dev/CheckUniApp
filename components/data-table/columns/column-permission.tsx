@@ -20,7 +20,7 @@ export function getPermissionColumns(
         return (
           <div className="flex items-center w-full">
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="font-semibold">
+              <span className="font-semibold capitalize">
                 {row.original.roles.name || ""}
               </span>
             </div>

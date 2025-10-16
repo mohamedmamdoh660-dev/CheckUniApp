@@ -129,15 +129,15 @@ export function GenderDistributionChart() {
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         {isLoading ? (
-          <div className="flex items-center justify-center h-[450px]">
+          <div className="flex items-center justify-center h-[500px]">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : chartData.length === 0 ? (
-          <div className="flex items-center justify-center h-[450px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[500px] text-muted-foreground">
             No data available
           </div>
         ) : (
-          <div className="h-[450px] w-full">
+          <div className="h-[500px] w-full">
             <PieChart
               width={400}
               height={300}

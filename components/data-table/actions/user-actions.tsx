@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { User } from "@/types/types";
+import { ResourceType, User } from "@/types/types";
 import EditUser from "@/components/(main)/user/component/edit-user";
 import ChangePassword from "@/components/(main)/user/component/change-password";
 import { Role } from "@/types/types";
@@ -26,6 +26,7 @@ import { Role } from "@/types/types";
 import { usersService } from "@/modules";
 import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
 import { useAuth } from "@/context/AuthContext";
+import { canDelete, canEdit } from "@/lib/permissions";
 
 interface UserTableRowActionsProps {
   row: Row<User>;
@@ -115,15 +116,17 @@ export function UserTableRowActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-max">
-          <DropdownMenuItem
-            onClick={() => {
-              setIsEditDialogOpen(true);
-            }}
-            className="cursor-pointer flex items-center"
-          >
-            <Edit className="mr-1 h-4 w-4" />
-            Edit
-          </DropdownMenuItem>
+          {canEdit(userProfile, ResourceType.USERS) && (
+            <DropdownMenuItem
+              onClick={() => {
+                setIsEditDialogOpen(true);
+              }}
+              className="cursor-pointer flex items-center"
+            >
+              <Edit className="mr-1 h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem
             onClick={() => setIsPasswordDialogOpen(true)}
@@ -133,13 +136,15 @@ export function UserTableRowActions({
             Change Password
           </DropdownMenuItem>
 
-          <DropdownMenuItem
-            onClick={() => handleConfirmation("delete")}
-            className="cursor-pointer flex items-center"
-          >
-            <Trash className="mr-1 h-4 w-4" />
-            Remove
-          </DropdownMenuItem>
+          {canDelete(userProfile, ResourceType.USERS) && (
+            <DropdownMenuItem
+              onClick={() => handleConfirmation("delete")}
+              className="cursor-pointer flex items-center"
+            >
+              <Trash className="mr-1 h-4 w-4" />
+              Remove
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem
             onClick={() =>

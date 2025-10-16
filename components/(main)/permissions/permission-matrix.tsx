@@ -52,7 +52,7 @@ const RESOURCE_CATEGORIES = {
 // Main CRUD actions for the matrix
 const MATRIX_ACTIONS = [
   ActionType.CREATE,
-  ActionType.READ,
+  ActionType.VIEW,
   ActionType.EDIT,
   ActionType.DELETE,
 ];

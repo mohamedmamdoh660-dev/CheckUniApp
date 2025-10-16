@@ -4,12 +4,9 @@ import { useState, useEffect } from "react";
 import { getPermissionColumns } from "@/components/data-table/columns/column-permission";
 import { DataTable } from "@/components/data-table/data-table";
 import { rolesService, Role } from "@/modules/roles";
-import { RoleAccess } from "@/types/types";
+import { ResourceType, RoleAccess } from "@/types/types";
 import { PermissionDataTableToolbar } from "@/components/data-table/toolbars/permission-toolbar";
 import { useDebounce } from "@/hooks/use-debounce";
-import PermissionMatrix from "./permission-matrix";
-import { LayoutGrid, List } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function PermissionManagementPage({ type }: { type: string }) {
   const [listPermissions, setListPermissions] = useState<RoleAccess[]>([]);
@@ -26,7 +23,7 @@ export default function PermissionManagementPage({ type }: { type: string }) {
     const fetchRoles = async () => {
       try {
         const rolesList = await rolesService.getAllRoles();
-        setRoles(rolesList.filter((role: Role) => role.name !== "super_admin"));
+        setRoles(rolesList);
       } catch (error) {
         console.error("Error fetching roles:", error);
       }
@@ -36,9 +33,9 @@ export default function PermissionManagementPage({ type }: { type: string }) {
   }, []);
 
   useEffect(() => {
-    if (viewMode === "list") {
-      fetchPermissions();
-    }
+    // if (viewMode === "list") {
+    fetchPermissions();
+    // }
   }, [
     selectedRoleId,
     debouncedSearchTerm,
@@ -80,7 +77,13 @@ export default function PermissionManagementPage({ type }: { type: string }) {
         );
       }
 
-      setListPermissions(permissions);
+      setListPermissions(
+        permissions.filter(
+          (permission) =>
+            permission.resource !== ResourceType.ROLES &&
+            permission.resource !== ResourceType.PERMISSIONS
+        )
+      );
     } catch (error) {
       console.error("Error fetching permissions:", error);
     } finally {
@@ -106,7 +109,7 @@ export default function PermissionManagementPage({ type }: { type: string }) {
 
   return (
     <div className="space-y-4">
-      <Tabs
+      {/* <Tabs
         value={viewMode}
         onValueChange={(v) => setViewMode(v as "matrix" | "list")}
       >
@@ -130,39 +133,39 @@ export default function PermissionManagementPage({ type }: { type: string }) {
           />
         </TabsContent>
 
-        <TabsContent value="list" className="mt-0">
-          <DataTable
-            data={listPermissions || []}
-            toolbar={
-              <PermissionDataTableToolbar
-                fetchRecords={fetchPermissions}
-                type={type}
-                onGlobalFilterChange={handleGlobalFilterChange}
-                onResourceFilterChange={handleResourceFilterChange}
-                onActionFilterChange={handleActionFilterChange}
-                roles={roles}
-                selectedRoleId={selectedRoleId}
-                handleRoleChange={handleRoleChange}
-                selectedResource={selectedResource}
-                selectedAction={selectedAction}
-                setSelectedResource={setSelectedResource}
-                setSelectedAction={setSelectedAction}
-              />
-            }
-            columns={getPermissionColumns(() => fetchPermissions())}
+        <TabsContent value="list" className="mt-0"> */}
+      <DataTable
+        data={listPermissions || []}
+        toolbar={
+          <PermissionDataTableToolbar
+            fetchRecords={fetchPermissions}
+            type={type}
             onGlobalFilterChange={handleGlobalFilterChange}
-            onPageChange={() => {}}
-            onPageSizeChange={() => {}}
-            pageSize={300}
-            currentPage={1}
-            loading={isRefetching}
-            pagination={false}
-            error={""}
-            rowCount={listPermissions.length}
-            type="permissions"
+            onResourceFilterChange={handleResourceFilterChange}
+            onActionFilterChange={handleActionFilterChange}
+            roles={roles}
+            selectedRoleId={selectedRoleId}
+            handleRoleChange={handleRoleChange}
+            selectedResource={selectedResource}
+            selectedAction={selectedAction}
+            setSelectedResource={setSelectedResource}
+            setSelectedAction={setSelectedAction}
           />
-        </TabsContent>
-      </Tabs>
+        }
+        columns={getPermissionColumns(() => fetchPermissions())}
+        onGlobalFilterChange={handleGlobalFilterChange}
+        onPageChange={() => {}}
+        onPageSizeChange={() => {}}
+        pageSize={300}
+        currentPage={1}
+        loading={isRefetching}
+        pagination={false}
+        error={""}
+        rowCount={listPermissions.length}
+        type="permissions"
+      />
+      {/* </TabsContent>
+      </Tabs> */}
     </div>
   );
 }

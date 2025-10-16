@@ -68,7 +68,7 @@ export function ReadProtected({
   return (
     <PermissionProtected
       resource={resource}
-      action={ActionType.READ}
+      action={ActionType.VIEW}
       fallback={fallback}
     >
       {children}
@@ -147,7 +147,7 @@ export function usePermission() {
   const canCreate = (resource: ResourceType) =>
     hasPermission(resource, ActionType.CREATE);
   const canRead = (resource: ResourceType) =>
-    hasPermission(resource, ActionType.READ);
+    hasPermission(resource, ActionType.VIEW);
   const canEdit = (resource: ResourceType) =>
     hasPermission(resource, ActionType.EDIT);
   const canDelete = (resource: ResourceType) =>

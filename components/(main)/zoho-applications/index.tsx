@@ -96,7 +96,9 @@ export default function ZohoApplicationsManagementPage({
               fetchApplications();
             }
 
-            toast.success(`${payload.new.name} has been added successfully`);
+            toast.success(
+              `${payload?.new?.application_name || "New application"} has been added successfully`
+            );
           } else if (payload.eventType === "UPDATE") {
             if (
               listApplications.find(
@@ -105,7 +107,9 @@ export default function ZohoApplicationsManagementPage({
             ) {
               fetchApplications();
             }
-            toast.success(`${payload.new.name} has been updated successfully`);
+            toast.success(
+              `${payload?.new?.application_name} has been updated successfully`
+            );
           } else if (payload.eventType === "DELETE") {
             if (
               listApplications.find(
@@ -114,7 +118,9 @@ export default function ZohoApplicationsManagementPage({
             ) {
               fetchApplications();
             }
-            toast.success(`${payload.old.name} has been deleted successfully`);
+            toast.success(
+              `${payload.old.application_name} has been deleted successfully`
+            );
           }
         }
       )

@@ -39,7 +39,7 @@ const hasViewPermission = (
     return userProfile.roles.role_accessCollection.edges.some(
       (access: any) =>
         access.node.resource === resource &&
-        access.node.action === ActionType.READ
+        access.node.action === ActionType.VIEW
     );
   } catch (error) {
     console.error("Error checking menu permissions:", error);

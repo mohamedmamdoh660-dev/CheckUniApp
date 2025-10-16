@@ -28,7 +28,7 @@ export function hasPermission(
  * Check if user can access a module (has read permission)
  */
 export function canAccessModule(userData: User | null, resource: ResourceType | string): boolean {
-  return hasPermission(userData, resource, ActionType.READ) || hasPermission(userData, resource, ActionType.VIEW);
+  return hasPermission(userData, resource, ActionType.VIEW) || hasPermission(userData, resource, ActionType.VIEW);
 }
 
 /**
@@ -59,6 +59,13 @@ export function canDelete(userData: User | null, resource: ResourceType | string
 export function canView(userData: User | null, resource: ResourceType | string): boolean {
   return hasPermission(userData, resource, ActionType.VIEW);
 }
+
+/**
+ * Check if user can export resources
+ */
+export function canExport(userData: User | null, resource: ResourceType | string): boolean {
+  return hasPermission(userData, resource, ActionType.EXPORT);
+} 
 
 /**
  * Parse user data from cookie string
