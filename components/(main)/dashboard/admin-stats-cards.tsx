@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { TrendingUp, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
-import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
+import { getAdminDashboardStats } from "@/modules/dashboard/services/admin-dashboard-service";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -32,7 +32,7 @@ export function AdminStatsCards() {
 
   const fetchStats = async () => {
     try {
-      const data = await dashboardService.getAdminDashboardStats();
+      const data = await getAdminDashboardStats();
       setStats(data);
     } catch (error) {
       console.error("Error fetching admin dashboard stats:", error);

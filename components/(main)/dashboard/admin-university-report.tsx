@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
+import { getUniversityDistribution } from "@/modules/dashboard/services/dashboard-service";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
@@ -70,7 +70,7 @@ export function AdminUniversityReport() {
 
   const fetchData = async () => {
     try {
-      const data = await dashboardService.getUniversityDistribution(
+      const data = await getUniversityDistribution(
         userProfile?.id,
         userProfile?.agency_id,
         userProfile?.roles?.name

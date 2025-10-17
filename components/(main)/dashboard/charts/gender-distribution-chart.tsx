@@ -18,7 +18,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
+import { getGenderDistribution } from "@/modules/dashboard/services/dashboard-service";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
@@ -59,7 +59,7 @@ export function GenderDistributionChart() {
 
   const fetchData = async () => {
     try {
-      const data = await dashboardService.getGenderDistribution(
+      const data = await getGenderDistribution(
         userProfile?.id,
         userProfile?.agency_id,
         userProfile?.roles?.name
@@ -128,7 +128,7 @@ export function GenderDistributionChart() {
         </Button>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        {isLoading ? (
+        {isLoading || isRefreshing ? (
           <div className="flex items-center justify-center h-[500px]">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>

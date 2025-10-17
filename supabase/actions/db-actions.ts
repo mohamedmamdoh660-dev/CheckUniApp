@@ -153,9 +153,11 @@ export const getApplicationsPagination = async (
         );
   
       // Role-based filtering
-      if (userRole === "agent") {
+      
+      if (userRole === "admin") {
+      } else if (userRole === "agent") {
         query = query.eq("agency_id", user_id);
-      } else if (userRole === "sub agent") {
+      } else {
         query = query.eq("user_id", user_id);
       }
   
@@ -313,9 +315,10 @@ export const getStudentsPagination = async (    search: string,
     
     
         // Role-based filtering (if needed)
-        if (userRole === "agent") {
+        if (userRole === "admin") {
+        } else if (userRole === "agent") {
           query = query.eq("agency_id", user_id);
-        } else if (userRole === "sub agent") {
+        } else {
           query = query.eq("user_id", user_id);
         }
     

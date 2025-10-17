@@ -35,7 +35,7 @@ import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
+import { getApplicationTimeline } from "@/modules/dashboard/services/dashboard-service";
 import { useAuth } from "@/context/AuthContext";
 import { COLORS } from "@/utils/colors";
 
@@ -78,7 +78,7 @@ export function ApplicationChart() {
     async (days: number) => {
       setIsLoading(true);
       try {
-        const result = await dashboardService.getApplicationTimeline(
+        const result = await getApplicationTimeline(
           days,
           userProfile?.id,
           userProfile?.agency_id,

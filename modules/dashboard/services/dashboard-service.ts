@@ -1,15 +1,8 @@
-import { supabase } from "@/lib/supabase-auth-client";
-import { adminDashboardService } from "./admin-dashboard-service";
+'use server';
 
-export const dashboardService = {
-  // Admin dashboard services
-  getAdminDashboardStats: adminDashboardService.getAdminDashboardStats,
-  getApplicationFunnel: adminDashboardService.getApplicationFunnel,
-  getBestPrograms: adminDashboardService.getBestPrograms,
-  /**
-   * Get dashboard statistics
-   */
-  getDashboardStats: async (role: string | undefined, agencyId: string | undefined, userId: string | undefined) => {
+import { supabase } from "@/lib/supabase-auth-client";
+
+export async function getDashboardStats(role: string | undefined, agencyId: string | undefined, userId: string | undefined) {
     try {
       const { data, error } = await supabase
       .rpc('get_dashboard_stats', {
@@ -32,12 +25,12 @@ export const dashboardService = {
       console.error("Error fetching dashboard stats:", error);
       throw error;
     }
-  },
+  }
 
   /**
    * Get application stages count
    */
-  getApplicationStagesCount: async () => {
+  export async function getApplicationStagesCount() {
     try {
       // Get pending applications count
       const { count: pending, error: pendingError } = await supabase
@@ -81,12 +74,12 @@ export const dashboardService = {
       console.error("Error fetching application stages count:", error);
       throw error;
     }
-  },
+  }
 
   /**
    * Get university distribution
    */
-  getUniversityDistribution: async (userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
+  export async function getUniversityDistribution(userId: string | undefined, agencyId: string | undefined, role: string | undefined) {
    
     try {
       const { data, error } = await supabase.rpc('get_university_applications', {
@@ -111,12 +104,12 @@ export const dashboardService = {
       console.error("Error fetching university distribution:", error);
       throw error;
     }
-  },
+  }
 
   /**
    * Get gender distribution
    */
-  getGenderDistribution: async (userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
+  export async function getGenderDistribution(userId: string | undefined, agencyId: string | undefined, role: string | undefined) {
     try {
       // Get students grouped by gender
       const query =  supabase
@@ -124,9 +117,10 @@ export const dashboardService = {
         .select('gender')
         .not('gender', 'is', null);
 
-      if (role === 'agent') {
+        if (role === 'admin') {
+        } else if (role === 'agent') {
          query.eq('agency_id', userId);
-      } else if (role === 'sub agent') {
+      } else {
         query.eq('user_id', userId);
       }
 
@@ -161,12 +155,12 @@ export const dashboardService = {
       console.error("Error fetching gender distribution:", error);
       throw error;
     }
-  },
+  }
 
   /**
    * Get recent applications
    */
-  getRecentApplications: async (limit = 10, userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
+  export async function getRecentApplications(limit = 10, userId: string | undefined, agencyId: string | undefined, role: string | undefined) {
     try {
       const query = supabase
         .from('zoho_applications')
@@ -203,9 +197,10 @@ export const dashboardService = {
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (role === 'agent') {
+        if (role === 'admin') {
+        } else if (role === 'agent') {
          query.eq('agency_id', userId);
-      } else if (role === 'sub agent') {
+      } else {
         query.eq('user_id', userId);
       }
 
@@ -217,12 +212,12 @@ export const dashboardService = {
       console.error("Error fetching recent applications:", error);
       throw error;
     }
-  },
+  }
 
   /**
    * Get all available application stages
    */
-  getApplicationStages: async (userId?: string, agencyId?: string, role?: string) => {
+  export async function getApplicationStages(userId?: string, agencyId?: string, role?: string) {
     try {
       const query = supabase
         .from('zoho_applications')
@@ -230,9 +225,10 @@ export const dashboardService = {
         .not('stage', 'is', null);
 
       // Apply role-based filtering if needed
-      if (role === 'agent') {
+      if (role === 'admin') {
+      } else if (role === 'agent') {
         query.eq('agency_id', userId);
-      } else if (role === 'sub agent') {
+      } else{
         query.eq('user_id', userId);
       }
 
@@ -251,12 +247,12 @@ export const dashboardService = {
       console.error("Error fetching application stages:", error);
       throw error;
     }
-  },
+  }
 
   /**
    * Get application timeline data
    */
-  getApplicationTimeline: async (days = 30, userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
+  export async function getApplicationTimeline(days = 30, userId: string | undefined, agencyId: string | undefined, role: string | undefined) {
     try {
       // Use SQL function to fetch timeline data
       const { data, error } = await supabase.rpc('get_application_timeline', {
@@ -301,7 +297,6 @@ export const dashboardService = {
       throw error;
     }
   }
-};
 
 
 

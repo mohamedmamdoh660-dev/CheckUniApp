@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
+import { getApplicationFunnel } from "@/modules/dashboard/services/admin-dashboard-service";
 import { COLORS } from "@/utils/colors";
 
 // Custom tooltip
@@ -48,7 +48,7 @@ export function AdminStageFunnel() {
 
   const fetchData = async () => {
     try {
-      const funnelData = await dashboardService.getApplicationFunnel();
+      const funnelData = await getApplicationFunnel();
 
       // Sort largest to smallest
       const sortedData = [...funnelData].sort((a, b) => b.value - a.value);
@@ -102,7 +102,7 @@ export function AdminStageFunnel() {
         </Button>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        {isLoading ? (
+        {isLoading || isRefreshing ? (
           <div className="flex items-center justify-center h-[500px]">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>

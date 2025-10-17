@@ -18,7 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
+import { getRecentApplications } from "@/modules/dashboard/services/dashboard-service";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -45,12 +45,7 @@ export function RecentApplications() {
   ) => {
     try {
       setLoading(true);
-      const data = await dashboardService.getRecentApplications(
-        10,
-        userId,
-        agencyId,
-        role
-      );
+      const data = await getRecentApplications(10, userId, agencyId, role);
       setApplications(data);
     } catch (error) {
       console.error("Error fetching recent applications:", error);

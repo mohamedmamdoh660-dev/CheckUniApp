@@ -1,10 +1,11 @@
+'use server';
+
 import { supabase } from "@/lib/supabase-auth-client";
 
-export const adminDashboardService = {
   /**
    * Get admin dashboard statistics
    */
-  getAdminDashboardStats: async () => {
+  export async function getAdminDashboardStats() {
     const { data, error } = await supabase.rpc('get_admin_dashboard_stats');
     
     if (error) {
@@ -12,12 +13,12 @@ export const adminDashboardService = {
     } else {
       return data;
     }
-  },
+  }
 
   /**
    * Get application funnel data
    */
-  getApplicationFunnel: async () => {
+  export async function getApplicationFunnel() {
     try {
       const { data, error } = await supabase.rpc('get_application_funnel');
 
@@ -32,12 +33,12 @@ export const adminDashboardService = {
       console.error("Error fetching application funnel data:", error);
       throw error;
     }
-  },
+  }
 
   /**
    * Get best programs data
    */
-  getBestPrograms: async (filters: { degree?: string, university?: string, stage?: string } = {}) => {
+  export async function getBestPrograms(filters: { degree?: string, university?: string, stage?: string } = {}) {
     try {
       let query = supabase
         .from('zoho_applications')
@@ -99,4 +100,3 @@ export const adminDashboardService = {
       throw error;
     }
   }
-};

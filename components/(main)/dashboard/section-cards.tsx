@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { TrendingUp, RefreshCw, Users, Calendar } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
-import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
+import { getDashboardStats } from "@/modules/dashboard/services/dashboard-service";
 
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
@@ -31,7 +31,7 @@ export function SectionCards() {
 
   const fetchStats = async () => {
     try {
-      const data = await dashboardService.getDashboardStats(
+      const data = await getDashboardStats(
         userProfile?.roles?.name,
         userProfile?.roles?.name === "agent"
           ? userProfile?.id

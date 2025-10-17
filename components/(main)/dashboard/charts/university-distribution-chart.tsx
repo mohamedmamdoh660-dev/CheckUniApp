@@ -10,13 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { COLORS } from "@/utils/colors";
+import { getUniversityDistribution } from "@/modules/dashboard/services/dashboard-service";
 
 // Custom tooltip
 const CustomTooltip = ({ active, payload }: any) => {
@@ -68,7 +68,7 @@ export function UniversityDistributionChart() {
 
   const fetchData = async () => {
     try {
-      const data = await dashboardService.getUniversityDistribution(
+      const data = await getUniversityDistribution(
         userProfile?.id,
         userProfile?.agency_id,
         userProfile?.roles?.name
@@ -143,7 +143,7 @@ export function UniversityDistributionChart() {
         </Button>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        {isLoading ? (
+        {isLoading || isRefreshing ? (
           <div className="flex items-center justify-center h-[500px]">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>

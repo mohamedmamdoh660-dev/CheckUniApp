@@ -22,8 +22,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { dashboardService } from "@/modules/dashboard/services/dashboard-service";
-import { supabase } from "@/lib/supabase-auth-client";
+import { getBestPrograms } from "@/modules/dashboard/services/admin-dashboard-service";
 import { COLORS } from "@/utils/colors";
 
 // Custom tooltip
@@ -59,7 +58,7 @@ export function AdminBestProgram() {
         filters.stage = selectedStage.toLowerCase().replace(/ /g, "_");
 
       // Fetch data from API
-      const data = await dashboardService.getBestPrograms(filters);
+      const data = await getBestPrograms(filters);
 
       // Add colors to the data
       const coloredData = data.map((item: any, index: number) => ({
