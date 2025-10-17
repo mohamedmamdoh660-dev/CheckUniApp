@@ -87,41 +87,22 @@ export const dashboardService = {
    * Get university distribution
    */
   getUniversityDistribution: async (userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
+   
     try {
-        const query = supabase
-        .from('zoho_applications')
-        .select('university::text, zoho_universities(id::text, name)')
-        .not('university', 'is', null);
-
-      if (role === 'agent') {
-         query.eq('agency_id', userId);
-      } else if (role === 'sub agent') {
-        query.eq('user_id', userId);
-      }
-
-      const { data, error } = await query;
+      const { data, error } = await supabase.rpc('get_university_applications', {
+        p_user_id: userId,
+        p_role: role,
+      });
 
       if (error) throw error;
 
-      // Count applications per university
-      const universityCounts = data?.reduce((acc: Record<string, any>, item: any) => {
-        const universityId = item.university;
-        const universityName = item.zoho_universities?.name || `University ${universityId}`;
-        
-        if (!acc[universityId]) {
-          acc[universityId] = {
-            university: universityName,
-            applications: 0
-          };
-        }
-        
-        acc[universityId].applications++;
-        return acc;
-      }, {});
+      const rows: Array<{ university: string; applications: number }> = Array.isArray((data as any)?.get_university_applications)
+        ? (data as any).get_university_applications
+        : (Array.isArray(data) ? (data as any) : []);
 
-      // Transform to array for chart
-      const chartData = Object.values(universityCounts || {}).map((item: any, index: number) => ({
-        ...item,
+      const chartData = (rows || []).map((r: any, index: number) => ({
+        university: r.university,
+        applications: r.applications,
         fill: `var(--chart-${(index % 5) + 1})`
       }));
 
@@ -277,119 +258,50 @@ export const dashboardService = {
    */
   getApplicationTimeline: async (days = 30, userId: string | undefined, agencyId: string | undefined, role: string | undefined) => {
     try {
-      // Calculate the date range
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-
-      // Fetch applications within the date range
-      const query = supabase
-        .from('zoho_applications')
-        .select('created_at, stage')
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString())
-        .order('created_at', { ascending: true });
-
-      if (role === 'agent') {
-         query.eq('agency_id', userId);
-      } else if (role === 'sub agent') {
-        query.eq('user_id', userId);
-      }
-
-      const { data, error } = await query;
+      // Use SQL function to fetch timeline data
+      const { data, error } = await supabase.rpc('get_application_timeline', {
+        p_days: days,
+        p_user_id: userId,
+        p_role: role,
+      });
 
       if (error) throw error;
 
+      const records: Array<{ date: string; stages: Record<string, number> }> = Array.isArray(data.get_application_timeline) ? (data.get_application_timeline as any) : [];
 
-      if (!data || data.length === 0) {
-        const result = Array.from(new Array(days).keys()).map((i) => {
-          const date = new Date(endDate);
-          date.setDate(date.getDate() - (days - 1 - i));
-          return { date: date.toISOString().split('T')[0] };
-        });
-        return { data: result, stages: [] };
+      if (!records || records.length === 0) {
+        return { data: [], stages: [] };
       }
 
-      // First pass: Collect ALL unique stages from the actual data
-      const allStagesSet = new Set<string>();
-      data.forEach((app: any) => {
-        const stage = app.stage?.toLowerCase().trim();
-        if (stage) {
-          allStagesSet.add(stage);
-        }
+      // Collect union of all stages (lowercased for consistency)
+      const stagesSet = new Set<string>();
+      records.forEach((r) => {
+        Object.keys(r.stages || {}).forEach((key) => stagesSet.add(key.toLowerCase()));
       });
 
-      // Use all stages found in the data
-      const allStages = Array.from(allStagesSet).sort();
+      const stages = Array.from(stagesSet);
 
-      // Create a map for each day in the range
-      const dateMap = new Map();
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date(endDate);
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        
-        // Create empty entry with all stages initialized to 0
-        const entry: Record<string, any> = { date: dateStr };
-        allStages.forEach(stage => {
-          entry[stage] = 0;
+      // Transform into chart-friendly shape: { date, [stage]: count, ... }
+      const chartData = records.map((r) => {
+        const entry: Record<string, any> = { date: r.date };
+        // Initialize all stages to 0 to keep consistent keys across dates
+        stages.forEach((s) => {
+          entry[s] = 0;
         });
-        
-        dateMap.set(dateStr, entry);
-      }
-
-      // Group applications by date and stage
-      const dailyCounts = new Map<string, Map<string, number>>();
-      
-      data.forEach((app: any) => {
-        const appDate = new Date(app.created_at);
-        const dateStr = appDate.toISOString().split('T')[0];
-        const stage = app.stage?.toLowerCase().trim();
-        
-        if (!stage) return;
-        
-        if (!dailyCounts.has(dateStr)) {
-          dailyCounts.set(dateStr, new Map());
-        }
-        
-        const dayStageCounts = dailyCounts.get(dateStr)!;
-        dayStageCounts.set(stage, (dayStageCounts.get(stage) || 0) + 1);
-      });
-
-      // Calculate cumulative counts for each date in our range
-      const cumulativeCounts = new Map<string, number>();
-      allStages.forEach(stage => cumulativeCounts.set(stage, 0));
-
-      // Process each date in chronological order
-      const sortedDates = Array.from(dateMap.keys()).sort();
-      
-      sortedDates.forEach(dateStr => {
-        const entry = dateMap.get(dateStr)!;
-        
-        // Add today's applications to cumulative count
-        const todaysCounts = dailyCounts.get(dateStr);
-        if (todaysCounts) {
-          todaysCounts.forEach((count, stage) => {
-            const currentCount = cumulativeCounts.get(stage) || 0;
-            cumulativeCounts.set(stage, currentCount + count);
-          });
-        }
-        
-        // Set cumulative values for this date
-        allStages.forEach(stage => {
-          entry[stage] = cumulativeCounts.get(stage) || 0;
+        // Fill with actual values from this record
+        Object.entries(r.stages || {}).forEach(([key, value]) => {
+          entry[key.toLowerCase()] = value as number;
         });
+        return entry;
       });
 
-      // Convert map to array (already sorted by our processing order)
-      const result = Array.from(dateMap.values());
-      
-     
-     
-      return { data: result, stages: allStages };
+      return { data: chartData, stages };
     } catch (error) {
       console.error("Error fetching application timeline:", error);
       throw error;
     }
   }
 };
+
+
+

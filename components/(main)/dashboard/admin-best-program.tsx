@@ -47,10 +47,6 @@ export function AdminBestProgram() {
   const [selectedUniversity, setSelectedUniversity] = useState("All");
   const [selectedStage, setSelectedStage] = useState("All");
 
-  const [degrees, setDegrees] = useState<string[]>(["All"]);
-  const [universities, setUniversities] = useState<string[]>(["All"]);
-  const [stages, setStages] = useState<string[]>(["All"]);
-
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -101,27 +97,14 @@ export function AdminBestProgram() {
     setIsRefreshing(false);
   };
 
-  const handleFilterChange = (type: string, value: string) => {
-    setIsRefreshing(true);
-    switch (type) {
-      case "degree":
-        setSelectedDegree(value);
-        break;
-      case "university":
-        setSelectedUniversity(value);
-        break;
-      case "stage":
-        setSelectedStage(value);
-        break;
-    }
-  };
-
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex flex-col gap-1">
           <CardTitle>Popular Programs</CardTitle>
-          <CardDescription>Top programs by application count</CardDescription>
+          <CardDescription>
+            Top 20 programs by application count
+          </CardDescription>
         </div>
         <Button
           variant="outline"
@@ -144,11 +127,11 @@ export function AdminBestProgram() {
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : chartData.length === 0 ? (
-          <div className="flex items-center justify-center h-[450px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[600px] text-muted-foreground">
             No data available
           </div>
         ) : (
-          <div className="h-[450px] w-full">
+          <div className={`h-[${chartData.length > 15 ? 600 : 450}px] w-full`}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}

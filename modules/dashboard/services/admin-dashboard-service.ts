@@ -19,31 +19,15 @@ export const adminDashboardService = {
    */
   getApplicationFunnel: async () => {
     try {
-      const { data, error } = await supabase
-        .from('zoho_applications')
-        .select('stage')
-      
+      const { data, error } = await supabase.rpc('get_application_funnel');
+
       if (error) throw error;
-      
-      // Count applications by status
-      const statusCounts: Record<string, number> = {};
-      
-      // Count each status
-      data.forEach(item => {
-        const status = item.stage || 'Unknown';
-        statusCounts[status] = (statusCounts[status] || 0) + 1;
-      });
-      
-      // Convert to array format for funnel chart
-      const totalApplications = data.length;
-      
-      const funnelData = Object.entries(statusCounts).map(([status, count]) => ({
-        name: status.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
-        value: count,
-        percentage: totalApplications > 0 ? Math.round((count / totalApplications) * 100) : 0
-      }));
-      
-      return funnelData;
+
+      const rows: Array<{ name: string; value: number; percentage: number }> = Array.isArray((data as any)?.get_application_funnel)
+        ? (data as any).get_application_funnel
+        : (Array.isArray(data) ? (data as any) : []);
+
+      return rows || [];
     } catch (error) {
       console.error("Error fetching application funnel data:", error);
       throw error;
@@ -107,7 +91,7 @@ export const adminDashboardService = {
       // Transform to array for chart and sort by applications count
       const chartData = Object.values(programCounts)
         .sort((a: any, b: any) => b.applications - a.applications)
-        .slice(0, 10); // Limit to top 10
+        .slice(0, 20); // Limit to top 10
       
       return chartData;
     } catch (error) {

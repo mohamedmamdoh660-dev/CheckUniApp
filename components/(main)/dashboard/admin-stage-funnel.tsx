@@ -113,7 +113,9 @@ export function AdminStageFunnel() {
         ) : (
           <div className="h-[500px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <FunnelChart>
+              <FunnelChart
+              //  margin={{ left: 30, bottom: 20, top: 20 }}
+              >
                 <Tooltip content={<CustomTooltip />} />
                 <Funnel
                   data={chartData}
@@ -128,7 +130,7 @@ export function AdminStageFunnel() {
                     fill="#9f9fa9"
                     stroke="none"
                     dataKey="name"
-                    fontSize={12}
+                    fontSize={11}
                     formatter={(val: string, entry: any) => {
                       return `${val} ${chartData.find((item) => item.name === val)?.value}`;
                     }}

@@ -78,7 +78,7 @@ export function UniversityDistributionChart() {
       const sortedData = [...data].sort(
         (a, b) => b.applications - a.applications
       );
-      const topData = sortedData.slice(0, 8);
+      const topData = sortedData.slice(0, 20);
 
       // Calculate percentages
       const totalApplications = topData.reduce(
@@ -124,7 +124,9 @@ export function UniversityDistributionChart() {
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex flex-col gap-1">
           <CardTitle>University Distribution</CardTitle>
-          <CardDescription>Applications by university</CardDescription>
+          <CardDescription>
+            Top 20 universities by application count
+          </CardDescription>
         </div>
         <Button
           variant="outline"
@@ -152,9 +154,9 @@ export function UniversityDistributionChart() {
         ) : (
           <div className="h-[500px] w-full">
             <PieChart
-              width={400}
-              height={300}
-              className="mx-auto !w-full !h-[413px]"
+              width={500}
+              height={200}
+              className="mx-auto !w-full !h-[500px]"
             >
               <Tooltip content={<CustomTooltip />} />
               <Pie
