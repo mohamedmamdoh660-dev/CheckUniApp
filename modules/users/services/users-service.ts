@@ -15,6 +15,7 @@ export const usersService = {
           role_id: data.role_id,
           first_name: data.first_name || null,
           last_name: data.last_name || null,
+          full_name: data.first_name + ' ' + data.last_name || null,
           is_active: true,
           profile: data.profile || null,
           agency_id: data.agency_id || null,
@@ -45,7 +46,7 @@ export const usersService = {
     sortOrder?: "asc" | "desc";
   }) => {
     // Create a filter object based on role
-    const filter: any = { email: { ilike: search } };
+    const filter: any = { or: [ { email: { ilike: search } }, { full_name: { ilike: search } } ] };
     
     // Only apply role_id filter if the user is not an admin
     if (roleName !== 'admin') {
@@ -78,6 +79,7 @@ export const usersService = {
         id: data.id,
         first_name: data.first_name,
         last_name: data.last_name,
+        full_name: data.first_name + ' ' + data.last_name || null,
         role_id: data.role_id,
         profile: data.profile,
         is_active: data.is_active

@@ -155,5 +155,30 @@ export const authService = {
     await authService.signOut();
     return response.json();
   }
+,
+
+  updateEmail: async (newEmail: string) => {
+    // First check if user exists with the new email
+    const existingUser = await usersService.getUserByEmail({
+      email: {
+        eq: newEmail
+      }
+    });
+
+    if (existingUser) {
+      throw new Error("User already exists with this email address");
+    }
+
+    // Update email in Supabase Auth
+    const { data, error } = await supabaseServerClient().auth.updateUser({
+      email: newEmail,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
 
 }; 

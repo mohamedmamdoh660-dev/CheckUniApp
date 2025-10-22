@@ -28,7 +28,7 @@ export const zohoProgramsService = {
   getPrograms: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, dependsOn: { field: string, value: string | number | null }[] | null = null) => {
     const offset = (page ) * pageSize;
     const searchPattern = `%${search}%`;
-    let filter = id ? { name: { ilike: searchPattern }, id: { eq: id } } : { name: { ilike: searchPattern } };
+    let filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
     if (dependsOn && dependsOn.length > 0) {
       dependsOn.forEach((dep: { field: string, value: string | number | null }) => {
         filter = {
@@ -307,7 +307,7 @@ export const zohoProgramsService = {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      let filter: any = { name: { ilike: searchPattern }, ...(label === 'University for Application' ? { active_in_apps: { eq: true } } : {}), ...(id ? { id: { eq: id } } : {}) };
+      let filter: any = { name: { ilike: searchPattern }, ...(label === 'University for Application' ? { active_in_apps: { eq: true }, active: { eq: true } } : {}), ...(id ? { id: { eq: id } } : {}) };
             if (dependsOn && dependsOn.value) {
         filter = {
           ...filter,

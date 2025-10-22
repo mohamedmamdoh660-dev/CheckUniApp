@@ -41,12 +41,13 @@ import {
 } from "lucide-react";
 import { Area, getCroppedImg } from "@/utils/image-crop";
 import { useAuth } from "@/context/AuthContext";
+import { authService } from "@/modules/auth";
 
 export type UserProfile = {
   first_name: string;
   last_name: string;
   email: string;
-  profile?: string;
+  profile_image?: string;
 };
 
 export function ProfileSettings() {
@@ -63,6 +64,9 @@ export function ProfileSettings() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
 
   // Image cropper states
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -108,7 +112,7 @@ export function ProfileSettings() {
       }
 
       // Convert blob to file
-      const file = new File([croppedBlob], "profile-image.jpg", {
+      const file = new File([croppedBlob], "profile_image-image.jpg", {
         type: "image/jpeg",
       });
 
@@ -117,7 +121,7 @@ export function ProfileSettings() {
       if (fileUrl) {
         setUserProfile((prev) => ({
           ...prev,
-          profile: fileUrl,
+          profile_image: fileUrl,
         }));
       }
 
@@ -148,13 +152,15 @@ export function ProfileSettings() {
         id: userProfileAuth?.id,
         first_name: userProfile?.first_name,
         last_name: userProfile?.last_name,
-        profile: userProfile?.profile ?? null,
+        full_name: userProfile?.first_name + " " + userProfile?.last_name,
+        profile_image: userProfile?.profile_image ?? null,
       });
       setUserProfileAuth({
         ...userProfileAuth,
         first_name: userProfile?.first_name,
         last_name: userProfile?.last_name,
-        profile: userProfile?.profile,
+        full_name: userProfile?.first_name + " " + userProfile?.last_name,
+        profile_image: userProfile?.profile_image ?? null,
       });
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -165,10 +171,48 @@ export function ProfileSettings() {
     }
   };
 
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleUpdateEmail = async () => {
+    if (!newEmail.trim()) {
+      toast.error("Please enter a valid email address");
+      return;
+    } else if (newEmail === userProfile?.email) {
+      toast.error("New email cannot be the same as the current email");
+      return;
+    } else if (!isValidEmail(newEmail)) {
+      toast.error("Invalid email address");
+      return;
+    }
+
+    setIsUpdatingEmail(true);
+    try {
+      await authService.updateEmail(newEmail);
+      toast.success(
+        "Email update initiated! Please check both your old and new email addresses for confirmation messages.",
+        { duration: 15000 }
+      );
+      setIsEmailDialogOpen(false);
+      setNewEmail("");
+    } catch (error) {
+      console.error("Failed to update email:", error);
+      toast.error("Failed to update email. Please try again.");
+    } finally {
+      setIsUpdatingEmail(false);
+    }
+  };
+
+  const openEmailDialog = () => {
+    setNewEmail("");
+    setIsEmailDialogOpen(true);
+  };
+
   const handleRemoveAvatar = () => {
     setUserProfile((prev) => ({
       ...prev,
-      profile: undefined,
+      profile_image: undefined,
     }));
   };
 
@@ -177,7 +221,7 @@ export function ProfileSettings() {
       <CardHeader>
         <CardTitle className="text-2xl">Personal Information</CardTitle>
         <CardDescription>
-          Update your personal details and profile picture
+          Update your personal details and profile_image picture
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -194,13 +238,13 @@ export function ProfileSettings() {
                 onDrop={handleDrop}
                 data-dragging={isDragging || undefined}
                 aria-label={
-                  userProfile?.profile ? "Change image" : "Upload image"
+                  userProfile?.profile_image ? "Change image" : "Upload image"
                 }
               >
-                {userProfile?.profile ? (
+                {userProfile?.profile_image ? (
                   <Image
                     className="h-full w-full object-cover"
-                    src={userProfile?.profile}
+                    src={userProfile?.profile_image}
                     alt="User avatar"
                     width={80}
                     height={80}
@@ -211,7 +255,7 @@ export function ProfileSettings() {
                   </div>
                 )}
               </button>
-              {userProfile?.profile && (
+              {userProfile?.profile_image && (
                 <Button
                   onClick={handleRemoveAvatar}
                   size="icon"
@@ -224,7 +268,7 @@ export function ProfileSettings() {
               <input
                 {...getInputProps()}
                 className="sr-only"
-                aria-label="Upload profile picture"
+                aria-label="Upload profile_image picture"
                 tabIndex={-1}
               />
             </div>
@@ -283,17 +327,27 @@ export function ProfileSettings() {
             </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter email address"
-              value={userProfile?.email}
-              disabled
-              className="bg-muted/50"
-            />
+            <Label htmlFor="email">Current Email</Label>
+            <div className="flex items-center space-x-2">
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter email address"
+                value={userProfile?.email}
+                disabled
+                className="bg-muted/50"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={openEmailDialog}
+                disabled={isUpdatingEmail}
+              >
+                Change Email
+              </Button>
+            </div>
             <p className="text-xs text-muted-foreground">
-              Email cannot be changed. Contact an administrator for assistance.
+              Click "Change Email" to update your email address
             </p>
           </div>
         </div>
@@ -306,13 +360,53 @@ export function ProfileSettings() {
         </div>
       </CardContent>
 
+      {/* Email Update Dialog */}
+      <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Update Email Address</DialogTitle>
+            <DialogDescription>
+              Enter your new email address. You will receive confirmation emails
+              at both your old and new addresses.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-email">New Email Address</Label>
+              <Input
+                id="new-email"
+                type="email"
+                placeholder="Enter new email address"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsEmailDialogOpen(false)}
+              disabled={isUpdatingEmail}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateEmail}
+              disabled={isUpdatingEmail || !newEmail.trim()}
+            >
+              {isUpdatingEmail ? "Updating..." : "Update Email"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Image Cropper Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md pb-0">
           <DialogHeader>
             <DialogTitle>Crop Profile Picture</DialogTitle>
             <DialogDescription>
-              Adjust your profile picture to fit the circular frame
+              Adjust your profile_image picture to fit the circular frame
             </DialogDescription>
           </DialogHeader>
           {previewUrl && (

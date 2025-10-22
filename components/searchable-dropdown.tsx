@@ -548,9 +548,9 @@ export function SearchableDropdown({
       >
         <span className="truncate text-ellipsis overflow-hidden max-w-[198px]">
           {selectedItem
-            ? selectedItem[displayField] +
-              " " +
-              (selectedItem[displayField2] || "")
+            ? (selectedItem[displayField] || "") +
+                " " +
+                (selectedItem[displayField2] || "") || ""
             : placeholder}
         </span>
         <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

@@ -191,7 +191,8 @@ export const UPDATE_USER = `
     $id: UUID!
     $first_name: String
     $last_name: String
-    $role_id: UUID!
+    $full_name: String
+    $role_id: UUID! 
     $profile: String
     $is_active: Boolean
   ) {
@@ -200,6 +201,7 @@ export const UPDATE_USER = `
       set: {
         first_name: $first_name
         last_name: $last_name
+        full_name: $full_name
         role_id: $role_id
         profile: $profile
         is_active: $is_active

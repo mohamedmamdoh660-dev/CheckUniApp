@@ -156,7 +156,7 @@ export default function AddZohoApplication({
         country: values.country || null,
         university: values.university || null,
         degree: values.degree || null,
-        student_name: studentName || null,
+        student_name: studentName.trim() || null,
         program_name: programName || null,
         user_id: userProfile?.id,
         agency_id:
@@ -248,19 +248,23 @@ export default function AddZohoApplication({
                         if (lockStudent) return;
                         field.onChange(item.id);
                         // @ts-ignore - item has first_name and last_name
-                        setStudentName(`${item.first_name} ${item.last_name}`);
+                        setStudentName(
+                          `${item.first_name || ""} ${item.last_name || ""}`
+                        );
                       }}
                       renderItem={(item) => (
                         <div className="flex items-center gap-2">
                           <Avatar className="h-6 w-6">
                             <AvatarImage
                               src={generateNameAvatar(
-                                item.first_name + " " + item.last_name
+                                item.first_name ||
+                                  "" + " " + item.last_name ||
+                                  ""
                               )}
                             />
                           </Avatar>
                           <span>
-                            {item.first_name} {item.last_name}
+                            {item.first_name || ""} {item.last_name || ""}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {item.email}
