@@ -139,9 +139,9 @@ export function GenderDistributionChart() {
         ) : (
           <div className="h-[500px] w-full">
             <PieChart
-              width={400}
+              width={500}
               height={300}
-              className="mx-auto !w-full !h-[413px]"
+              className="mx-auto !w-full !h-[500px]"
             >
               <Tooltip content={<CustomTooltip />} />
 

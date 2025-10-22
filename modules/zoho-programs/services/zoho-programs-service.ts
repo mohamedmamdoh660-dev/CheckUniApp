@@ -307,7 +307,7 @@ export const zohoProgramsService = {
     try {
       const offset = (page ) * pageSize;
       const searchPattern = `%${search}%`;
-      let filter: any = { name: { ilike: searchPattern }, ...(label === 'University for Application' ? { active_in_apps: { eq: true }, active: { eq: true } } : {}), ...(id ? { id: { eq: id } } : {}) };
+      let filter: any = { name: { ilike: searchPattern }, ...(label === 'University for Application' ? { active_in_apps: { eq: true } } : {}), active: { eq: true }, ...(id ? { id: { eq: id } } : {}) };
             if (dependsOn && dependsOn.value) {
         filter = {
           ...filter,
