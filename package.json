@@ -50,6 +50,7 @@
     "date-fns": "^4.1.0",
     "fs": "^0.0.1-security",
     "graphql-tag": "^2.12.6",
+    "html-react-parser": "^5.2.7",
     "html2canvas": "^1.4.1",
     "js-cookie": "^3.0.5",
     "jspdf": "^3.0.3",

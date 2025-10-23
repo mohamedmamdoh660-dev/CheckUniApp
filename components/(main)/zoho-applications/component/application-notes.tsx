@@ -13,6 +13,7 @@ import { useAuth } from "@/context/AuthContext";
 import { markApplicationNotesAsRead } from "@/supabase/actions/db-actions";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import parse from "html-react-parser";
 
 type Props = {
   applicationId: string;
@@ -206,7 +207,7 @@ export default function ApplicationNotes({
                       {n.user_type || "User"}
                     </div>
                     <div className="text-sm whitespace-pre-wrap break-words">
-                      {n.content || ""}
+                      {parse(n.content || "")}
                     </div>
                   </div>
                 </div>

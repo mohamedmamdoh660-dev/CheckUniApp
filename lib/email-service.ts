@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY || 're_ZVrp7HSP_7Umc1ZRNbC2k7sEBmDGt3JCx');
+const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY!);
 
 interface EmailOptions {
   to: string;
@@ -12,7 +12,7 @@ export const emailService = {
   sendEmail: async ({ to, subject, html }: EmailOptions) => {
     try {
       const data = await resend.emails.send({
-        from: process.env.EMAIL_FROM || 'STARTER <probotic@browserautomations.com>',
+        from: process.env.NEXT_PUBLIC_EMAIL_FROM!,
         to,
         subject,
         html,
