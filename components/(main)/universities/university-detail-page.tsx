@@ -302,7 +302,7 @@ export default function UniversityDetailPage() {
                             </TableCell>
                             <TableCell>
                               <span
-                                className=" cursor-pointer hover:underline hover:text-primary leading-tight line-clamp-2 text-wrap"
+                                className="  leading-tight line-clamp-2 text-wrap"
                                 title={program.name || "N/A"}
                               >
                                 {program.zoho_faculty?.name || "N/A"}
@@ -313,7 +313,7 @@ export default function UniversityDetailPage() {
                             </TableCell>
                             <TableCell>
                               <span
-                                className=" cursor-pointer hover:underline hover:text-primary leading-tight line-clamp-2 text-wrap"
+                                className="  leading-tight line-clamp-2 text-wrap"
                                 title={program.name || "N/A"}
                               >
                                 {program.zoho_speciality?.name || "N/A"}
