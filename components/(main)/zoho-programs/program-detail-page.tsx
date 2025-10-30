@@ -31,6 +31,7 @@ import {
 import { StatusBadge } from "@/components/ui/status-badge";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { formatNumber } from "@/utils/format-number";
+import { getApplicationsByProgramId } from "@/supabase/actions/db-actions";
 
 export default function ProgramDetailPage() {
   const params = useParams();
@@ -57,17 +58,7 @@ export default function ProgramDetailPage() {
   useEffect(() => {
     const loadApps = async () => {
       try {
-        const { data } = await supabaseClient
-          .from("zoho_applications")
-          .select(
-            `id, application_name, stage, created_at,
-             zoho_students:zoho_students!applications_student_fkey (id, first_name, last_name, email, photo_url),
-             zoho_universities:zoho_universities!zoho_applications_university_fkey (name),
-             zoho_academic_years:zoho_academic_years!zoho_applications_acdamic_year_fkey (name),
-             zoho_semesters:zoho_semesters!zoho_applications_semester_fkey (name)`
-          )
-          .eq("program", programId)
-          .order("created_at", { ascending: false });
+        const data: any = await getApplicationsByProgramId(programId);
         setApplications(data || []);
       } catch {}
     };

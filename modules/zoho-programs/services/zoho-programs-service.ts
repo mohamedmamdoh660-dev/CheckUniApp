@@ -51,9 +51,7 @@ export const zohoProgramsService = {
     search: string,
     limit: number,
     offset: number,
-    user_id: string,
-    userRole: string,
-    agency_id: string,
+  
     filters: Record<string, string> = {},
     sorting: { sortBy?: string, sortOrder?: "asc" | "desc" } = {}
   ) => {

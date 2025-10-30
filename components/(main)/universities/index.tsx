@@ -1,14 +1,16 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 
-import { columnsUniversities } from "@/components/data-table/columns/column-universities";
+import { getUniversitiesColumns } from "@/components/data-table/columns/column-universities";
 import { UniversitiesToolbar } from "@/components/data-table/toolbars/universities-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { universitiesService } from "@/modules/universities/services/universities-service";
 import { ZohoUniversity } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useRouter } from "next/navigation";
 
 export default function UniversitiesManagementPage({ type }: { type: string }) {
+  const router = useRouter();
   const [listUniversities, setListUniversities] = useState<ZohoUniversity[]>(
     []
   );
@@ -77,7 +79,7 @@ export default function UniversitiesManagementPage({ type }: { type: string }) {
         toolbar={
           <UniversitiesToolbar fetchRecords={fetchUniversities} type={type} />
         }
-        columns={columnsUniversities}
+        columns={getUniversitiesColumns(router)}
         onGlobalFilterChange={handleGlobalFilterChange}
         onSortingChange={handleSortingChange}
         onPageChange={handlePageChange}

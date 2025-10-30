@@ -237,9 +237,10 @@ export interface ZohoUniversity {
   year_founded?: string;
   active_in_apps?: boolean;
   qs_rank?: string;
+  active?: boolean;
   times_higher_education_rank?: string;
   shanghai_ranking?: string;
-  
+  description?: string;
   // Related entities
   zoho_cities?: {
     id: string;

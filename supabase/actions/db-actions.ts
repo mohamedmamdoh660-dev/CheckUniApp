@@ -354,9 +354,7 @@ export const getStudentsPagination = async (    search: string,
     search: string,
     limit: number,
     offset: number,
-    user_id: string,
-    userRole: string,
-    agency_id: string,
+    
     filters: Record<string, string> = {},
     sorting: { sortBy?: string, sortOrder?: "asc" | "desc" } = {}
   ) => {
@@ -523,3 +521,22 @@ export const getTableCount = async (
   if (error) throw error;
   return (data as number) || 0;
 };
+
+
+export const getApplicationsByProgramId = async (id: string) => { 
+  const { data, error } = await supabaseClient
+          .from("zoho_applications")
+          .select(
+            `id, application_name, stage, created_at,
+             zoho_students:zoho_students!applications_student_fkey (id, first_name, last_name, email, photo_url),
+             zoho_universities:zoho_universities!zoho_applications_university_fkey (name),
+             zoho_academic_years:zoho_academic_years!zoho_applications_acdamic_year_fkey (name),
+             zoho_semesters:zoho_semesters!zoho_applications_semester_fkey (name)`
+          )
+          .eq("program", id)
+          .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data;
+
+}

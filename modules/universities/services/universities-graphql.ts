@@ -18,6 +18,7 @@ export const GET_UNIVERSITIES = `
           profile_image
           address
           city
+          active
           country
           created_at
           update_at
@@ -54,6 +55,12 @@ export const GET_UNIVERSITY_BY_ID = `
           country
           created_at
           update_at
+          year_founded
+          qs_rank
+          admission_email
+          active
+          active_in_apps
+          description
           zoho_cities {
             id
             name

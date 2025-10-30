@@ -41,9 +41,7 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
         `%${debouncedSearchTerm}%`,
         pageSize,
         currentPage,
-        userProfile?.id || "",
-        userProfile?.roles?.name || "",
-        userProfile?.agency_id || "",
+
         filters,
         sorting
       );
