@@ -60,7 +60,10 @@ export default function ProgramDetailPage() {
       try {
         const data: any = await getApplicationsByProgramId(programId);
         setApplications(data || []);
-      } catch {}
+      } catch (e) {
+        console.error("Error loading applications:", e);
+        setApplications([]);
+      }
     };
     if (programId) loadApps();
   }, [programId]);
