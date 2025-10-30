@@ -112,7 +112,10 @@ export function getZohoApplicationsColumns(
                 />
               </div>
             )}
-            <div className="text-left">
+            <div
+              className="text-left hover:cursor-pointer hover:text-primary"
+              onClick={() => router.push(`/universities/${university?.id}`)}
+            >
               {university?.name ||
                 (row.original.university
                   ? `ID: ${row.original.university}`

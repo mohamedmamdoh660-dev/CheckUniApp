@@ -62,7 +62,12 @@ export function getZohoProgramsColumns(
               />
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
-              <span className=" font-semibold">{university?.name}</span>
+              <span
+                className=" font-semibold hover:cursor-pointer hover:text-primary"
+                onClick={() => router?.push(`/universities/${university?.id}`)}
+              >
+                {university?.name}
+              </span>
             </div>
           </div>
         );

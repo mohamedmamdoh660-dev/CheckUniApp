@@ -13,21 +13,13 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
 import { BellRing, CalendarDays, GraduationCap, School } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash } from "lucide-react";
+
 import { useState } from "react";
 import { announcementsService } from "@/modules/announcements/services/announcements-service";
 import { toast } from "sonner";
 import EditAnnouncementDialog from "./component/edit-announcement";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
+import { useRouter } from "next/navigation";
 
 interface AnnouncementCardProps {
   announcement: ZohoAnnouncement;
@@ -42,7 +34,7 @@ export default function AnnouncementCard({
 }: AnnouncementCardProps) {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const router = useRouter();
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this announcement?")) {
       setIsDeleting(true);
@@ -107,7 +99,15 @@ export default function AnnouncementCard({
               />
               <AvatarFallback>{universityInitials}</AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium line-clamp-1">
+            <span
+              className="text-sm font-medium line-clamp-1"
+              title={universityName}
+              onClick={() =>
+                router.push(
+                  `/universities/${announcement.zoho_universities?.id}`
+                )
+              }
+            >
               {universityName}
             </span>
           </div>

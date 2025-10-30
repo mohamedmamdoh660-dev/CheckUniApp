@@ -37,25 +37,20 @@ export default function UniversityDetails({
             </p>
             <p className="font-medium">{university?.name || "N/A"}</p>
           </div>
+
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">
               Sector
             </p>
             <p className="font-medium">{university?.sector || "N/A"}</p>
           </div>
+
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">
-              Country
+              Location
             </p>
             <p className="font-medium">
-              {university?.zoho_countries?.name || "N/A"}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">
-              City
-            </p>
-            <p className="font-medium">
+              {university?.zoho_countries?.name || "N/A"},{" "}
               {university?.zoho_cities?.name || "N/A"}
             </p>
           </div>
@@ -143,12 +138,7 @@ export default function UniversityDetails({
               )}
             </p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">
-              Description
-            </p>
-            <p className="font-medium">{university?.description || "N/A"}</p>
-          </div>
+
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">
               Accommodation
@@ -161,11 +151,20 @@ export default function UniversityDetails({
             </p>
             <p className="font-medium">{formatDate(university?.created_at)}</p>
           </div>
+          {/* Updated At */}
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">
               Updated At
             </p>
             <p className="font-medium">{formatDate(university?.update_at)}</p>
+          </div>
+
+          {/* Description */}
+          <div className="col-span-3">
+            <p className="text-sm font-medium text-muted-foreground mb-1">
+              Description
+            </p>
+            <p className="font-medium">{university?.description || "N/A"}</p>
           </div>
         </div>
       </CardContent>

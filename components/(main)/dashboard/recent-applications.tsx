@@ -196,7 +196,14 @@ export function RecentApplications() {
                         {application.zoho_programs?.name || "Unknown Program"}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div
+                          className="flex items-center gap-2 hover:cursor-pointer hover:text-primary"
+                          onClick={() =>
+                            router.push(
+                              `/universities/${application.zoho_universities?.id}`
+                            )
+                          }
+                        >
                           {application.zoho_universities?.logo && (
                             <div className="w-6 h-6 relative overflow-hidden rounded-full">
                               <Image

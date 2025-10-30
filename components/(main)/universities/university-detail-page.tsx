@@ -176,22 +176,13 @@ export default function UniversityDetailPage() {
                       {university.sector}
                     </Badge>
                   ) : null}
-                  {countryName !== "N/A" ? (
+                  {countryName !== "N/A" && cityName !== "N/A" ? (
                     <Badge
                       variant="secondary"
                       className="bg-primary/10 text-primary border-primary/20 text-[13px]"
                     >
                       <MapPin className="!w-4 !h-4 mr-1" />
-                      {countryName}
-                    </Badge>
-                  ) : null}
-                  {cityName !== "N/A" ? (
-                    <Badge
-                      variant="secondary"
-                      className="bg-primary/10 text-primary border-primary/20 text-[13px]"
-                    >
-                      <MapPin className="!w-4 !h-4 mr-1" />
-                      {cityName}
+                      {countryName}, {cityName}
                     </Badge>
                   ) : null}
                 </div>
