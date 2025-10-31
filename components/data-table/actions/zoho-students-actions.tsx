@@ -97,7 +97,7 @@ export function ZohoStudentsTableRowActions({
             <Eye className="mr-1 h-4 w-4" />
             View Details
           </DropdownMenuItem>
-          {isCrmId && canEdit(userProfile, ResourceType.STUDENTS) && (
+          {canEdit(userProfile, ResourceType.STUDENTS) && (
             <DropdownMenuItem
               onClick={() => {
                 router.push(`/students/edit/${values.id}`);

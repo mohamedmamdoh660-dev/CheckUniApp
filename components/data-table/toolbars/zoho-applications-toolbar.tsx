@@ -316,7 +316,7 @@ export function ZohoApplicationsDataTableToolbar<TData>({
         </Button> */}
       </div>
       {table && <DataTableViewOptions table={table} />}
-      {isCrmId && canCreate(userProfile, ResourceType.APPLICATIONS) && (
+      {canCreate(userProfile, ResourceType.APPLICATIONS) && (
         <>
           <div className="pl-2">
             <Button

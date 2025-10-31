@@ -125,7 +125,7 @@ export function ZohoStudentsDataTableToolbar<TData>({
         </Button>
       </div>
       {table && <DataTableViewOptions table={table} />}
-      {isCrmId && canCreate(userProfile, ResourceType.STUDENTS) && (
+      {canCreate(userProfile, ResourceType.STUDENTS) && (
         <div className="pl-2">
           <Button
             variant="default"

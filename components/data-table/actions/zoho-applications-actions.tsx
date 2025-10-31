@@ -158,7 +158,7 @@ export function ZohoApplicationsTableRowActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-max">
-          {isCrmId && canEdit(userProfile, ResourceType.APPLICATIONS) && (
+          {canEdit(userProfile, ResourceType.APPLICATIONS) && (
             <DropdownMenuItem
               onClick={() => {
                 setIsEditDialogOpen(true);

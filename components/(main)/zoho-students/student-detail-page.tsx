@@ -259,30 +259,29 @@ export function StudentDetailPage() {
                   ) : null}
                 </div>
               </div>
-              {(userProfile?.crm_id || userProfile?.agency?.crm_id) &&
-                canCreate(userProfile, ResourceType.APPLICATIONS) && (
-                  <div className="flex gap-3">
-                    <Button onClick={() => setAddOpen(true)}>
-                      Add Application
-                    </Button>
-                    <AddZohoApplication
-                      open={addOpen}
-                      onOpenChange={setAddOpen}
-                      onRefresh={async () => {
-                        try {
-                          const apps =
-                            await zohoApplicationsService.getApplicationsByStudent(
-                              studentId
-                            );
-                          setApplications(apps || []);
-                        } catch {}
-                      }}
-                      presetStudentId={studentId}
-                      presetStudentName={`${student?.first_name || ""} ${student?.last_name || ""}`}
-                      lockStudent
-                    />
-                  </div>
-                )}
+              {canCreate(userProfile, ResourceType.APPLICATIONS) && (
+                <div className="flex gap-3">
+                  <Button onClick={() => setAddOpen(true)}>
+                    Add Application
+                  </Button>
+                  <AddZohoApplication
+                    open={addOpen}
+                    onOpenChange={setAddOpen}
+                    onRefresh={async () => {
+                      try {
+                        const apps =
+                          await zohoApplicationsService.getApplicationsByStudent(
+                            studentId
+                          );
+                        setApplications(apps || []);
+                      } catch {}
+                    }}
+                    presetStudentId={studentId}
+                    presetStudentName={`${student?.first_name || ""} ${student?.last_name || ""}`}
+                    lockStudent
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

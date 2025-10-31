@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getUserId, getUserProfile, useUserData } from "@/lib/utils";
+import { cn, getUserId, getUserProfile, useUserData } from "@/lib/utils";
 import { usersService } from "@/modules/users/services/users-service";
 import { Button } from "@/components/ui/button";
 import { saveFile } from "@/supabase/actions/save-file";
@@ -24,6 +24,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { updateUserPassword } from "@/lib/actions/auth-actions";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Cropper,
   CropperCropArea,
@@ -42,6 +54,16 @@ import {
 import { Area, getCroppedImg } from "@/utils/image-crop";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/modules/auth";
+
+const passwordFormSchema = z
+  .object({
+    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export type UserProfile = {
   first_name: string;
@@ -67,6 +89,14 @@ export function ProfileSettings() {
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [newEmail, setNewEmail] = useState("");
+
+  // Password change states
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // Image cropper states
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -207,6 +237,48 @@ export function ProfileSettings() {
   const openEmailDialog = () => {
     setNewEmail("");
     setIsEmailDialogOpen(true);
+  };
+
+  const openPasswordDialog = () => {
+    setPasswordMessage(null);
+    setIsPasswordDialogOpen(true);
+  };
+
+  const passwordForm = useForm<z.infer<typeof passwordFormSchema>>({
+    resolver: zodResolver(passwordFormSchema),
+    defaultValues: {
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
+
+  const handleChangePassword = async (
+    values: z.infer<typeof passwordFormSchema>
+  ) => {
+    setIsChangingPassword(true);
+    setPasswordMessage(null);
+    try {
+      // In a real implementation, you would verify the current password first
+      const result = await updateUserPassword(
+        userProfileAuth?.id || "",
+        values.newPassword
+      );
+      if (!result.success) {
+        setPasswordMessage({
+          type: "error",
+          text: result.error || "Failed to update password",
+        });
+        throw new Error(result.error || "Failed to update password");
+      }
+      toast.success("Password updated successfully");
+      passwordForm.reset();
+      setIsPasswordDialogOpen(false);
+    } catch (error) {
+      console.error("Error updating password:", error);
+      toast.error("Failed to update password");
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const handleRemoveAvatar = () => {
@@ -352,6 +424,37 @@ export function ProfileSettings() {
           </div>
         </div>
 
+        {/* Password Section */}
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <Label className="text-base font-medium">Password</Label>
+            <p className="text-sm text-muted-foreground">
+              Update your password to keep your account secure
+            </p>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Input
+                type="password"
+                value="••••••••"
+                disabled
+                className="bg-muted/50"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={openPasswordDialog}
+                disabled={isChangingPassword}
+              >
+                Change Password
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Click "Change Password" to update your password
+            </p>
+          </div>
+        </div>
+
         {/* Save Button */}
         <div className="flex justify-end pt-2">
           <Button onClick={handleUpdateUserProfile} disabled={isLoading}>
@@ -397,6 +500,92 @@ export function ProfileSettings() {
               {isUpdatingEmail ? "Updating..." : "Update Email"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Change Dialog */}
+      <Dialog
+        open={isPasswordDialogOpen}
+        onOpenChange={setIsPasswordDialogOpen}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
+              Update your password to keep your account secure
+            </DialogDescription>
+          </DialogHeader>
+          <div className="pt-4 pb-2">
+            <Form {...passwordForm}>
+              <form
+                onSubmit={passwordForm.handleSubmit(handleChangePassword)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={passwordForm.control}
+                  name="newPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>New Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Enter new password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={passwordForm.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm New Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Confirm new password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {passwordMessage && (
+                  <div
+                    className={cn(
+                      "p-3 rounded-md text-sm",
+                      passwordMessage.type === "success"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                        : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                    )}
+                  >
+                    {passwordMessage.text}
+                  </div>
+                )}
+
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsPasswordDialogOpen(false)}
+                    disabled={isChangingPassword}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isChangingPassword}>
+                    {isChangingPassword ? "Updating..." : "Update Password"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </div>
         </DialogContent>
       </Dialog>
 
