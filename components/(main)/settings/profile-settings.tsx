@@ -221,7 +221,7 @@ export function ProfileSettings() {
     try {
       await authService.updateEmail(newEmail);
       toast.success(
-        `Email update initiated! Please check your new email address ${newEmail} for confirmation message.`,
+        `Email update initiated! Please check your new email address (${newEmail}) for a confirmation link, and then confirm the change using the message sent to your old email address (${userProfile?.email}).`,
         { duration: 15000 }
       );
       setIsEmailDialogOpen(false);
