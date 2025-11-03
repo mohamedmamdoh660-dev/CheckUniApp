@@ -28,19 +28,29 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSearchParams } from "next/navigation";
+import { UserRoles } from "@/types/types";
 
 export default function SettingsDialog() {
   const [activeSection, setActiveSection] = useState("Profile");
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
-  const { settings } = useAuth();
+  const { settings, userProfile } = useAuth();
 
-  // Navigation data
+  // Check if user is admin or agent
+  const isAdminOrAgent =
+    userProfile?.roles?.name === UserRoles.ADMIN ||
+    userProfile?.roles?.name === UserRoles.AGENT;
+
+  // Navigation data - only show Organization and Appearance for admin/agent users
   const data = {
     nav: [
       { name: "Profile", icon: User },
-      { name: "Organization", icon: Building },
-      { name: "Appearance", icon: Paintbrush },
+      ...(isAdminOrAgent
+        ? [
+            { name: "Organization", icon: Building },
+            { name: "Appearance", icon: Paintbrush },
+          ]
+        : []),
     ],
   };
 
@@ -54,10 +64,15 @@ export default function SettingsDialog() {
       case "Profile":
         return <ProfileSettings />;
       case "Organization":
-        return settings ? <OrganizationSettings settings={settings} /> : null;
+        // Only show Organization settings for admin/agent users
+        return isAdminOrAgent && settings ? (
+          <OrganizationSettings settings={settings} />
+        ) : null;
       case "Appearance":
-        return settings ? <AppearanceSettings settings={settings} /> : null;
-
+        // Only show Appearance settings for admin/agent users
+        return isAdminOrAgent && settings ? (
+          <AppearanceSettings settings={settings} />
+        ) : null;
       default:
         return null;
     }

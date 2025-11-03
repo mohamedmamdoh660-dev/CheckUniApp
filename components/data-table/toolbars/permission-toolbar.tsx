@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { Plus, RefreshCcw, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ActionType, ResourceType, RoleAccess } from "@/types/types";
+import { ActionType, ResourceType, RoleAccess, UserRoles } from "@/types/types";
 import { CreateProtected } from "@/components/auth/permission-protected";
 import {
   Dialog,
@@ -328,6 +328,18 @@ export function PermissionDataTableToolbar<TData>({
                       resource !== ResourceType.ROLES &&
                       resource !== ResourceType.PERMISSIONS
                   )
+                  .filter((resource) => {
+                    if (
+                      roles.find((role) => role.id === selectedRoleId)?.name !==
+                        UserRoles.ADMIN &&
+                      roles.find((role) => role.id === selectedRoleId)?.name !==
+                        UserRoles.AGENT &&
+                      selectedRoleId
+                    ) {
+                      return resource !== ResourceType.USERS;
+                    }
+                    return true;
+                  })
                   .map((resource) => (
                     <SelectItem
                       key={resource}
@@ -505,7 +517,22 @@ export function PermissionDataTableToolbar<TData>({
                           onChange={(options) =>
                             field.onChange(options.map((opt) => opt.value))
                           }
-                          defaultOptions={availableResources}
+                          defaultOptions={availableResources.filter(
+                            (resource) => {
+                              // If user is not admin or agent, filter out USERS and SETTINGS
+                              if (
+                                roles.find(
+                                  (role) => role.id === formSelectedRole
+                                )?.name !== UserRoles.ADMIN &&
+                                roles.find(
+                                  (role) => role.id === formSelectedRole
+                                )?.name !== UserRoles.AGENT
+                              ) {
+                                return resource.value !== ResourceType.USERS;
+                              }
+                              return true;
+                            }
+                          )}
                           placeholder={
                             !formSelectedRole || !formSelectedAction
                               ? "Select a role and action first"
