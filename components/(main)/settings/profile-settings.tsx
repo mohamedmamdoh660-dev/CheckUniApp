@@ -351,7 +351,7 @@ export function ProfileSettings() {
         </div>
 
         {/* Name Fields in Responsive Row */}
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <div className="space-y-1">
             <Label className="text-base font-medium">Full Name</Label>
             <p className="text-sm text-muted-foreground">
@@ -388,10 +388,10 @@ export function ProfileSettings() {
               />
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Email Field */}
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <div className="space-y-1">
             <Label className="text-base font-medium">Email Address</Label>
             <p className="text-sm text-muted-foreground">
@@ -422,8 +422,7 @@ export function ProfileSettings() {
               Click "Change Email" to update your email address
             </p>
           </div>
-        </div>
-
+        </div> */}
         {/* Password Section */}
         <div className="space-y-4">
           <div className="space-y-1">
