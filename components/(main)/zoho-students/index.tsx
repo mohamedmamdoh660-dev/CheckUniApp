@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 import { getZohoStudentsColumns } from "@/components/data-table/columns/column-zoho-students";
 import { ZohoStudentsDataTableToolbar } from "@/components/data-table/toolbars/zoho-students-toolbar";
@@ -11,7 +11,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { getStudentsPagination } from "@/supabase/actions/db-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
@@ -25,8 +24,7 @@ import {
 } from "lucide-react";
 import InfoGraphic from "@/components/ui/info-graphic";
 import { Button } from "@/components/ui/button";
-import { supabaseClient } from "@/lib/supabase-auth-client";
-import { toast } from "sonner";
+
 export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [listStudents, setListStudents] = useState<ZohoStudent[]>([]);
   const [recordCount, setRecordCount] = useState<number>(0);
@@ -70,45 +68,45 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   // Realtime list updates for students table
-  useEffect(() => {
-    const channel = supabaseClient
-      .channel("rt-students-list")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "zoho_students" },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            if (currentPage === 0) {
-              fetchStudents();
-            }
+  // useEffect(() => {
+  //   const channel = supabaseClient
+  //     .channel("rt-students-list")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "zoho_students" },
+  //       (payload) => {
+  //         if (payload.eventType === "INSERT") {
+  //           if (currentPage === 0) {
+  //             fetchStudents();
+  //           }
 
-            toast.success(
-              `${payload.new.first_name} ${payload.new.last_name} has been added successfully`
-            );
-          } else if (payload.eventType === "UPDATE") {
-            if (listStudents.find((student) => student.id === payload.new.id)) {
-              fetchStudents();
-            }
-            toast.success(
-              `${payload.new.first_name} ${payload.new.last_name} has been updated successfully`
-            );
-          } else if (payload.eventType === "DELETE") {
-            if (listStudents.find((student) => student.id === payload.old.id)) {
-              fetchStudents();
-            }
-            toast.success(
-              `${payload.old.first_name} ${payload.old.last_name} has been deleted successfully`
-            );
-          }
-        }
-      )
-      .subscribe();
-    return () => {
-      try {
-        supabaseClient.removeChannel(channel);
-      } catch {}
-    };
-  }, []);
+  //           toast.success(
+  //             `${payload.new.first_name} ${payload.new.last_name} has been added successfully`
+  //           );
+  //         } else if (payload.eventType === "UPDATE") {
+  //           if (listStudents.find((student) => student.id === payload.new.id)) {
+  //             fetchStudents();
+  //           }
+  //           toast.success(
+  //             `${payload.new.first_name} ${payload.new.last_name} has been updated successfully`
+  //           );
+  //         } else if (payload.eventType === "DELETE") {
+  //           if (listStudents.find((student) => student.id === payload.old.id)) {
+  //             fetchStudents();
+  //           }
+  //           toast.success(
+  //             `${payload.old.first_name} ${payload.old.last_name} has been deleted successfully`
+  //           );
+  //         }
+  //       }
+  //     )
+  //     .subscribe();
+  //   return () => {
+  //     try {
+  //       supabaseClient.removeChannel(channel);
+  //     } catch {}
+  //   };
+  // }, []);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {

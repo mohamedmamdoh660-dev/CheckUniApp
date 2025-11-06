@@ -414,9 +414,9 @@ export const getStudentsPagination = async (    search: string,
 
     // Handle active filter
     if (filters.active === 'true' || filters.active === 'false') {
-      query = query.eq('active', filters.active === 'true');
+      query = query.eq('active_applications', filters.active === 'true');
     } else {
-      query = query.eq('active', true);
+      query = query.eq('active_applications', true);
     }
     
     // Handle applications filter

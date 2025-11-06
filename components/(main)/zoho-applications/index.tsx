@@ -84,53 +84,53 @@ export default function ZohoApplicationsManagementPage({
   }, [fetchApplications]);
 
   // Realtime list updates for applications table
-  useEffect(() => {
-    const channel = supabaseClient
-      .channel("rt-applications-list")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "zoho_applications" },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            if (currentPage === 0) {
-              fetchApplications();
-            }
+  // useEffect(() => {
+  //   const channel = supabaseClient
+  //     .channel("rt-applications-list")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "zoho_applications" },
+  //       (payload) => {
+  //         if (payload.eventType === "INSERT") {
+  //           // if (currentPage === 0) {
+  //           //   fetchApplications();
+  //           // }
 
-            toast.success(
-              `${payload?.new?.application_name || "New application"} has been added successfully`
-            );
-          } else if (payload.eventType === "UPDATE") {
-            if (
-              listApplications.find(
-                (application) => application.id === payload.new.id
-              )
-            ) {
-              fetchApplications();
-            }
-            toast.success(
-              `${payload?.new?.application_name} has been updated successfully`
-            );
-          } else if (payload.eventType === "DELETE") {
-            if (
-              listApplications.find(
-                (application) => application.id === payload.old.id
-              )
-            ) {
-              fetchApplications();
-            }
-            toast.success(
-              `${payload.old.application_name} has been deleted successfully`
-            );
-          }
-        }
-      )
-      .subscribe();
-    return () => {
-      try {
-        supabaseClient.removeChannel(channel);
-      } catch {}
-    };
-  }, [fetchApplications]);
+  //           // toast.success(
+  //           //   `${payload?.new?.application_name || "New application"} has been added successfully`
+  //           // );
+  //         } else if (payload.eventType === "UPDATE") {
+  //           // if (
+  //           //   listApplications.find(
+  //           //     (application) => application.id === payload.new.id
+  //           //   )
+  //           // ) {
+  //           //   fetchApplications();
+  //           // }
+  //           // toast.success(
+  //           //   `${payload?.new?.application_name} has been updated successfully`
+  //           // );
+  //         } else if (payload.eventType === "DELETE") {
+  //           // if (
+  //           //   listApplications.find(
+  //           //     (application) => application.id === payload.old.id
+  //           //   )
+  //           // ) {
+  //           //   fetchApplications();
+  //           // }
+  //           // toast.success(
+  //           //   `${payload.old.application_name} has been deleted successfully`
+  //           // );
+  //         }
+  //       }
+  //     )
+  //     .subscribe();
+  //   return () => {
+  //     try {
+  //       supabaseClient.removeChannel(channel);
+  //     } catch {}
+  //   };
+  // }, [fetchApplications]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {

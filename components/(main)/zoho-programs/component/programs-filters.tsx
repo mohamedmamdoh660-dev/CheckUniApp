@@ -133,6 +133,16 @@ export default function ProgramsFilters({
               onSelect={(it: any) => setCountry(it?.id || "")}
             />
             <SearchableDropdown
+              placeholder="City"
+              table="zoho-cities"
+              label="filter cities"
+              searchField="name"
+              displayField="name"
+              initialValue={city}
+              location={LOCATION}
+              onSelect={(it: any) => setCity(it?.id || "")}
+            />
+            <SearchableDropdown
               placeholder="Language"
               table="zoho-languages"
               searchField="name"
@@ -154,21 +164,6 @@ export default function ProgramsFilters({
                 <SelectItem value="null">Status (any)</SelectItem>
                 <SelectItem value="true">Active</SelectItem>
                 <SelectItem value="false">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={appsOpen}
-              onValueChange={(it: any) =>
-                it === "null" ? setAppsOpen("") : setAppsOpen(it)
-              }
-            >
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="Applications (any)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="null">Applications (any)</SelectItem>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
               </SelectContent>
             </Select>
           </div>
