@@ -39,6 +39,13 @@ export function canCreate(userData: User | null, resource: ResourceType | string
 }
 
 /**
+ * Check if user can view all resources
+ */
+export function canViewAll(userData: User | null, resource: ResourceType | string): boolean {
+  return hasPermission(userData, resource, ActionType.ViewAll);
+}
+
+/**
  * Check if user can edit resources
  */
 export function canEdit(userData: User | null, resource: ResourceType | string): boolean {

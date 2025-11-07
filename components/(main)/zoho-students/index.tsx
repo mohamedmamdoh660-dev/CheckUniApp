@@ -5,7 +5,7 @@ import { getZohoStudentsColumns } from "@/components/data-table/columns/column-z
 import { ZohoStudentsDataTableToolbar } from "@/components/data-table/toolbars/zoho-students-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
-import { ZohoStudent } from "@/types/types";
+import { ResourceType, ZohoStudent } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import InfoGraphic from "@/components/ui/info-graphic";
 import { Button } from "@/components/ui/button";
+import { canViewAll } from "@/lib/permissions";
 
 export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [listStudents, setListStudents] = useState<ZohoStudent[]>([]);
@@ -44,6 +45,7 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   async function fetchStudents() {
     setIsRefetching(true);
     try {
+      const recordPermission = canViewAll(userProfile, ResourceType.STUDENTS);
       const studentsResponse: any = await getStudentsPagination(
         `${debouncedSearchTerm}`,
         pageSize,
@@ -51,7 +53,8 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
         userProfile?.id || "",
         userProfile?.roles?.name || "",
         userProfile?.agency_id || "",
-        sorting
+        sorting,
+        recordPermission
       );
 
       setListStudents(studentsResponse.students);

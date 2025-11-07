@@ -310,7 +310,7 @@ export default function ProgramDetailPage() {
                                   )
                                 }
                               >
-                                <Avatar className="h-6 w-6 border-foreground/10 border">
+                                <Avatar className="">
                                   <AvatarImage
                                     src={
                                       a.zoho_students?.photo_url ||

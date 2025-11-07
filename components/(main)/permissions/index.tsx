@@ -110,31 +110,6 @@ export default function PermissionManagementPage({ type }: { type: string }) {
 
   return (
     <div className="space-y-4">
-      {/* <Tabs
-        value={viewMode}
-        onValueChange={(v) => setViewMode(v as "matrix" | "list")}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <TabsList>
-            <TabsTrigger value="matrix" className="gap-2">
-              <LayoutGrid className="h-4 w-4" />
-              Matrix View
-            </TabsTrigger>
-            <TabsTrigger value="list" className="gap-2">
-              <List className="h-4 w-4" />
-              List View
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="matrix" className="mt-0">
-          <PermissionMatrix
-            roles={roles}
-            onPermissionsUpdated={fetchPermissions}
-          />
-        </TabsContent>
-
-        <TabsContent value="list" className="mt-0"> */}
       <DataTable
         data={listPermissions || []}
         toolbar={

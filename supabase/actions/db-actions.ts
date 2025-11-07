@@ -49,7 +49,8 @@ export const getApplicationsPagination = async (
   sorting?: {
     sortBy?: string;
     sortOrder?: "asc" | "desc";
-  }
+  },
+  recordPermission: boolean = false
 ) => {
  
     try {
@@ -153,8 +154,7 @@ export const getApplicationsPagination = async (
         );
   
       // Role-based filtering
-      
-      if (userRole === "admin") {
+      if (userRole === "admin" || recordPermission) {
       } else if (userRole === "agent") {
         query = query.eq("agency_id", user_id);
       } else {
@@ -253,7 +253,9 @@ export const getStudentsPagination = async (    search: string,
   sorting?: {
     sortBy?: string;
     sortOrder?: "asc" | "desc";
-  }) => {
+  },
+  recordPermission: boolean = false
+) => {
  
     
       try {
@@ -315,7 +317,7 @@ export const getStudentsPagination = async (    search: string,
     
     
         // Role-based filtering (if needed)
-        if (userRole === "admin") {
+        if (userRole === "admin" || recordPermission) {
         } else if (userRole === "agent") {
           query = query.eq("agency_id", user_id);
         } else {

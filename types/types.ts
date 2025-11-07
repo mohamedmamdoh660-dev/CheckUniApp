@@ -182,6 +182,7 @@ export enum ActionType {
   DELETE = "delete",
   VIEW = "view",
   EXPORT = "export",
+  ViewAll = "view all",
 }
 
 

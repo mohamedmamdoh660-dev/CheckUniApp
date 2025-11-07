@@ -99,19 +99,19 @@ export function getZohoApplicationsColumns(
       ),
       cell: ({ row }) => {
         const university = row.original.zoho_universities;
+        if (!university) return "-";
 
         return (
           <div className="flex items-center gap-2">
-            {university?.logo && (
-              <div className="w-8 h-8 relative overflow-hidden rounded-full">
-                <Image
-                  src={university.logo}
-                  alt={university?.name || "University"}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )}
+            <Avatar className="border-foreground/10 border-[1px]">
+              <AvatarImage
+                src={
+                  university?.logo?.includes("http")
+                    ? university.logo
+                    : generateNameAvatar(university?.name || "")
+                }
+              />
+            </Avatar>
             <div
               className="text-left hover:cursor-pointer hover:text-primary"
               onClick={() => router.push(`/universities/${university?.id}`)}
@@ -207,6 +207,8 @@ export function getZohoApplicationsColumns(
         const agent = row.original.agent;
         const fullName =
           `${agent?.first_name || ""} ${agent?.last_name || ""}`.trim();
+
+        if (!agent) return "-";
 
         return (
           <div className="flex items-center w-full">

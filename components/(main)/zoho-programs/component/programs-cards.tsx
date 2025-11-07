@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ZohoProgram } from "@/types/types";
 import { currentTimezone } from "@/lib/helper/current-timezone";
+import educationalProgramsImage from "@/public/images/educational-programs.png";
 import {
   Building2,
   Calendar,
@@ -55,22 +56,31 @@ export function ZohoProgramsCards({
           </Tooltip>
 
           {/* Cover image */}
-          <div className="relative h-28 w-full bg-muted">
+          <div className="relative h-28 w-full bg-muted flex items-center justify-center">
             {program.zoho_universities?.profile_image ? (
               <Image
                 src={program.zoho_universities?.profile_image}
-                alt={program.zoho_universities?.name || "University"}
+                alt={program.zoho_universities?.name || "Educational Programs"}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
-            ) : null}
+            ) : (
+              <Image
+                src={educationalProgramsImage}
+                alt="Educational Programs"
+                unoptimized
+                width={90}
+                height={90}
+                className="object-cover opacity-50"
+              />
+            )}
           </div>
           <CardHeader className="flex-row items-center justify-between gap-1">
-            <div className="flex items-start gap-3 min-w-0">
+            <div className="flex items-start gap-3 min-w-0 w-full">
               {/* University logo */}
-              <div className="  rounded-full  ">
-                <Avatar>
+              <div className="rounded-full h-10 w-10 flex-shrink-0">
+                <Avatar className="h-full w-full object-cover">
                   <AvatarImage
                     src={
                       program?.zoho_universities?.logo ||
@@ -79,7 +89,7 @@ export function ZohoProgramsCards({
                   />
                 </Avatar>
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1 overflow-hidden">
                 <CardTitle
                   className="text-base font-semibold truncate cursor-pointer hover:text-primary"
                   onClick={() => router.push(`/programs/${program.id}`)}

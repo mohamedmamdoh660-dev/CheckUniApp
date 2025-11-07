@@ -5,7 +5,7 @@ import { getZohoApplicationsColumns } from "@/components/data-table/columns/colu
 import { ZohoApplicationsDataTableToolbar } from "@/components/data-table/toolbars/zoho-applications-toolbar";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
-import { ZohoApplication } from "@/types/types";
+import { ResourceType, ZohoApplication } from "@/types/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,7 @@ import { supabaseClient } from "@/lib/supabase-auth-client";
 import { ZohoApplicationsCards } from "./component/applications-cards";
 import Loader from "@/components/loader";
 import { toast } from "sonner";
+import { canViewAll } from "@/lib/permissions";
 
 export default function ZohoApplicationsManagementPage({
   type,
@@ -35,6 +36,7 @@ export default function ZohoApplicationsManagementPage({
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
   const { userProfile } = useAuth();
+
   const router = useRouter();
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [sorting, setSorting] = useState<{
@@ -50,6 +52,10 @@ export default function ZohoApplicationsManagementPage({
   const fetchApplications = useCallback(async () => {
     setIsRefetching(true);
     try {
+      const recordPermission = canViewAll(
+        userProfile,
+        ResourceType.APPLICATIONS
+      );
       const applicationsResponse: any = await getApplicationsPagination(
         `${debouncedSearchTerm}`,
         pageSize,
@@ -58,7 +64,8 @@ export default function ZohoApplicationsManagementPage({
         userProfile?.roles?.name || "",
         userProfile?.agency_id || "",
         filters,
-        sorting
+        sorting,
+        recordPermission
       );
 
       setListApplications(applicationsResponse.applications);

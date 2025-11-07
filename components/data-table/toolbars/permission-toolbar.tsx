@@ -41,8 +41,16 @@ import { rolesService } from "@/modules";
 // Resource-specific actions mapping
 const RESOURCE_ACTIONS: Record<ResourceType, ActionType[]> = {
   [ResourceType.DASHBOARD]: [ActionType.VIEW],
-  [ResourceType.STUDENTS]: [ActionType.CREATE, ActionType.VIEW],
-  [ResourceType.APPLICATIONS]: [ActionType.VIEW, ActionType.CREATE],
+  [ResourceType.STUDENTS]: [
+    ActionType.CREATE,
+    ActionType.VIEW,
+    ActionType.ViewAll,
+  ],
+  [ResourceType.APPLICATIONS]: [
+    ActionType.VIEW,
+    ActionType.CREATE,
+    ActionType.ViewAll,
+  ],
   [ResourceType.PROGRAMS]: [ActionType.VIEW, ActionType.EXPORT],
   // All other resources: only VIEW
   [ResourceType.USERS]: [
