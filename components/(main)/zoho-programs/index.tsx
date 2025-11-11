@@ -26,7 +26,6 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
   const [isRefetching, setIsRefetching] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
-  const { userProfile } = useAuth();
   const [filters, setFilters] = useState<Record<string, string>>({});
   const router = useRouter();
   const [globalFilter, setGlobalFilter] = useState<string>("");
@@ -40,7 +39,7 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
       const programsResponse: any = await getProgramsPagination(
         `%${debouncedSearchTerm}%`,
         pageSize,
-        currentPage,
+        currentPage * pageSize,
 
         filters,
         sorting

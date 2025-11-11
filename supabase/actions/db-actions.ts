@@ -356,88 +356,93 @@ export const getStudentsPagination = async (    search: string,
     search: string,
     limit: number,
     offset: number,
-    
     filters: Record<string, string> = {},
     sorting: { sortBy?: string, sortOrder?: "asc" | "desc" } = {}
   ) => {
- 
     
-    // Build the query
-    let query = supabaseClient
-      .from('zoho_programs')
-      .select(`
-        *,
-        zoho_countries (
-          id,
-          name,
-          country_code
-        ),
-        zoho_degrees (
-          id,
-          name
-        ),
-        zoho_faculty (
-          id,
-          name
-        ),
-        zoho_languages (
-          id,
-          name
-        ),
-        zoho_speciality (
-          id,
-          name
-        ),
-        zoho_cities (
-          id,
-          name
-        ),
-        zoho_universities (
-          id,
-          name,
-          sector,
-          logo
-        )
-      `, { count: 'exact' });
- 
-    // Apply search filter if provided
-    if (search && search.trim() !== "") {
-      query = query.ilike('name', `%${search.trim()}%`);
+    // Clean up search - don't send %% if empty
+    const cleanSearch = search && search.trim() && search !== "%%" ? search.trim() : null;
+    
+    const { data, error } = await supabaseClient.rpc('get_programs_pagination', {
+      p_search: cleanSearch,
+      p_limit: limit,
+      p_offset: offset,
+      p_university_id: filters.university || null,
+      p_faculty_id: filters.faculty || null,
+      p_speciality_id: filters.speciality || null,
+      p_degree_id: filters.degree || null,
+      p_country_id: filters.country || null,
+      p_city_id: filters.city || null,
+      p_language_id: filters.language || null,
+      p_min_tuition: filters.minTuition ? parseInt(filters.minTuition) : null,
+      p_max_tuition: filters.maxTuition ? parseInt(filters.maxTuition) : null,
+      p_active_applications: filters.active === 'true' ? true : filters.active === 'false' ? false : true,
+      p_sort_by: sorting?.sortBy || 'created_at',
+      p_sort_order: sorting?.sortOrder || 'desc'
+    });
+  
+    if (error) {
+      console.error("❌ RPC Error:", error);
+      throw error;
     }
-
-    // Apply advanced filters
-    if (filters.university) query = query.eq('university_id', filters.university);
-    if (filters.faculty) query = query.eq('faculty_id', filters.faculty);
-    if (filters.speciality) query = query.eq('speciality_id', filters.speciality);
-    if (filters.degree) query = query.eq('degree_id', filters.degree);
-    if (filters.country) query = query.eq('country_id', filters.country);
-    if (filters.city) query = query.eq('city_id', filters.city);
-    if (filters.language) query = query.eq('language_id', filters.language);
-
-    // Handle active filter
-    if (filters.active === 'true' || filters.active === 'false') {
-      query = query.eq('active_applications', filters.active === 'true');
-    } else {
-      query = query.eq('active_applications', true);
-    }
-    
-    // Handle applications filter
-    if (filters.active_applications === 'open' || filters.active_applications === 'closed') {
-      query = query.eq('active_applications', filters.active_applications === 'open');
-    }
-    
-    // Apply ordering and pagination
-    const { data, error, count } = await query.order(
-   sorting?.sortBy || "created_at",
-      { ascending: sorting?.sortOrder === "asc" }
-    )
-    .range(offset * limit,limit * (offset + 1) - 1)
-    
-    if (error) throw error;
-    
+  
+  
+    // Get total count from first row (all rows have same total_count)
+    const totalCount = data && data.length > 0 ? data[0].total_count : 0;
+  
+    // Transform data to match your expected structure
+    const programs = data?.map((row: any) => ({
+      id: row.id,
+      name: row.name,
+      official_tuition: row.official_tuition,
+      discounted_tuition: row.discounted_tuition,
+      official_tuition_int: row.official_tuition_int,
+      university_id: row.university_id,
+      faculty_id: row.faculty_id,
+      speciality_id: row.speciality_id,
+      degree_id: row.degree_id,
+      country_id: row.country_id,
+      city_id: row.city_id,
+      language_id: row.language_id,
+      active_applications: row.active_applications,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+      zoho_countries: row.country_name ? {
+        id: row.country_id,
+        name: row.country_name,
+        country_code: row.country_code
+      } : null,
+      zoho_degrees: row.degree_name ? {
+        id: row.degree_id,
+        name: row.degree_name
+      } : null,
+      zoho_faculty: row.faculty_name ? {
+        id: row.faculty_id,
+        name: row.faculty_name
+      } : null,
+      zoho_languages: row.language_name ? {
+        id: row.language_id,
+        name: row.language_name
+      } : null,
+      zoho_speciality: row.speciality_name ? {
+        id: row.speciality_id,
+        name: row.speciality_name
+      } : null,
+      zoho_cities: row.city_name ? {
+        id: row.city_id,
+        name: row.city_name
+      } : null,
+      zoho_universities: row.university_name ? {
+        id: row.university_id,
+        name: row.university_name,
+        sector: row.university_sector,
+        logo: row.university_logo
+      } : null
+    }));
+  
     return {
-      programs: data,
-      totalCount: count || 0
+      programs: programs || [],
+      totalCount: totalCount
     };
   }
 

@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/select";
 import { useClearLocationSelections } from "@/context/SearchableDropdownContext";
 import React, { useEffect } from "react";
+import { Slider } from "@/components/ui/slider";
+import { formatNumber } from "@/utils/format-number";
 
 export interface ProgramsFiltersProps {
   filters: Record<string, string>;
@@ -50,6 +52,12 @@ export default function ProgramsFilters({
     filters.created_from || ""
   );
   const [createdTo, setCreatedTo] = React.useState(filters.created_to || "");
+  const DEFAULT_MIN_TUITION = 0;
+  const DEFAULT_MAX_TUITION = 1550000;
+  const [tuitionRange, setTuitionRange] = React.useState<[number, number]>([
+    filters.minTuition ? Number(filters.minTuition) : DEFAULT_MIN_TUITION,
+    filters.maxTuition ? Number(filters.maxTuition) : DEFAULT_MAX_TUITION,
+  ]);
 
   const activeCount = Object.keys(filters || {}).length;
 
@@ -66,10 +74,11 @@ export default function ProgramsFilters({
       setAppsOpen("");
       setCreatedFrom("");
       setCreatedTo("");
+      setTuitionRange([DEFAULT_MIN_TUITION, DEFAULT_MAX_TUITION]);
       clearLocationSelections(LOCATION);
       setClearFilters(false);
     }
-  }, [clearFilters]);
+  }, [clearFilters, clearLocationSelections, setClearFilters]);
 
   return (
     <div className="px-2 flex items-center gap-2">
@@ -166,6 +175,29 @@ export default function ProgramsFilters({
                 <SelectItem value="false">Inactive</SelectItem>
               </SelectContent>
             </Select>
+            <div className="col-span-1 md:col-span-2 mt-2">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">
+                  Official Tuition Range
+                </span>
+                <span className="text-sm font-medium">
+                  {formatNumber(tuitionRange[0])} -{" "}
+                  {formatNumber(tuitionRange[1])}
+                </span>
+              </div>
+              <Slider
+                min={DEFAULT_MIN_TUITION}
+                max={DEFAULT_MAX_TUITION}
+                defaultValue={[tuitionRange[0], tuitionRange[1]]}
+                value={tuitionRange}
+                onValueChange={(vals: number[]) =>
+                  setTuitionRange([vals[0], vals[1] ?? vals[0]])
+                }
+                step={100}
+                showTooltip
+                tooltipContent={(v) => `${formatNumber(v)} `}
+              />
+            </div>
           </div>
           <div className="flex justify-end gap-2 mt-4">
             <Button
@@ -183,6 +215,7 @@ export default function ProgramsFilters({
                 setAppsOpen("");
                 setCreatedFrom("");
                 setCreatedTo("");
+                setTuitionRange([DEFAULT_MIN_TUITION, DEFAULT_MAX_TUITION]);
                 clearLocationSelections(LOCATION);
                 onFiltersChange({});
                 setOpenFilters(false);
@@ -205,6 +238,14 @@ export default function ProgramsFilters({
                   active_applications: appsOpen,
                   created_from: createdFrom,
                   created_to: createdTo,
+                  minTuition:
+                    tuitionRange[0] !== DEFAULT_MIN_TUITION
+                      ? String(tuitionRange[0])
+                      : "",
+                  maxTuition:
+                    tuitionRange[1] !== DEFAULT_MAX_TUITION
+                      ? String(tuitionRange[1])
+                      : "",
                 };
                 Object.keys(next).forEach((k) => {
                   if (!next[k]) delete next[k];
