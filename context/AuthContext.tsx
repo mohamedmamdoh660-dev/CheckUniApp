@@ -71,9 +71,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (user) {
           signOut();
         }
+        const settingsData = JSON.parse(
+          localStorage.getItem("DAP-SETTINGS") || "{}"
+        );
+        if (settingsData) {
+          setSettings(settingsData);
+        }
         setUser(null);
         setUserProfile(null);
-        setSettings(null);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -94,6 +99,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       type: userProfile?.roles.name === "admin" ? "ADMIN" : "",
     });
     if (settingsData) {
+      localStorage.setItem("DAP-SETTINGS", JSON.stringify(settingsData));
       setSettings(settingsData);
     } else if (userProfile?.roles.name === "agent") {
       const createdSettings = await settingsService.insertSettings({
@@ -108,8 +114,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         agency_id: userProfile?.id,
         type: "AGENT",
       });
+      localStorage.setItem("DAP-SETTINGS", JSON.stringify(createdSettings));
+
       setSettings(createdSettings);
-      window.dispatchEvent(new CustomEvent("settings-update"));
     }
   };
 
@@ -123,31 +130,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       fetchSettings();
     }
   }, [userProfile]);
-
-  // Listen for settings updates
-  // useEffect(() => {
-  //   if (userProfile?.id) {
-  //     const handleSettingsUpdate = async () => {
-  //       try {
-  //         const fetchedSettings = await settingsService.getSettingsById({
-  //           id:
-  //             userProfile?.roles.name === "admin"
-  //               ? ""
-  //               : userProfile?.agency_id || userProfile?.id,
-  //           type: userProfile?.roles.name === "admin" ? "ADMIN" : "",
-  //         });
-  //         setSettings(fetchedSettings);
-  //       } catch (error) {
-  //         console.error("Failed to fetch settings:", error);
-  //       }
-  //     };
-
-  //     window.addEventListener("settings-update", handleSettingsUpdate);
-  //     return () => {
-  //       window.removeEventListener("settings-update", handleSettingsUpdate);
-  //     };
-  //   }
-  // }, [userProfile]);
 
   const checkRouteAccess = (path: string, userData: User | null) => {
     const isPublicRoute = PUBLIC_ROUTES.some(

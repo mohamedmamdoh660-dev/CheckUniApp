@@ -109,10 +109,115 @@ export async function requestPasswordReset(email: string, type: string) {
     // 4. Send email with reset link
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3010";
     const resetLink = `${baseUrl}/auth/reset-password?token=${token}`;
- const res =   await emailService.sendEmail({
+const res =   await emailService.sendEmail({
       to: email,
       subject: "Reset your password",
-      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p><p>If you did not request this, ignore this email.</p>`
+      html: `<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f5f5f5;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);">
+                    <!-- Body Content -->
+                    <tr>
+                        <td style="padding: 32px 24px; color: #202124;">
+                            <!-- Icon -->
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 24px;">
+                                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative;">
+                                          <img alt="✉️" aria-label="✉️" draggable="false" src="https://fonts.gstatic.com/s/e/notoemoji/16.0/2709_fe0f/72.png" loading="lazy" style=" height: 49px; margin: 15px 0 0 15px;">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Title -->
+                            <h1 style="font-size: 28px; font-weight: 500; color: #202124; text-align: center; margin: 0 0 8px 0; letter-spacing: -0.5px;">Reset Your Password</h1>
+                            <p style="text-align: center; font-size: 14px; color: #5f6368; margin: 0 0 24px 0;">We received a request to reset your password</p>
+                            <!-- Message -->
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 24px;">
+                                <tr>
+                                    <td style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 16px; border-radius: 0 4px 4px 0; font-size: 14px; line-height: 1.6; color: #3c4043;">
+                                        Click the button below to choose a new password. If you didn’t request this, you can safely ignore this email.
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- CTA Button -->
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 24px;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="${resetLink}" style="display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 6px; font-size: 15px; font-weight: 600; border: none; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">Reset Password</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Alternative Link -->
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 24px;">
+                                <tr>
+                                    <td style="text-align: center; font-size: 13px; color: #5f6368;">
+                                        <p style="margin: 0 0 8px 0;">Or copy and paste this link in your browser:</p>
+                                        <p style="margin: 0; word-break: break-all; color: #1f73e6; font-family: monospace; font-size: 12px;">${resetLink}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Info Box -->
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 24px; background-color: #e8f4f8; border: 1px solid #b3dfe0; border-radius: 4px;">
+                                <tr>
+                                    <td style="padding: 16px; font-size: 13px; line-height: 1.6; color: #2c5282;">
+                                        <p style="margin: 0 0 8px 0;"><strong>ℹ️ This link will expire in 1 hour</strong></p>
+                                        <p style="margin: 0;">If you didn't request a password reset, please ignore this email.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Security Tips -->
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 24px; background-color: #fef7e0; border: 1px solid #f9f1ba; border-radius: 4px;">
+                                <tr>
+                                    <td style="padding: 16px; font-size: 13px; line-height: 1.6; color: #3c4043;">
+                                        <p style="margin: 0 0 8px 0; font-weight: 600; color: #202124;">🔒 Safety First:</p>
+                                        <ul style="margin: 0; padding-left: 20px;">
+                                            <li style="margin: 6px 0;">Never share this email with anyone</li>
+                                            <li style="margin: 6px 0;">We will never ask for your password via email</li>
+                                            <li style="margin: 6px 0;">Keep your account secure with a strong password</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Quick Links -->
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td align="center" style="font-size: 12px; color: #5f6368;">
+                                        <p style="margin: 0;">
+                                            <a href="#" style="color: #1f73e6; text-decoration: none; margin: 0 12px;">FAQ</a>
+                                            <span style="color: #dadce0;">|</span>
+                                            <a href="#" style="color: #1f73e6; text-decoration: none; margin: 0 12px;">Documentation</a>
+                                            <span style="color: #dadce0;">|</span>
+                                            <a href="#" style="color: #1f73e6; text-decoration: none; margin: 0 12px;">Support</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr style="border-top: 1px solid #e8e8e8; background-color: #f8f9fa;">
+                        <td style="padding: 16px 24px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td style="font-size: 11px; color: #9aa0a6; text-align: center;">
+                                        <p style="margin: 0 0 8px 0;">© 2025 Supabase. All rights reserved.</p>
+                                        <p style="margin: 0;">
+                                            <a href="#" style="color: #1f73e6; text-decoration: none;">Privacy Policy</a>
+                                            <span style="color: #dadce0;"> · </span>
+                                            <a href="#" style="color: #1f73e6; text-decoration: none;">Terms of Service</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>`
     });
   } catch (error) {
     console.log("🚀 ~ requestPasswordReset ~ error:", error)
