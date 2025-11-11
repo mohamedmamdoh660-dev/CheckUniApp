@@ -32,6 +32,9 @@ export default function ForgotPassword() {
       toast.success(
         "If your email exists in our system, a reset link has been sent."
       );
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 2000);
     } catch (err) {
       console.log("🚀 ~ handleSubmit ~ err:", err);
       toast.error("Something went wrong, so please try again later.");
