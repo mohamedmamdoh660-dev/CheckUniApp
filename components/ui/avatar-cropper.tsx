@@ -115,8 +115,15 @@ export function AvatarCropper({
         previewUrl.toLowerCase().includes(".png") ||
         previewUrl.toLowerCase().includes("image/png");
 
-      // Get the cropped image blob
-      const croppedBlob = await getCroppedImg(previewUrl, cropData);
+      // FIXED: Now properly passing all parameters to preserve PNG transparency
+      const croppedBlob = await getCroppedImg(
+        previewUrl,
+        cropData,
+        cropData.width, // outputWidth
+        cropData.height, // outputHeight
+        "image/png", // Always use PNG to preserve transparency
+        1.0 // Maximum quality for PNG
+      );
 
       if (!croppedBlob) {
         throw new Error("Failed to generate cropped image blob.");
@@ -170,7 +177,7 @@ export function AvatarCropper({
     previousFileIdRef.current = fileId;
   }, [fileId]);
 
-  // Set initial image if profile is provided
+  // Set initial image if profile_image is provided
   useEffect(() => {
     if (profileImage && !finalImageUrl) {
       setFinalImageUrl(profileImage);
