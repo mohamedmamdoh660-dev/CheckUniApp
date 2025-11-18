@@ -157,28 +157,39 @@ export const authService = {
   }
 ,
 
-  updateEmail: async (newEmail: string) => {
+  updateEmail: async (newEmail: string, crm_id: string) => {
+    console.log("🚀 ~ newEmail:", newEmail)
+    console.log("🚀 ~ crm_id:", crm_id)
     // First check if user exists with the new email
-    const existingUser = await usersService.getUserByEmail({
-      email: {
-        eq: newEmail
-      }
+    // const existingUser = await usersService.getUserByEmail({
+    //   email: {
+    //     eq: newEmail
+    //   }
+    // });
+
+    // if (existingUser) {
+    //   throw new Error("User already exists with this email address");
+    // }
+
+    // // Update email in Supabase Auth
+    // const { data, error } = await supabaseServerClient().auth.updateUser({
+    //   email: newEmail,
+    // });
+
+    // if (error) {
+    //   throw new Error(error.message);
+    // }
+
+    const response = await fetch('https://automation.sitconnect.net/webhook/03ed1ba0-2bb5-4f12-9996-7a546269aa98', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: crm_id, email: newEmail }),
     });
-
-    if (existingUser) {
-      throw new Error("User already exists with this email address");
+    if (!response.ok) {
+      throw new Error('Failed to update email');
     }
-
-    // Update email in Supabase Auth
-    const { data, error } = await supabaseServerClient().auth.updateUser({
-      email: newEmail,
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
-  }
-
+    return response.json();
+  },
 }; 

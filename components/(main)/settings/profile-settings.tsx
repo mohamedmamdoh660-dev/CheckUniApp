@@ -215,15 +215,18 @@ export function ProfileSettings() {
     } else if (!isValidEmail(newEmail)) {
       toast.error("Invalid email address");
       return;
+    } else if (!userProfileAuth?.crm_id) {
+      toast.error("User not registered in CRM");
+      return;
     }
 
     setIsUpdatingEmail(true);
     try {
-      await authService.updateEmail(newEmail);
-      toast.success(
-        `Email update initiated! Please check your new email address (${newEmail}) for a confirmation link, and then confirm the change using the message sent to your old email address (${userProfile?.email}).`,
-        { duration: 15000 }
-      );
+      await authService.updateEmail(newEmail, userProfileAuth?.crm_id || "");
+      toast.success(`Email updated successfully`);
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
       setIsEmailDialogOpen(false);
       setNewEmail("");
     } catch (error) {
