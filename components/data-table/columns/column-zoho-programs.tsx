@@ -193,6 +193,23 @@ export function getZohoProgramsColumns(
       enableSorting: true,
       enableHiding: true,
     },
+    {
+      accessorKey: "tuition_fee_usd",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Tuition (USD)" />
+      ),
+      cell: ({ row }) => {
+        const tuition = row.original.tuition_fee_usd || 0;
+
+        return (
+          <div className="text-left">
+            <div>{`${formatNumber(Number(tuition))} USD`}</div>
+          </div>
+        );
+      },
+      enableSorting: true,
+      enableHiding: true,
+    },
 
     {
       accessorKey: "active",

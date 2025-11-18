@@ -364,7 +364,7 @@ export interface ZohoProgram {
   user_id?: string;
   agency?: User;
   user?: User;
-  
+  tuition_fee_usd?: number;
   // Related entities
   zoho_countries?: ZohoCountry;
   zoho_degrees?: ZohoDegree;

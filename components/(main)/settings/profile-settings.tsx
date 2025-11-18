@@ -69,7 +69,7 @@ export type UserProfile = {
   first_name: string;
   last_name: string;
   email: string;
-  profile_image?: string;
+  profile?: string;
 };
 
 export function ProfileSettings() {
@@ -142,7 +142,7 @@ export function ProfileSettings() {
       }
 
       // Convert blob to file
-      const file = new File([croppedBlob], "profile_image-image.jpg", {
+      const file = new File([croppedBlob], "profile-image.jpg", {
         type: "image/jpeg",
       });
 
@@ -151,7 +151,7 @@ export function ProfileSettings() {
       if (fileUrl) {
         setUserProfile((prev) => ({
           ...prev,
-          profile_image: fileUrl,
+          profile: fileUrl,
         }));
       }
 
@@ -183,14 +183,14 @@ export function ProfileSettings() {
         first_name: userProfile?.first_name,
         last_name: userProfile?.last_name,
         full_name: userProfile?.first_name + " " + userProfile?.last_name,
-        profile_image: userProfile?.profile_image ?? null,
+        profile: userProfile?.profile ?? null,
       });
       setUserProfileAuth({
         ...userProfileAuth,
         first_name: userProfile?.first_name,
         last_name: userProfile?.last_name,
         full_name: userProfile?.first_name + " " + userProfile?.last_name,
-        profile_image: userProfile?.profile_image ?? null,
+        profile: userProfile?.profile ?? null,
       });
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -284,7 +284,7 @@ export function ProfileSettings() {
   const handleRemoveAvatar = () => {
     setUserProfile((prev) => ({
       ...prev,
-      profile_image: undefined,
+      profile: undefined,
     }));
   };
 
@@ -293,7 +293,7 @@ export function ProfileSettings() {
       <CardHeader>
         <CardTitle className="text-2xl">Personal Information</CardTitle>
         <CardDescription>
-          Update your personal details and profile_image picture
+          Update your personal details and profile picture
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -310,13 +310,13 @@ export function ProfileSettings() {
                 onDrop={handleDrop}
                 data-dragging={isDragging || undefined}
                 aria-label={
-                  userProfile?.profile_image ? "Change image" : "Upload image"
+                  userProfile?.profile ? "Change image" : "Upload image"
                 }
               >
-                {userProfile?.profile_image ? (
+                {userProfile?.profile ? (
                   <Image
                     className="h-full w-full object-cover"
-                    src={userProfile?.profile_image}
+                    src={userProfile?.profile}
                     alt="User avatar"
                     width={80}
                     height={80}
@@ -327,7 +327,7 @@ export function ProfileSettings() {
                   </div>
                 )}
               </button>
-              {userProfile?.profile_image && (
+              {userProfile?.profile && (
                 <Button
                   onClick={handleRemoveAvatar}
                   size="icon"
@@ -340,7 +340,7 @@ export function ProfileSettings() {
               <input
                 {...getInputProps()}
                 className="sr-only"
-                aria-label="Upload profile_image picture"
+                aria-label="Upload profile picture"
                 tabIndex={-1}
               />
             </div>
@@ -391,15 +391,20 @@ export function ProfileSettings() {
         </div> */}
 
         {/* Email Field */}
-        {/* <div className="space-y-4">
-          <div className="space-y-1">
+        <div className="space-y-4">
+          {/* <div className="space-y-1">
             <Label className="text-base font-medium">Email Address</Label>
             <p className="text-sm text-muted-foreground">
               Your email address is used for signing in
             </p>
-          </div>
+          </div> */}
           <div className="space-y-2">
-            <Label htmlFor="email">Current Email</Label>
+            <div className="space-y-1">
+              <Label className="text-base font-medium">Email Address</Label>
+              <p className="text-sm text-muted-foreground">
+                Your email address is used for signing in
+              </p>
+            </div>{" "}
             <div className="flex items-center space-x-2">
               <Input
                 id="email"
@@ -422,7 +427,7 @@ export function ProfileSettings() {
               Click "Change Email" to update your email address
             </p>
           </div>
-        </div> */}
+        </div>
         {/* Password Section */}
         <div className="space-y-4">
           <div className="space-y-1">
@@ -594,7 +599,7 @@ export function ProfileSettings() {
           <DialogHeader>
             <DialogTitle>Crop Profile Picture</DialogTitle>
             <DialogDescription>
-              Adjust your profile_image picture to fit the circular frame
+              Adjust your profile picture to fit the circular frame
             </DialogDescription>
           </DialogHeader>
           {previewUrl && (

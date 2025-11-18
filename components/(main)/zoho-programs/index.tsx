@@ -40,7 +40,6 @@ export default function ZohoProgramsManagementPage({ type }: { type: string }) {
         `%${debouncedSearchTerm}%`,
         pageSize,
         currentPage * pageSize,
-
         filters,
         sorting
       );

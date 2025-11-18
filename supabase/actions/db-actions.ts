@@ -376,9 +376,9 @@ export const getStudentsPagination = async (    search: string,
       p_language_id: filters.language || null,
       p_min_tuition: filters.minTuition ? parseInt(filters.minTuition) : 0,
       p_max_tuition: filters.maxTuition ? parseInt(filters.maxTuition) : null,
-      p_active_applications: filters.active === 'true' ? true : filters.active === 'false' ? false : true,
+      p_active_applications: !filters.active ? null : filters.active === 'true' ? true : filters.active === 'false' ? false : true,
       p_sort_by: sorting?.sortBy || 'created_at',
-      p_sort_order: sorting?.sortOrder || 'desc'
+      p_sort_order: sorting?.sortOrder || 'desc',
     });
   
     if (error) {
@@ -405,6 +405,9 @@ export const getStudentsPagination = async (    search: string,
       city_id: row.city_id,
       language_id: row.language_id,
       active_applications: row.active_applications,
+      active: row.active,
+      tuition_fee_usd: row.tuition_fee_usd,
+      tuition_currency: row.tuition_currency,
       created_at: row.created_at,
       updated_at: row.updated_at,
       zoho_countries: row.country_name ? {
