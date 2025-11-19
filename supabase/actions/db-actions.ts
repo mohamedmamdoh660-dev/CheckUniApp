@@ -514,7 +514,7 @@ export const getStudentsPagination = async (    search: string,
     const { data, error } = await supabaseClient
       .from('zoho_notifications')
       .update({ is_read: true })
-      .eq('agent_id', agent_id);
+      .eq('user_id', agent_id);
     if (error) throw error;
     return data;
   }

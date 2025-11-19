@@ -25,6 +25,8 @@ import {
 import InfoGraphic from "@/components/ui/info-graphic";
 import { Button } from "@/components/ui/button";
 import { canViewAll } from "@/lib/permissions";
+import { toast } from "sonner";
+import { supabaseClient } from "@/lib/supabase-auth-client";
 
 export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   const [listStudents, setListStudents] = useState<ZohoStudent[]>([]);
@@ -42,20 +44,26 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
     sortOrder?: "asc" | "desc";
   }>({});
 
-  async function fetchStudents() {
+  async function fetchStudents({
+    resetPagination = false,
+  }: { resetPagination?: boolean } = {}) {
     setIsRefetching(true);
     try {
       const recordPermission = canViewAll(userProfile, ResourceType.STUDENTS);
       const studentsResponse: any = await getStudentsPagination(
         `${debouncedSearchTerm}`,
         pageSize,
-        currentPage,
+        resetPagination ? 0 : currentPage,
         userProfile?.id || "",
         userProfile?.roles?.name || "",
         userProfile?.agency_id || "",
         sorting,
         recordPermission
       );
+
+      if (resetPagination) {
+        setCurrentPage(0);
+      }
 
       setListStudents(studentsResponse.students);
       setRecordCount(studentsResponse.totalCount);
@@ -71,45 +79,39 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
   }, [currentPage, pageSize, debouncedSearchTerm, sorting]);
 
   // Realtime list updates for students table
-  // useEffect(() => {
-  //   const channel = supabaseClient
-  //     .channel("rt-students-list")
-  //     .on(
-  //       "postgres_changes",
-  //       { event: "*", schema: "public", table: "zoho_students" },
-  //       (payload) => {
-  //         if (payload.eventType === "INSERT") {
-  //           if (currentPage === 0) {
-  //             fetchStudents();
-  //           }
-
-  //           toast.success(
-  //             `${payload.new.first_name} ${payload.new.last_name} has been added successfully`
-  //           );
-  //         } else if (payload.eventType === "UPDATE") {
-  //           if (listStudents.find((student) => student.id === payload.new.id)) {
-  //             fetchStudents();
-  //           }
-  //           toast.success(
-  //             `${payload.new.first_name} ${payload.new.last_name} has been updated successfully`
-  //           );
-  //         } else if (payload.eventType === "DELETE") {
-  //           if (listStudents.find((student) => student.id === payload.old.id)) {
-  //             fetchStudents();
-  //           }
-  //           toast.success(
-  //             `${payload.old.first_name} ${payload.old.last_name} has been deleted successfully`
-  //           );
-  //         }
-  //       }
-  //     )
-  //     .subscribe();
-  //   return () => {
-  //     try {
-  //       supabaseClient.removeChannel(channel);
-  //     } catch {}
-  //   };
-  // }, []);
+  useEffect(() => {
+    const channel = supabaseClient
+      .channel("rt-students-list")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "zoho_students" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            if (payload.new.user_id === userProfile?.id) {
+              fetchStudents({ resetPagination: true });
+              toast.success(
+                `${payload?.new?.first_name} ${payload?.new?.last_name} has been added successfully`
+              );
+            }
+          } else if (payload.eventType === "UPDATE") {
+            if (
+              listStudents.find((student) => student.id === payload.new.id) &&
+              payload.new.user_id === userProfile?.id
+            ) {
+              toast.success(
+                `${payload?.new?.first_name} ${payload?.new?.last_name} has been updated successfully`
+              );
+            }
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      try {
+        supabaseClient.removeChannel(channel);
+      } catch {}
+    };
+  }, []);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {
@@ -198,7 +200,11 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
               description="Try adjusting your search or filters, or add a new student."
               isLeftArrow={false}
               button={
-                <Button variant="outline" size="sm" onClick={fetchStudents}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fetchStudents({ resetPagination: true })}
+                >
                   <RefreshCcw className="mr-2 h-4 w-4" /> Refresh
                 </Button>
               }

@@ -49,95 +49,90 @@ export default function ZohoApplicationsManagementPage({
     name: "",
   });
 
-  const fetchApplications = useCallback(async () => {
-    setIsRefetching(true);
-    try {
-      const recordPermission = canViewAll(
-        userProfile,
-        ResourceType.APPLICATIONS
-      );
-      const applicationsResponse: any = await getApplicationsPagination(
-        `${debouncedSearchTerm}`,
-        pageSize,
-        currentPage,
-        userProfile?.id || "",
-        userProfile?.roles?.name || "",
-        userProfile?.agency_id || "",
-        filters,
-        sorting,
-        recordPermission
-      );
+  const fetchApplications = useCallback(
+    async ({ resetPagination = false }: { resetPagination?: boolean } = {}) => {
+      setIsRefetching(true);
+      try {
+        const recordPermission = canViewAll(
+          userProfile,
+          ResourceType.APPLICATIONS
+        );
+        const applicationsResponse: any = await getApplicationsPagination(
+          `${debouncedSearchTerm}`,
+          pageSize,
+          resetPagination ? 0 : currentPage,
+          userProfile?.id || "",
+          userProfile?.roles?.name || "",
+          userProfile?.agency_id || "",
+          filters,
+          sorting,
+          recordPermission
+        );
 
-      setListApplications(applicationsResponse.applications);
-      setRecordCount(applicationsResponse.totalCount);
-    } catch (error) {
-      console.error("Error fetching applications:", error);
-    } finally {
-      setIsRefetching(false);
-    }
-  }, [
-    debouncedSearchTerm,
-    pageSize,
-    currentPage,
-    userProfile?.id,
-    userProfile?.roles?.name,
-    userProfile?.agency_id,
-    filters,
-    sorting,
-  ]);
+        if (resetPagination) {
+          setCurrentPage(0);
+        }
+
+        setListApplications(applicationsResponse.applications);
+        setRecordCount(applicationsResponse.totalCount);
+      } catch (error) {
+        console.error("Error fetching applications:", error);
+      } finally {
+        setIsRefetching(false);
+      }
+    },
+    [
+      debouncedSearchTerm,
+      pageSize,
+      currentPage,
+      userProfile?.id,
+      userProfile?.roles?.name,
+      userProfile?.agency_id,
+      filters,
+      sorting,
+    ]
+  );
 
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
 
   // Realtime list updates for applications table
-  // useEffect(() => {
-  //   const channel = supabaseClient
-  //     .channel("rt-applications-list")
-  //     .on(
-  //       "postgres_changes",
-  //       { event: "*", schema: "public", table: "zoho_applications" },
-  //       (payload) => {
-  //         if (payload.eventType === "INSERT") {
-  //           // if (currentPage === 0) {
-  //           //   fetchApplications();
-  //           // }
-
-  //           // toast.success(
-  //           //   `${payload?.new?.application_name || "New application"} has been added successfully`
-  //           // );
-  //         } else if (payload.eventType === "UPDATE") {
-  //           // if (
-  //           //   listApplications.find(
-  //           //     (application) => application.id === payload.new.id
-  //           //   )
-  //           // ) {
-  //           //   fetchApplications();
-  //           // }
-  //           // toast.success(
-  //           //   `${payload?.new?.application_name} has been updated successfully`
-  //           // );
-  //         } else if (payload.eventType === "DELETE") {
-  //           // if (
-  //           //   listApplications.find(
-  //           //     (application) => application.id === payload.old.id
-  //           //   )
-  //           // ) {
-  //           //   fetchApplications();
-  //           // }
-  //           // toast.success(
-  //           //   `${payload.old.application_name} has been deleted successfully`
-  //           // );
-  //         }
-  //       }
-  //     )
-  //     .subscribe();
-  //   return () => {
-  //     try {
-  //       supabaseClient.removeChannel(channel);
-  //     } catch {}
-  //   };
-  // }, [fetchApplications]);
+  useEffect(() => {
+    const channel = supabaseClient
+      .channel("rt-applications-list")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "zoho_applications" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            if (payload.new.user_id === userProfile?.id) {
+              fetchApplications({ resetPagination: true });
+              toast.success(
+                `${payload?.new?.application_name || "New application"} has been added successfully`
+              );
+            }
+          } else if (payload.eventType === "UPDATE") {
+            if (
+              listApplications.find(
+                (application) => application.id === payload.new.id
+              ) &&
+              payload.new.user_id === userProfile?.id
+            ) {
+              toast.success(
+                `${payload?.new?.application_name} has been updated successfully`
+              );
+            }
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      try {
+        supabaseClient.removeChannel(channel);
+      } catch {}
+    };
+  }, [fetchApplications]);
 
   const handleGlobalFilterChange = (filter: string) => {
     if (!searchQuery && !filter) {

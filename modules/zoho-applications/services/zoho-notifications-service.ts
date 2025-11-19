@@ -14,15 +14,17 @@ export type NotificationItem = {
   content?: string | null;
   module_name: string;
   module_id: string;
-  agent_id?: string | null;
+  agency_id?: string | null;
+  user_id?: string | null;
   priority?: string | null;
   is_read: boolean;
 };
 
 class NotificationsService {
-  async listByUser(agent_id?: string, limit = 20, offset = 0, onlyUnread = false) {
+  async listByUser(agent_id?: string, agency_id?: string, limit = 20, offset = 0, onlyUnread = false) {
     const data = await executeGraphQLBackend(GET_NOTIFICATIONS, {
       agent_id: agent_id || null,
+      agency_id: agency_id || null,
       limit,
       offset,
       only_unread: onlyUnread,

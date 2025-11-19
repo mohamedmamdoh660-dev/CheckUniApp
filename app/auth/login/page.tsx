@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { authService } from "@/modules/auth";
 import { toast } from "sonner";
+import Logo from "@/components/logo";
 
 export default function Login() {
   const id = useId();
@@ -87,38 +88,12 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-sidebar hover:bg-sidebar-hover p-8 rounded-lg shadow">
         <div className="flex flex-col items-center gap-2">
-          {(
-            settings?.logo_setting === "horizontal"
-              ? settings?.logo_horizontal_url
-              : settings?.logo_url
-          ) ? (
-            <div
-              className="flex shrink-0 items-center justify-center rounded-md  border-sidebar-border relative"
-              aria-hidden="true"
-            >
-              <Image
-                src={
-                  (settings?.logo_setting === "horizontal"
-                    ? settings?.logo_horizontal_url
-                    : settings?.logo_url) || generateNameAvatar("Whatsapp")
-                }
-                alt="logo"
-                width={50}
-                height={50}
-                unoptimized
-                className={cn(
-                  `w-[${settings?.logo_setting === "horizontal" ? "60%" : "30%"}] h-full object-cover rounded-md transition-opacity duration-300`,
-                  isImageLoading ? "opacity-0" : "opacity-100"
-                )}
-                style={{
-                  width:
-                    settings?.logo_setting === "horizontal" ? "60%" : "30%",
-                }}
-                onLoadingComplete={() => setIsImageLoading(false)}
-                priority
-              />
-            </div>
-          ) : null}
+          <div
+            className="flex shrink-0 items-center justify-center rounded-md  border-sidebar-border relative"
+            aria-hidden="true"
+          >
+            <Logo settings={settings as Settings} />
+          </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Welcome Back
           </h2>

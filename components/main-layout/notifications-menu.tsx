@@ -65,21 +65,6 @@ export default function NotificationsMenu() {
                     {row.content}
                   </div>
                 ) : null}
-                {/* <div className="mt-3 flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      try {
-                        router.push(`/${row.module_name}/${row.module_id}`);
-                      } finally {
-                        toast.dismiss(t);
-                      }
-                    }}
-                  >
-                    Open
-                  </Button>
-                </div> */}
               </div>
               <button
                 onClick={() => toast.dismiss(t)}
@@ -97,29 +82,30 @@ export default function NotificationsMenu() {
         }
       );
     },
-    [router]
+    []
   );
 
   const unreadCount = useMemo(
     () => items.filter((i) => !i.is_read).length,
     [items]
   );
+  const load = async () => {
+    try {
+      setLoading(true);
+      const rows = await notificationsService.listByUser(
+        agentId,
+        userProfile?.agency_id,
+        100,
+        0,
+        false
+      );
+      setItems(rows);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        const rows = await notificationsService.listByUser(
-          agentId,
-          100,
-          0,
-          false
-        );
-        setItems(rows);
-      } finally {
-        setLoading(false);
-      }
-    };
     if (agentId) load();
   }, [agentId, showNotificationToast]);
 
@@ -135,14 +121,16 @@ export default function NotificationsMenu() {
           const row: any = payload.new || payload.record;
           if (!row) return;
           const belongsToUser =
-            row.agent_id === agentId || row.user_id === agentId;
+            (row.user_id === agentId &&
+              row.agency_id === userProfile?.agency_id) ||
+            (!row.user_id && row.agency_id === userProfile?.agency_id);
           if (!belongsToUser) return;
 
           if (payload.eventType === "INSERT") {
             setItems((prev) => [row, ...prev.filter((i) => i.id !== row.id)]);
             showNotificationToast(row, "new");
           } else if (payload.eventType === "UPDATE") {
-            showNotificationToast(row, "update");
+            // showNotificationToast(row, "update");
             setItems((prev) =>
               prev.map((i) => (i.id === row.id ? { ...i, ...row } : i))
             );
@@ -217,7 +205,7 @@ export default function NotificationsMenu() {
             </Badge>
           )}
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="mb-0" />
+        <DropdownMenuSeparator className="my-0!" />
         <div className="max-h-96 overflow-auto">
           {loading ? (
             <div className="px-3 py-8 text-center text-sm text-muted-foreground">
@@ -231,9 +219,11 @@ export default function NotificationsMenu() {
             items.map((n) => (
               <div
                 key={n.id}
-                className={`px-3 py-2 border-b cursor-pointer last:border-b-0 ${n.is_read ? "bg-background hover:bg-muted" : "bg-primary/5 hover:bg-primary/10"}`}
+                className={`px-3 py-2 border-b  last:border-b-0 ${n.is_read ? "bg-background hover:bg-muted" : "bg-primary/5 hover:bg-primary/10"} ${n.module_id && n.module_name ? "cursor-pointer" : "cursor-default"}`}
                 onClick={() => {
-                  router.push(`/${n.module_name}/${n.module_id}`);
+                  if (n.module_id && n.module_name) {
+                    router.push(`/${n.module_name}/${n.module_id}`);
+                  }
                 }}
               >
                 <div className="flex items-start justify-between gap-2">

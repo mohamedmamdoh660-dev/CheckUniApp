@@ -1,33 +1,50 @@
 export const GET_NOTIFICATIONS = `
  
-  query GetNotifications($agent_id: UUID, $limit: Int, $offset: Int, $only_unread: Boolean) {
-    zoho_notificationsCollection(
-      filter: {
-        and: [
-          { agent_id: { eq: $agent_id } }
-        ]
-      }
-      first: $limit
-      offset: $offset
-      orderBy: [{ created_at: DescNullsLast }]
-    ) {
-      edges {
-        node {
-          id
-          created_at
-          updated_at
-          title
-          content
-          module_name
-          module_id
-          agent_id
-          
-          priority
-          is_read
+  query GetNotifications(
+  $agent_id: UUID
+  $agency_id: UUID
+  $limit: Int
+  $offset: Int
+  $only_unread: Boolean
+) {
+  zoho_notificationsCollection(
+    filter: {
+      or: [
+        {
+          and: [
+            { user_id: { eq: $agent_id } }
+                      ]
+        },
+        {
+          and: [
+            { user_id: { eq: null } }
+            { agency_id: { eq: $agency_id } }
+          ]
         }
+      ]
+    }
+    first: $limit
+    offset: $offset
+    orderBy: [{ created_at: DescNullsLast }]
+  ) {
+    edges {
+      node {
+        id
+        created_at
+        updated_at
+        title
+        content
+        module_name
+        agency_id
+        module_id
+        user_id
+        priority
+        is_read
       }
     }
   }
+}
+
 
 `;
 

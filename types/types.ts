@@ -290,10 +290,6 @@ export interface ZohoApplication {
   online_application_id?: string | null;
   app_id?: string | null;
 }
-
-
-
-
 export interface ZohoCity {
   id: string;
   name?: string;
