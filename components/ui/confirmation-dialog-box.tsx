@@ -23,6 +23,9 @@ interface ConfirmationDialogBoxProps {
   loading?: boolean;
   type?: string;
   icon?: React.ReactNode;
+  content?: React.ReactNode;
+  countdown?: number | null;
+  countdownLabel?: string;
 }
 
 const ConfirmationDialogBox = ({
@@ -36,6 +39,9 @@ const ConfirmationDialogBox = ({
   loading = false,
   type,
   icon,
+  content,
+  countdown,
+  countdownLabel,
 }: ConfirmationDialogBoxProps) => {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -44,6 +50,12 @@ const ConfirmationDialogBox = ({
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
+        {content && <div className="text-sm text-muted-foreground">{content}</div>}
+        {loading && typeof countdown === "number" && countdown >= 0 && (
+          <div className="mt-4 rounded-md bg-muted px-3 py-2 text-center text-sm text-muted-foreground">
+            {countdownLabel || "Processing"}... {countdown}s
+          </div>
+        )}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>{cancelText}</AlertDialogCancel>
           <AlertDialogAction

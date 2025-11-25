@@ -160,6 +160,21 @@ export const authService = {
   updateEmail: async (newEmail: string, crm_id: string) => {
     console.log("🚀 ~ newEmail:", newEmail)
     console.log("🚀 ~ crm_id:", crm_id)
+    
+
+    const response = await fetch('https://automation.sitconnect.net/webhook/03ed1ba0-2bb5-4f12-9996-7a546269aa98', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: crm_id, email: newEmail }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update email');
+    }
+    return response.json();
+
+
     // First check if user exists with the new email
     // const existingUser = await usersService.getUserByEmail({
     //   email: {
@@ -179,17 +194,5 @@ export const authService = {
     // if (error) {
     //   throw new Error(error.message);
     // }
-
-    const response = await fetch('https://automation.sitconnect.net/webhook/03ed1ba0-2bb5-4f12-9996-7a546269aa98', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id: crm_id, email: newEmail }),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to update email');
-    }
-    return response.json();
   },
 }; 

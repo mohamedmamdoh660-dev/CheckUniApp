@@ -54,6 +54,7 @@ import {
 import { Area, getCroppedImg } from "@/utils/image-crop";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/modules/auth";
+import ConfirmationDialogBox from "@/components/ui/confirmation-dialog-box";
 
 const passwordFormSchema = z
   .object({
@@ -73,8 +74,11 @@ export type UserProfile = {
 };
 
 export function ProfileSettings() {
-  const { userProfile: userProfileAuth, setUserProfile: setUserProfileAuth } =
-    useAuth();
+  const {
+    userProfile: userProfileAuth,
+    setUserProfile: setUserProfileAuth,
+    signOut,
+  } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile>(getUserProfile());
 
   useEffect(() => {
@@ -82,13 +86,46 @@ export function ProfileSettings() {
       setUserProfile(userProfileAuth as UserProfile);
     };
     fetchUserData();
-  }, []);
+  }, [userProfileAuth]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+  const [isEmailConfirmDialogOpen, setIsEmailConfirmDialogOpen] =
+    useState(false);
   const [newEmail, setNewEmail] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [processingCountdown, setProcessingCountdown] = useState<number | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (processingCountdown === null) return;
+
+    if (processingCountdown <= 0) {
+      (async () => {
+        try {
+          await signOut();
+        } catch (error) {
+          console.error("Failed to sign out after email update:", error);
+        } finally {
+          setProcessingCountdown(null);
+          setIsEmailConfirmDialogOpen(false);
+          setIsUpdatingEmail(false);
+          setPendingEmail("");
+          setNewEmail("");
+        }
+      })();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setProcessingCountdown((prev) => (prev !== null ? prev - 1 : prev));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [processingCountdown, signOut]);
 
   // Password change states
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
@@ -216,23 +253,55 @@ export function ProfileSettings() {
       toast.error("Invalid email address");
       return;
     } else if (!userProfileAuth?.crm_id) {
-      toast.error("User not registered in CRM");
+      toast.error(
+        "User not registered in CRM, so you cannot update your email address."
+      );
       return;
     }
 
     setIsUpdatingEmail(true);
     try {
-      await authService.updateEmail(newEmail, userProfileAuth?.crm_id || "");
-      toast.success(`Email updated successfully`);
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
+      const existingUser = await usersService.getUserByEmail({
+        email: { eq: newEmail },
+      });
+      if (existingUser) {
+        toast.error(
+          "There is problem is processing your req so please contact admininstratior."
+        );
+        return;
+      }
+      setPendingEmail(newEmail);
+      setIsEmailConfirmDialogOpen(true);
+    } catch (error) {
+      console.error("Failed to validate email:", error);
+      toast.error("Failed to validate email. Please try again.");
+    } finally {
+      setIsUpdatingEmail(false);
+    }
+  };
+
+  const handleConfirmEmailUpdate = async () => {
+    if (!pendingEmail || !userProfileAuth?.crm_id) return;
+    if (processingCountdown !== null) return;
+    setIsUpdatingEmail(true);
+    try {
+      await authService.updateEmail(
+        pendingEmail,
+        userProfileAuth?.crm_id || ""
+      );
+      toast.info(
+        "We are updating your email. This may take a moment. We will log you out shortly so you can sign in with the new address."
+      );
       setIsEmailDialogOpen(false);
+      setProcessingCountdown(5);
       setNewEmail("");
     } catch (error) {
       console.error("Failed to update email:", error);
       toast.error("Failed to update email. Please try again.");
-    } finally {
+      setIsEmailConfirmDialogOpen(false);
+      setProcessingCountdown(null);
+      setPendingEmail("");
+      setNewEmail("");
       setIsUpdatingEmail(false);
     }
   };
@@ -504,11 +573,46 @@ export function ProfileSettings() {
               onClick={handleUpdateEmail}
               disabled={isUpdatingEmail || !newEmail.trim()}
             >
-              {isUpdatingEmail ? "Updating..." : "Update Email"}
+              {isUpdatingEmail ? "Processing..." : "Update Email"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ConfirmationDialogBox
+        title="Confirm Email Update"
+        description="You're about to change the email you use to sign in."
+        content={
+          <div className="space-y-2">
+            <p>
+              New email:{" "}
+              <span className="font-semibold text-foreground">
+                {pendingEmail || newEmail}
+              </span>
+            </p>
+            <p>
+              Once we process this change, we'll end your current session so you
+              can log back in with the updated address.
+            </p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>
+                Unsaved work stays intact, but you'll need to sign in again.
+              </li>
+              <li>This action cannot be undone immediately.</li>
+            </ul>
+          </div>
+        }
+        confirmText="Yes, update email"
+        onConfirm={handleConfirmEmailUpdate}
+        isOpen={isEmailConfirmDialogOpen}
+        setIsOpen={(open) => {
+          if (isUpdatingEmail && processingCountdown !== null) return;
+          setIsEmailConfirmDialogOpen(open);
+        }}
+        loading={isUpdatingEmail}
+        countdown={processingCountdown}
+        countdownLabel="Signing you out in"
+      />
 
       {/* Password Change Dialog */}
       <Dialog

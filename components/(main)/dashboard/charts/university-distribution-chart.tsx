@@ -78,7 +78,7 @@ export function UniversityDistributionChart() {
       const sortedData = [...data].sort(
         (a, b) => b.applications - a.applications
       );
-      const topData = sortedData.slice(0, 20);
+      const topData = sortedData.slice(0, 10);
 
       // Calculate percentages
       const totalApplications = topData.reduce(
@@ -125,7 +125,7 @@ export function UniversityDistributionChart() {
         <div className="flex flex-col gap-1">
           <CardTitle>University Distribution</CardTitle>
           <CardDescription>
-            Top 20 universities by application count
+            Top 10 universities by application count
           </CardDescription>
         </div>
         <Button
