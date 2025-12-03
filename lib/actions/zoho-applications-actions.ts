@@ -3,11 +3,11 @@
 import { ZohoApplication } from "@/types/types";
 
 // N8n webhook URLs
-const CREATE_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/4615d5ae-b3ba-413f-980e-a30a48be3c00";
-const UPDATE_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/6519959c-2c7f-4397-978c-587e7bdb4a90";
-const DELETE_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/c5aecacb-b462-4725-bca6-f7a1a80603eb"; // Reusing student delete webhook as no specific one was provided
-const UPLOAD_ATTACHMENT_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/58e479b5-ea43-42ee-abdd-b50815dfa4d9";
-const DOWNLOAD_ATTACHMENT_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/13eca8cf-8742-4351-9ae6-eaace4fa10ce";
+const CREATE_WEBHOOK_URL = "https://automation.sitconnect.net/webhook/4615d5ae-b3ba-413f-980e-a30a48be3c00";
+const UPDATE_WEBHOOK_URL = "";
+const DELETE_WEBHOOK_URL = ""; // Reusing student delete webhook as no specific one was provided
+const UPLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.sitconnect.net/webhook/58e479b5-ea43-42ee-abdd-b50815dfa4d9";
+const DOWNLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.sitconnect.net/webhook/13eca8cf-8742-4351-9ae6-eaace4fa10ce";
 /**
  * Create application via n8n webhook
  */

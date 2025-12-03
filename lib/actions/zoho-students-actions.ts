@@ -3,9 +3,9 @@
 import { ZohoStudent } from "@/types/types";
 
 // N8n webhook URLs
-const CREATE_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/da599eaf-7f5e-45aa-9d53-33d1f185515a";
-const EDIT_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/fd05f4dc-7652-41ee-8c4b-64cd4164662d";
-const DELETE_WEBHOOK_URL = "https://n8n.browserautomations.com/webhook/c5aecacb-b462-4725-bca6-f7a1a80603eb";
+const CREATE_WEBHOOK_URL = "https://automation.sitconnect.net/webhook/da599eaf-7f5e-45aa-9d53-33d1f185515a";
+const EDIT_WEBHOOK_URL = "";
+const DELETE_WEBHOOK_URL = "";
 
 /**
  * Create student via n8n webhook

@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
     // Call n8n webhook to fetch the actual file content
     const webhookUrl =
-      "https://n8n.browserautomations.com/webhook/13eca8cf-8742-4351-9ae6-eaace4fa10ce";
+      "https://automation.sitconnect.net/webhook/13eca8cf-8742-4351-9ae6-eaace4fa10ce";
 
     const webhookRes = await fetch(webhookUrl, {
       method: "POST",
