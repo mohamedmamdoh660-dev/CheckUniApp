@@ -25,21 +25,43 @@ export const zohoProgramsService = {
   /**
    * Get all programs
    */
-  getPrograms: async (search: string = "", page: number = 1, pageSize: number = 10, id: string | null = null, dependsOn: { field: string, value: string | number | null }[] | null = null) => {
+  getPrograms: async (
+    search: string = "",
+    page: number = 1,
+    pageSize: number = 10,
+    id: string | null = null,
+    dependsOn: { field: string, value: string | number | null }[] | null = null,
+    location: string = ""
+  ) => {
+    // Correct offset calculation (0-based)
     const offset = (page ) * pageSize;
     const searchPattern = `%${search}%`;
-    let filter = id ? { name: { ilike: searchPattern }, id: { eq: id }, active: { eq: true } } : { name: { ilike: searchPattern }, active: { eq: true } };
+
+    // Build the base filter object
+    let filter: Record<string, any> = {
+      name: { ilike: searchPattern },
+      active: { eq: true }
+    };
+
+    // Add id condition to filter if provided
+    if (id) {
+      filter.id = { eq: id };
+    }
+
+    // Add conditional active_application property if called from add-application-form
+    if (location === "add-application-form") {
+      filter.active_applications = { eq: true }
+    }
+
+    // Add any other dependency filters
     if (dependsOn && dependsOn.length > 0) {
-      dependsOn.forEach((dep: { field: string, value: string | number | null }) => {
-        filter = {
-          ...filter,
-          [dep.field]: { eq: dep.value }
-        };
+      dependsOn.forEach((dep) => {
+        if (dep.field && dep.value !== undefined) {
+          filter[dep.field] = { eq: dep.value };
+        }
       });
     }
-    
-      
-    
+
     const response = await executeGraphQLBackend(GET_PROGRAMS, { filter, limit: pageSize, offset });
     return response.zoho_programsCollection.edges.map((edge: any) => edge.node);
   },

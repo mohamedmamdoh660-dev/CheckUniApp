@@ -66,6 +66,7 @@ import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-progr
 import { formatFileSize } from "@/utils/format-file-size";
 import moment from "moment-timezone";
 import { getCountriesForTimezone } from "countries-and-timezones";
+import { useDebounce } from "@/hooks/use-debounce";
 
 // Enhanced form validation schema based on the images
 const formSchema = z
@@ -802,6 +803,89 @@ export default function StudentInformationForm({
       form.trigger("passport_expiry_date");
     }
   }, [watchedIssueDate, watchedExpiryDate, form]);
+
+  // Debounced validation for email and passport_number
+  const watchedEmail = form.watch("email");
+  const watchedPassportNumber = form.watch("passport_number");
+  const debouncedEmail = useDebounce(watchedEmail, 800);
+  const debouncedPassportNumber = useDebounce(watchedPassportNumber, 800);
+
+  // Check for duplicate email
+  useEffect(() => {
+    const checkEmailDuplicate = async () => {
+      if (!debouncedEmail || debouncedEmail.trim() === "") {
+        form.clearErrors("email");
+        return;
+      }
+
+      // Basic email format validation first
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(debouncedEmail)) {
+        // Let zod handle format validation
+        return;
+      }
+
+      try {
+        const excludeId = mode === "edit" ? studentId : undefined;
+        const isDuplicate = await zohoStudentsService.checkDuplicateEmail(
+          debouncedEmail,
+          excludeId
+        );
+
+        if (isDuplicate) {
+          form.setError("email", {
+            type: "manual",
+            message: "This email is already registered",
+          });
+          toast.error("This email is already in use", {
+            description: "Please enter a different email address",
+          });
+        } else {
+          // Clear error if email is valid and not duplicate
+          form.clearErrors("email");
+        }
+      } catch (error) {
+        console.error("Error checking duplicate email:", error);
+      }
+    };
+
+    checkEmailDuplicate();
+  }, [debouncedEmail, form, mode, studentId]);
+
+  // Check for duplicate passport number
+  useEffect(() => {
+    const checkPassportDuplicate = async () => {
+      if (!debouncedPassportNumber || debouncedPassportNumber.trim() === "") {
+        form.clearErrors("passport_number");
+        return;
+      }
+
+      try {
+        const excludeId = mode === "edit" ? studentId : undefined;
+        const isDuplicate = await zohoStudentsService.checkDuplicatePassport(
+          debouncedPassportNumber,
+          excludeId
+        );
+
+        if (isDuplicate) {
+          form.setError("passport_number", {
+            type: "manual",
+            message: "This passport is already in use",
+          });
+          toast.error("This passport is already in use", {
+            description: "Please enter a different passport number",
+          });
+        } else {
+          // Clear error if passport is valid and not duplicate
+          form.clearErrors("passport_number");
+        }
+      } catch (error) {
+        console.error("Error checking duplicate passport:", error);
+      }
+    };
+
+    checkPassportDuplicate();
+  }, [debouncedPassportNumber, form, mode, studentId]);
 
   return (
     <div className="space-y-6">

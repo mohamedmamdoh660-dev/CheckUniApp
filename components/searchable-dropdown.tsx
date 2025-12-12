@@ -52,6 +52,7 @@ const fetchTableData = async ({
   id,
   label,
   userProfile,
+  location,
 }: {
   table: string;
   searchTerm: string;
@@ -62,6 +63,7 @@ const fetchTableData = async ({
   id?: string;
   label?: string;
   userProfile?: any;
+  location?: string;
 }) => {
   try {
     let data: any[] = [];
@@ -202,7 +204,8 @@ const fetchTableData = async ({
           page,
           pageSize,
           id,
-          dependsOn
+          dependsOn,
+          location
         );
         data = allPrograms;
         count = allPrograms.length;
@@ -320,6 +323,7 @@ export function SearchableDropdown({
           dependsOn: dependsOn || [],
           label,
           userProfile,
+          location,
         });
 
         if (currentPage === 0) {

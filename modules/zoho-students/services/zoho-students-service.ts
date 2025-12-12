@@ -176,5 +176,77 @@ export const zohoStudentsService = {
       console.error('Error deleting student:', error);
       throw error;
     }
+  },
+
+  /**
+   * Check if email already exists
+   */
+  checkDuplicateEmail: async (email: string, excludeId?: string): Promise<boolean> => {
+    try {
+      // Build filter conditionally
+      let filter: any = { email: { eq: email } };
+      if (excludeId) {
+        filter = {
+          and: [
+            { email: { eq: email } },
+            { id: { neq: excludeId } }
+          ]
+        };
+      }
+      
+      const response = await executeGraphQLBackend(
+        `query CheckDuplicateEmail($filter: zoho_studentsFilter!) {
+          zoho_studentsCollection(filter: $filter, first: 1) {
+            edges {
+              node {
+                id
+                email
+              }
+            }
+          }
+        }`,
+        { filter }
+      );
+      return response.zoho_studentsCollection.edges.length > 0;
+    } catch (error) {
+      console.error('Error checking duplicate email:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Check if passport number already exists
+   */
+  checkDuplicatePassport: async (passport_number: string, excludeId?: string): Promise<boolean> => {
+    try {
+      // Build filter conditionally
+      let filter: any = { passport_number: { eq: passport_number } };
+      if (excludeId) {
+        filter = {
+          and: [
+            { passport_number: { eq: passport_number } },
+            { id: { neq: excludeId } }
+          ]
+        };
+      }
+      
+      const response = await executeGraphQLBackend(
+        `query CheckDuplicatePassport($filter: zoho_studentsFilter!) {
+          zoho_studentsCollection(filter: $filter, first: 1) {
+            edges {
+              node {
+                id
+                passport_number
+              }
+            }
+          }
+        }`,
+        { filter }
+      );
+      return response.zoho_studentsCollection.edges.length > 0;
+    } catch (error) {
+      console.error('Error checking duplicate passport:', error);
+      return false;
+    }
   }
 };

@@ -248,7 +248,7 @@ export default function ProgramDetailPage() {
                       <p className="text-sm font-medium text-muted-foreground mb-1">
                         Status
                       </p>
-                      {program.active ? (
+                      {program.active_applications ? (
                         <StatusBadge status="active" />
                       ) : (
                         <StatusBadge status="inactive" />
