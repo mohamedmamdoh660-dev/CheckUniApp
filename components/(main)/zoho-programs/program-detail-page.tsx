@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { zohoProgramsService } from "@/modules/zoho-programs/services/zoho-programs-service";
 import { supabaseClient } from "@/lib/supabase-auth-client";
-import { ZohoProgram } from "@/types/types";
+import { ResourceType, ZohoProgram } from "@/types/types";
 import {
   Table,
   TableBody,
@@ -32,6 +32,8 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { generateNameAvatar } from "@/utils/generateRandomAvatar";
 import { formatNumber } from "@/utils/format-number";
 import { getApplicationsByProgramId } from "@/supabase/actions/db-actions";
+import { useAuth } from "@/context/AuthContext";
+import { canViewAll } from "@/lib/permissions";
 
 export default function ProgramDetailPage() {
   const params = useParams();
@@ -40,6 +42,7 @@ export default function ProgramDetailPage() {
   const [program, setProgram] = useState<ZohoProgram | null>(null);
   const [loading, setLoading] = useState(false);
   const [applications, setApplications] = useState<any[]>([]);
+  const { userProfile } = useAuth();
 
   useEffect(() => {
     const load = async () => {
@@ -58,7 +61,11 @@ export default function ProgramDetailPage() {
   useEffect(() => {
     const loadApps = async () => {
       try {
-        const data: any = await getApplicationsByProgramId(programId);
+        const data: any = await getApplicationsByProgramId(
+          programId,
+          userProfile?.roles?.name || "",
+          userProfile?.id || ""
+        );
         setApplications(data || []);
       } catch (e) {
         console.error("Error loading applications:", e);

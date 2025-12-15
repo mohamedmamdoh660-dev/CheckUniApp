@@ -533,20 +533,33 @@ export const getTableCount = async (
 };
 
 
-export const getApplicationsByProgramId = async (id: string) => { 
-  const { data, error } = await supabaseClient
-          .from("zoho_applications")
-          .select(
-            `id, application_name, stage, created_at,
-             zoho_students:zoho_students!applications_student_fkey (id, first_name, last_name, email, photo_url),
-             zoho_universities:zoho_universities!zoho_applications_university_fkey (name),
-             zoho_academic_years:zoho_academic_years!zoho_applications_acdamic_year_fkey (name),
-             zoho_semesters:zoho_semesters!zoho_applications_semester_fkey (name)`
-          )
-          .eq("program", id)
-          .order("created_at", { ascending: false });
+export const getApplicationsByProgramId = async (id: string, userRole?: string, user_id?: string) => {
+  // If userRole/permissions are provided, restrict applications by user/agency, otherwise return all by program
+  let query = supabaseClient
+    .from("zoho_applications")
+    .select(
+      `id, application_name, stage, created_at,
+       zoho_students:zoho_students!applications_student_fkey (id, first_name, last_name, email, photo_url),
+       zoho_universities:zoho_universities!zoho_applications_university_fkey (name),
+       zoho_academic_years:zoho_academic_years!zoho_applications_acdamic_year_fkey (name),
+       zoho_semesters:zoho_semesters!zoho_applications_semester_fkey (name)`
+    )
+    .eq("program", id);
 
+  // Add permission-based filtering if role/user_id is passed
+  if (userRole && user_id) {
+    if (userRole === "admin") {
+      // Admins or those with recordPermission can access all
+    } else if (userRole === "agent") {
+      query = query.eq("agency_id", user_id);
+    } else {
+      query = query.eq("user_id", user_id);
+    }
+  }
+
+  query = query.order("created_at", { ascending: false });
+
+  const { data, error } = await query;
   if (error) throw error;
   return data;
-
-}
+};

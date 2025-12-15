@@ -219,7 +219,11 @@ export default function NotificationsMenu() {
             items.map((n) => (
               <div
                 key={n.id}
-                className={`px-3 py-2 border-b  last:border-b-0 ${n.is_read ? "bg-background hover:bg-muted" : "bg-primary/5 hover:bg-primary/10"} ${n.module_id && n.module_name ? "cursor-pointer" : "cursor-default"}`}
+                className={`px-3 py-2 border-b last:border-b-0 overflow-hidden ${n.is_read ? "bg-background hover:bg-muted" : "bg-primary/5 hover:bg-primary/10"} ${
+                  n.module_id && n.module_name
+                    ? "cursor-pointer"
+                    : "cursor-default"
+                }`}
                 onClick={() => {
                   if (n.module_id && n.module_name) {
                     router.push(`/${n.module_name}/${n.module_id}`);
@@ -227,18 +231,23 @@ export default function NotificationsMenu() {
                 }}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start gap-2 flex-1 min-w-0">
                     <div className="mt-1">
                       <Avatar>
                         <AvatarImage src={generateNameAvatar(n.module_name)} />
                       </Avatar>
                     </div>
-                    <div className="min-w-0">
-                      <div className="font-medium truncate">{n.title}</div>
+                    <div className="min-w-0 flex-1 overflow-hidden">
+                      <div className="font-medium truncate ">{n.title}</div>
                       {n.content ? (
-                        <div className="text-sm text-muted-foreground truncate">
-                          {n.content}
-                        </div>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="text-sm text-muted-foreground truncate">
+                              {n.content}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>{n.content}</TooltipContent>
+                        </Tooltip>
                       ) : null}
                     </div>
                   </div>
