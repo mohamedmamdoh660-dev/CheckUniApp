@@ -234,7 +234,7 @@ export default function NotificationsMenu() {
                   <div className="flex items-start gap-2 flex-1 min-w-0">
                     <div className="mt-1">
                       <Avatar>
-                        <AvatarImage src={generateNameAvatar(n.module_name)} />
+                        <AvatarImage src={generateNameAvatar(n.title)} />
                       </Avatar>
                     </div>
                     <div className="min-w-0 flex-1 overflow-hidden">
