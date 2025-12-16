@@ -1,4 +1,3 @@
-"use server";
 
 import { ZohoStudent } from "@/types/types";
 
