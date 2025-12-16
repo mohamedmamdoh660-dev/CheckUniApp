@@ -528,7 +528,8 @@ export default function StudentInformationForm({
       toast.error(
         error instanceof Error
           ? error.message
-          : `Failed to ${mode === "create" ? "create" : "update"} student`
+          : `Failed to ${mode === "create" ? "create" : "update"} student`,
+        { duration: 5000 }
       );
     } finally {
       setIsLoading(false);

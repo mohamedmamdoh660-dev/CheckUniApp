@@ -210,7 +210,8 @@ export default function AddZohoApplication({
     } catch (error) {
       console.error("Error creating application:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to create application"
+        error instanceof Error ? error.message : "Failed to create application",
+        { duration: 5000 }
       );
     } finally {
       setIsLoading(false);
