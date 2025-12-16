@@ -493,6 +493,7 @@ export default function StudentInformationForm({
           // await zohoStudentsService.createStudent(studentDataWithId);
           toast.success("Student created successfully");
           router.push("/students");
+          // throw new Error("Student created successfully");
         } else {
           throw new Error(
             webhookResponse.message || "Failed to create student via webhook"
@@ -525,7 +526,9 @@ export default function StudentInformationForm({
         error
       );
       toast.error(
-        `Failed to ${mode === "create" ? "create" : "update"} student`
+        error instanceof Error
+          ? error.message
+          : `Failed to ${mode === "create" ? "create" : "update"} student`
       );
     } finally {
       setIsLoading(false);
@@ -890,7 +893,7 @@ export default function StudentInformationForm({
   return (
     <div className="space-y-6">
       {isLoading && mode === "create" && (
-        <div className="fixed inset-0  flex items-center justify-center bg-black/50 backdrop-blur-sm mb-[0px] z-[7]">
+        <div className="fixed inset-0  flex items-center justify-center bg-black/50 backdrop-blur-sm mb-[0px] z-[25]">
           <div className="flex flex-col items-center gap-4 rounded-lg border bg-card p-8 shadow-lg max-w-sm">
             {/* Simple spinner */}
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
