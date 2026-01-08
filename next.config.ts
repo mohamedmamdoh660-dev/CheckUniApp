@@ -2,6 +2,7 @@ import { Domain } from "domain";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone', // ✅ Enable standalone output for Docker
   typescript: {
     ignoreBuildErrors: true, // ✅ Ignore TypeScript build errors
   },
