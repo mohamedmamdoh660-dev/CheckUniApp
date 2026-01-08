@@ -1,26 +1,34 @@
-import { Domain } from "domain";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone', // ✅ Enable standalone output for Docker
+  output: "standalone", // ✅ أهم سطر عشان الدوكر يشتغل
+  
   typescript: {
-    ignoreBuildErrors: true, // ✅ Ignore TypeScript build errors
+    ignoreBuildErrors: true,
   },
   eslint: {
-    ignoreDuringBuilds: true, // ✅ Ignore ESLint errors during build
+    ignoreDuringBuilds: true,
   },
+  
   images: {
-    domains: ['*'],
-    dangerouslyAllowSVG: true, // Allow SVG images
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;", // Recommended security setting
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // للسماح بأي صور خارجية (بديل النجمة)
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
   },
+
   webpack: (config) => {
     config.module.rules.push({
       test: /\.svg$/,
-      use: ['@svgr/webpack'],
+      use: ["@svgr/webpack"],
     });
     return config;
-  },  
+  },
 };
 
 export default nextConfig;
