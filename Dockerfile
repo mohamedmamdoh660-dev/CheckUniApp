@@ -27,6 +27,10 @@ ENV NODE_ENV=production
 # Build the Next.js application
 RUN npm run build
 
+# Debug: List .next directory contents to verify standalone build
+RUN ls -la /app/.next || echo ".next directory not found"
+RUN ls -la /app/.next/standalone || echo "standalone directory not found"
+
 # Stage 3: Runner
 FROM node:20-alpine AS runner
 WORKDIR /app
