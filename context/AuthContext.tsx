@@ -85,7 +85,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       setUserProfile(null);
       setSettings(null);
-      signOut();
+      // Don't call signOut() here to avoid redirect loop
+      // Just redirect to login if not already on a public route
+      const isPublicRoute = PUBLIC_ROUTES.some(
+        (route) => window.location.pathname === route || window.location.pathname.startsWith(`${route}/`)
+      );
+      if (!isPublicRoute) {
+        window.location.href = "/auth/login";
+      }
     }
     setLoading(false);
   };
