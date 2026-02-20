@@ -162,7 +162,7 @@ export const authService = {
     console.log("🚀 ~ crm_id:", crm_id)
     
 
-    const response = await fetch('https://automation.sitconnect.net/webhook/03ed1ba0-2bb5-4f12-9996-7a546269aa98', {
+    const response = await fetch('https://automation.checkuni.com/webhook-test/c0679d76-4492-48ea-b4c7-44aec8ae1cd1', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
