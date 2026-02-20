@@ -2,11 +2,11 @@
 import { ZohoApplication } from "@/types/types";
 
 // N8n webhook URLs
-const CREATE_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
-const UPDATE_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
-const DELETE_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
-const UPLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
-const DOWNLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
+const CREATE_WEBHOOK_URL = "https://automation.checkuni.com/webhook/4615d5ae-b3ba-413f-980e-a30a48be3c00";
+const UPDATE_WEBHOOK_URL = "";
+const DELETE_WEBHOOK_URL = "";
+const UPLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.checkuni.com/webhook/58e479b5-ea43-42ee-abdd-b50815dfa4d9";
+const DOWNLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.checkuni.com/webhook/13eca8cf-8742-4351-9ae6-eaace4fa10ce";
 /**
  * Create application via n8n webhook
  */
