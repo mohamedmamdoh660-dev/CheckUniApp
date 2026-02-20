@@ -1,5 +1,5 @@
 "use server";
-import { supabaseClient } from "@/lib/supabase-auth-client";
+import { supabase } from "@/lib/supabase-auth-client";
 
 export const saveFile = async (file: File) => {
   try {
@@ -11,16 +11,17 @@ export const saveFile = async (file: File) => {
 
     const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME || "uploads";
 
-    const { data, error } = await supabaseClient.storage
+    const { data, error } = await supabase.storage
       .from(bucketName)
       .upload(`public/${Date.now()}.${file.name?.split(".")?.pop()}`, file, {
         upsert: true,
         cacheControl: "3600",
         contentType: file.type,
       });
+    if (error) throw new Error(error.message);
     const {
       data: { publicUrl },
-    } = supabaseClient.storage
+    } = supabase.storage
       .from(bucketName)
       .getPublicUrl(data?.path || "");
 
