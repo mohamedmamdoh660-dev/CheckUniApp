@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
     // Call n8n webhook to fetch the actual file content
     const webhookUrl =
-      "https://automation.checkuni.com/webhook-test/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
+      "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
 
     const webhookRes = await fetch(webhookUrl, {
       method: "POST",

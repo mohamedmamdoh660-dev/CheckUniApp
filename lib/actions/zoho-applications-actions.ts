@@ -2,11 +2,11 @@
 import { ZohoApplication } from "@/types/types";
 
 // N8n webhook URLs
-const CREATE_WEBHOOK_URL = "https://automation.checkuni.com/webhook-test/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
-const UPDATE_WEBHOOK_URL = "https://automation.checkuni.com/webhook-test/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
-const DELETE_WEBHOOK_URL = "https://automation.checkuni.com/webhook-test/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
-const UPLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.checkuni.com/webhook-test/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
-const DOWNLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.checkuni.com/webhook-test/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
+const CREATE_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
+const UPDATE_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
+const DELETE_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
+const UPLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
+const DOWNLOAD_ATTACHMENT_WEBHOOK_URL = "https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1";
 /**
  * Create application via n8n webhook
  */

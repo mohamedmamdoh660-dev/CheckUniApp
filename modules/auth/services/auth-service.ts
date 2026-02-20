@@ -162,7 +162,7 @@ export const authService = {
     console.log("🚀 ~ crm_id:", crm_id)
     
 
-    const response = await fetch('https://automation.checkuni.com/webhook-test/c0679d76-4492-48ea-b4c7-44aec8ae1cd1', {
+    const response = await fetch('https://automation.checkuni.com/webhook/c0679d76-4492-48ea-b4c7-44aec8ae1cd1', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
