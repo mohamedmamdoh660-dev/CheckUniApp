@@ -123,9 +123,9 @@ export default function ProgramsExportDialog({
         ].join("\n");
         const csvHeader = columns.join(",");
         const csvRows = mappedRows
-          .map((row) =>
+          .map((row: any) =>
             row
-              .map((cell) => {
+              .map((cell: any) => {
                 const s = String(cell ?? "");
                 const escaped = s.replace(/"/g, '""');
                 return escaped.includes(",") ? `"${escaped}"` : escaped;
@@ -155,8 +155,8 @@ export default function ProgramsExportDialog({
         const tableHeader = `<tr>${columns.map((c) => `<th style='text-align:left;padding:6px;border:1px solid #ddd;'>${c}</th>`).join("")}</tr>`;
         const tableRows = mappedRows
           .map(
-            (row) =>
-              `<tr>${row.map((cell) => `<td style='padding:6px;border:1px solid #ddd;'>${String(cell ?? "")}</td>`).join("")}</tr>`
+            (row: any) =>
+              `<tr>${row.map((cell: any) => `<td style='padding:6px;border:1px solid #ddd;'>${String(cell ?? "")}</td>`).join("")}</tr>`
           )
           .join("");
         const html = `

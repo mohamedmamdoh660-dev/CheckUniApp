@@ -85,7 +85,7 @@ export default function ZohoStudentsManagementPage({ type }: { type: string }) {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "zoho_students" },
-        (payload) => {
+        (payload: any) => {
           if (payload.eventType === "INSERT") {
             if (payload.new.user_id === userProfile?.id) {
               fetchStudents({ resetPagination: true });

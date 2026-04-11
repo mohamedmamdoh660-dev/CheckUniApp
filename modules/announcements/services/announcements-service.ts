@@ -150,7 +150,7 @@ class AnnouncementsService {
           schema: 'public', 
           table: 'zoho_announcements' 
         }, 
-        (payload) => {
+        (payload: any) => {
           return payload;
         }
       )
@@ -168,7 +168,7 @@ class AnnouncementsService {
           table: 'zoho_announcements',
           filter: `id=eq.${id}`
         }, 
-        (payload) => {
+        (payload: any) => {
           return payload;
         }
       )
