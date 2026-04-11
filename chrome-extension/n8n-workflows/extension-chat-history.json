@@ -1,0 +1,328 @@
+{
+  "name": "Extension Chat History",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "extension-chat",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Webhook",
+      "webhookId": "ext-chat-hist-001"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "action",
+              "value": "={{ $json.body.action }}",
+              "type": "string"
+            },
+            {
+              "id": "f2",
+              "name": "agent_id",
+              "value": "={{ $json.body.agent_id }}",
+              "type": "string"
+            },
+            {
+              "id": "f3",
+              "name": "session_id",
+              "value": "={{ $json.body.session_id }}",
+              "type": "string"
+            },
+            {
+              "id": "f4",
+              "name": "role",
+              "value": "={{ $json.body.role }}",
+              "type": "string"
+            },
+            {
+              "id": "f5",
+              "name": "content",
+              "value": "={{ $json.body.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [224, 0],
+      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "name": "Parse Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "load",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-load"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "load"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "save",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-save"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "save"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "sessions",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-sessions"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "sessions"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [448, 0],
+      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Switch Action"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "extension_chats",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "keyValue": "={{ $json.session_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [672, -160],
+      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "name": "Load Messages",
+      "credentials": {
+        "supabaseApi": {
+          "id": "7uIiqTJr3QPa9xmS",
+          "name": "Sit Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const messages = $input.all().map(item => ({\n  role: item.json.role,\n  content: item.json.content,\n  time: new Date(item.json.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),\n  ts: new Date(item.json.created_at).getTime()\n}));\n\n// Filter last 24 hours\nconst cutoff = Date.now() - (24 * 60 * 60 * 1000);\nconst recent = messages.filter(m => m.ts >= cutoff);\n\nreturn [{ json: { messages: recent } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [896, -160],
+      "id": "a1b2c3d4-0005-4000-8000-000000000005",
+      "name": "Format Messages"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [1120, -160],
+      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "name": "Respond Load"
+    },
+    {
+      "parameters": {
+        "tableId": "extension_chats",
+        "fieldsToSend": "defineBelow",
+        "fieldValues": {
+          "values": [
+            {
+              "fieldName": "agent_id",
+              "fieldValue": "={{ $json.agent_id }}"
+            },
+            {
+              "fieldName": "session_id",
+              "fieldValue": "={{ $json.session_id }}"
+            },
+            {
+              "fieldName": "role",
+              "fieldValue": "={{ $json.role }}"
+            },
+            {
+              "fieldName": "content",
+              "fieldValue": "={{ $json.content }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [672, 0],
+      "id": "a1b2c3d4-0007-4000-8000-000000000007",
+      "name": "Save Message",
+      "credentials": {
+        "supabaseApi": {
+          "id": "7uIiqTJr3QPa9xmS",
+          "name": "Sit Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [896, 0],
+      "id": "a1b2c3d4-0008-4000-8000-000000000008",
+      "name": "Respond Save"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "extension_chats",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "agent_id",
+              "keyValue": "={{ $json.agent_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [672, 160],
+      "id": "a1b2c3d4-0009-4000-8000-000000000009",
+      "name": "Get All Chats",
+      "credentials": {
+        "supabaseApi": {
+          "id": "7uIiqTJr3QPa9xmS",
+          "name": "Sit Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allMessages = $input.all().map(item => item.json);\nconst cutoff = Date.now() - (24 * 60 * 60 * 1000);\n\n// Group by session_id, filter last 24h\nconst sessionsMap = {};\nfor (const msg of allMessages) {\n  const ts = new Date(msg.created_at).getTime();\n  if (ts < cutoff) continue;\n  \n  if (!sessionsMap[msg.session_id]) {\n    sessionsMap[msg.session_id] = {\n      session_id: msg.session_id,\n      first_message: '',\n      created_at: msg.created_at,\n      message_count: 0\n    };\n  }\n  sessionsMap[msg.session_id].message_count++;\n  // Use first user message as preview\n  if (msg.role === 'user' && !sessionsMap[msg.session_id].first_message) {\n    sessionsMap[msg.session_id].first_message = msg.content.substring(0, 50);\n  }\n}\n\nconst sessions = Object.values(sessionsMap)\n  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nreturn [{ json: { sessions } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [896, 160],
+      "id": "a1b2c3d4-0010-4000-8000-000000000010",
+      "name": "Build Sessions"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [1120, 160],
+      "id": "a1b2c3d4-0011-4000-8000-000000000011",
+      "name": "Respond Sessions"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Parse Fields", "type": "main", "index": 0 }]]
+    },
+    "Parse Fields": {
+      "main": [[{ "node": "Switch Action", "type": "main", "index": 0 }]]
+    },
+    "Switch Action": {
+      "main": [
+        [{ "node": "Load Messages", "type": "main", "index": 0 }],
+        [{ "node": "Save Message", "type": "main", "index": 0 }],
+        [{ "node": "Get All Chats", "type": "main", "index": 0 }]
+      ]
+    },
+    "Load Messages": {
+      "main": [[{ "node": "Format Messages", "type": "main", "index": 0 }]]
+    },
+    "Format Messages": {
+      "main": [[{ "node": "Respond Load", "type": "main", "index": 0 }]]
+    },
+    "Save Message": {
+      "main": [[{ "node": "Respond Save", "type": "main", "index": 0 }]]
+    },
+    "Get All Chats": {
+      "main": [[{ "node": "Build Sessions", "type": "main", "index": 0 }]]
+    },
+    "Build Sessions": {
+      "main": [[{ "node": "Respond Sessions", "type": "main", "index": 0 }]]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

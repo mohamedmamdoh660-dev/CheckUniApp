@@ -820,9 +820,9 @@ export function StudentDetailPage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {applications.map((a: any) => (
+                          {applications.map((a: any, index: number) => (
                             <TableRow
-                              key={a.app_id}
+                              key={a.id || a.app_id || `app-row-${index}`}
                               // className="cursor-pointer"
                               // onClick={() =>
                               //   router.push(`/applications/${a.id}`)

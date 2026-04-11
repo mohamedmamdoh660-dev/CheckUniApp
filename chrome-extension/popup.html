@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SIT Connect AI Assistant</title>
+  <link rel="stylesheet" href="popup.css"/>
+</head>
+<body>
+
+  <!-- ───────────── LOGIN SCREEN ───────────── -->
+  <div id="login-screen" class="screen">
+    <div class="login-wrapper">
+      <!-- Logo & Brand -->
+      <div class="brand">
+        <div class="sit-logo">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 10C4.79086 10 3 11.7909 3 14C3 16.2091 4.79086 18 7 18C8.80735 18 10.3346 16.8041 10.8291 15.155C11.1664 14.0305 11.5312 12.8227 12 11.4583C12.4688 10.0938 12.8336 8.88607 13.1709 7.76156C13.6654 6.11242 15.1926 4.9165 17 4.9165C19.2091 4.9165 21 6.70736 21 8.9165C21 11.1256 19.2091 12.9165 17 12.9165C15.1926 12.9165 13.6654 11.7206 13.1709 10.0715" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.8291 10.0715C10.3346 11.7206 8.80735 12.9165 7 12.9165C4.79086 12.9165 3 11.1256 3 8.9165C3 6.70736 4.79086 4.9165 7 4.9165C8.80735 4.9165 10.3346 6.11242 10.8291 7.76156" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.1709 15.155C13.6654 16.8041 15.1926 18 17 18C19.2091 18 21 16.2091 21 14C21 11.7909 19.2091 10 17 10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h1>SIT CONNECT</h1>
+        <p>Partner Agent AI Assistant</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="login-form">
+        <div class="input-group">
+          <label for="email">Email</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <input type="email" id="email" placeholder="agent@daxow.com" required autocomplete="email"/>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password"/>
+          </div>
+        </div>
+
+        <div id="login-error" class="error-msg hidden"></div>
+
+        <button type="submit" id="login-btn" class="btn-primary">
+          <span id="login-btn-text">Sign In</span>
+          <div id="login-spinner" class="spinner hidden"></div>
+        </button>
+      </form>
+
+      <p class="login-footer">Use your Daxow Portal credentials</p>
+    </div>
+  </div>
+
+  <!-- ───────────── CHAT SCREEN ───────────── -->
+  <div id="chat-screen" class="screen hidden">
+
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="header-brand">
+        <div class="sit-logo-small">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 10C4.79086 10 3 11.7909 3 14C3 16.2091 4.79086 18 7 18C8.80735 18 10.3346 16.8041 10.8291 15.155C11.1664 14.0305 11.5312 12.8227 12 11.4583C12.4688 10.0938 12.8336 8.88607 13.1709 7.76156C13.6654 6.11242 15.1926 4.9165 17 4.9165C19.2091 4.9165 21 6.70736 21 8.9165C21 11.1256 19.2091 12.9165 17 12.9165C15.1926 12.9165 13.6654 11.7206 13.1709 10.0715" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.8291 10.0715C10.3346 11.7206 8.80735 12.9165 7 12.9165C4.79086 12.9165 3 11.1256 3 8.9165C3 6.70736 4.79086 4.9165 7 4.9165C8.80735 4.9165 10.3346 6.11242 10.8291 7.76156" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.1709 15.155C13.6654 16.8041 15.1926 18 17 18C19.2091 18 21 16.2091 21 14C21 11.7909 19.2091 10 17 10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="header-info">
+          <h2>SIT Connect AI</h2>
+          <span class="status"><span class="dot"></span>Online</span>
+        </div>
+      </div>
+      <div class="chat-header-right">
+        <span id="user-email-badge" class="email-badge"></span>
+        <button id="settings-btn" class="btn-icon-header" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+        </button>
+        <button id="logout-btn" class="btn-icon-header" title="Logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Chat Tabs Bar -->
+    <div id="chat-tabs-bar" class="chat-tabs-bar">
+      <div id="session-tabs" class="session-tabs"></div>
+      <button id="new-chat-btn" class="btn-new-chat" title="New Chat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Messages Area -->
+    <div id="messages" class="messages">
+      <!-- Welcome message -->
+      <div class="message ai-message" id="welcome-msg">
+        <div class="msg-bubble">
+          Hi there! 👋 I'm <strong>Sayeed</strong>, your AI assistant from <strong>SIT Connect</strong>.<br/><br/>
+          How can I help you today?
+        </div>
+        <span class="msg-time">just now</span>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+
+      <!-- Slash Command Menu -->
+      <div id="slash-menu" class="slash-menu hidden">
+        <div class="slash-menu-header">
+          <span class="slash-menu-title">Commands</span>
+          <kbd>/</kbd>
+        </div>
+
+        <!-- Level 1: Main commands -->
+        <div id="slash-main" class="slash-level">
+          <button class="slash-item" data-cmd="search">
+            <span class="slash-icon">🔍</span>
+            <div class="slash-text">
+              <span class="slash-name">Search</span>
+              <span class="slash-desc">Find a student by email, passport, phone…</span>
+            </div>
+          </button>
+          <button class="slash-item" data-cmd="list">
+            <span class="slash-icon">📋</span>
+            <div class="slash-text">
+              <span class="slash-name">List</span>
+              <span class="slash-desc">View student lists &amp; reports</span>
+            </div>
+          </button>
+          <button class="slash-item" data-cmd="other">
+            <span class="slash-icon">💬</span>
+            <div class="slash-text">
+              <span class="slash-name">Other</span>
+              <span class="slash-desc">General questions &amp; assistance</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Level 2: Search sub-commands -->
+        <div id="slash-search" class="slash-level hidden">
+          <button class="slash-back" data-back="main">← Back</button>
+          <button class="slash-item" data-action="search-name">
+            <span class="slash-icon">👤</span>
+            <div class="slash-text">
+              <span class="slash-name">Student Name</span>
+              <span class="slash-desc">Search student by full name</span>
+            </div>
+          </button>
+          <button class="slash-item" data-action="search-email">
+            <span class="slash-icon">✉️</span>
+            <div class="slash-text">
+              <span class="slash-name">Email</span>
+              <span class="slash-desc">Search student by email address</span>
+            </div>
+          </button>
+          <button class="slash-item" data-action="search-passport">
+            <span class="slash-icon">🛂</span>
+            <div class="slash-text">
+              <span class="slash-name">Passport</span>
+              <span class="slash-desc">Search student by passport number</span>
+            </div>
+          </button>
+          <button class="slash-item" data-action="search-application">
+            <span class="slash-icon">📄</span>
+            <div class="slash-text">
+              <span class="slash-name">Application</span>
+              <span class="slash-desc">Search by application or SIT ID</span>
+            </div>
+          </button>
+          <button class="slash-item" data-action="search-program">
+            <span class="slash-icon">🎓</span>
+            <div class="slash-text">
+              <span class="slash-name">Program</span>
+              <span class="slash-desc">Search by program name or university</span>
+            </div>
+          </button>
+          <button class="slash-item" data-action="search-other">
+            <span class="slash-icon">🔎</span>
+            <div class="slash-text">
+              <span class="slash-name">Other</span>
+              <span class="slash-desc">Search by other criteria</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Level 2: List sub-commands -->
+        <div id="slash-list" class="slash-level hidden">
+          <button class="slash-back" data-back="main">← Back</button>
+          <button class="slash-item slash-item-disabled" data-action="list-soon">
+            <span class="slash-icon">🚧</span>
+            <div class="slash-text">
+              <span class="slash-name">Coming Soon</span>
+              <span class="slash-desc">List features are under development</span>
+            </div>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="input-row">
+        <textarea
+          id="chat-input"
+          class="chat-textarea"
+          placeholder="Type / for commands or ask anything..."
+          rows="1"
+        ></textarea>
+        <button id="send-btn" class="btn-send" title="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    <!-- Footer Footer -->
+    <div class="chat-footer">
+      Powered by SIT Connect · Your data is private
+    </div>
+
+  </div>
+
+  <!-- ───────────── SETTINGS PANEL ───────────── -->
+  <div id="settings-panel" class="settings-overlay hidden">
+    <div class="settings-box">
+      <div class="settings-header">
+        <h3>Settings</h3>
+        <button id="settings-close" class="btn-close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-label">Appearance</p>
+        <div class="theme-options">
+          <button class="theme-btn" data-theme="light">
+            <span class="theme-icon">☀️</span>
+            <span>Light</span>
+          </button>
+          <button class="theme-btn" data-theme="dark">
+            <span class="theme-icon">🌙</span>
+            <span>Dark</span>
+          </button>
+          <button class="theme-btn" data-theme="auto">
+            <span class="theme-icon">🖥️</span>
+            <span>Auto</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-label">Account</p>
+        <div class="settings-info">
+          <span class="info-label">Signed in as</span>
+          <span id="settings-email" class="info-value"></span>
+        </div>
+        <button id="settings-logout" class="btn-danger-full">Sign Out</button>
+      </div>
+
+      <p class="settings-version">SIT Connect AI · v1.0.0</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

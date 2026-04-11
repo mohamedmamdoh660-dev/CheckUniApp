@@ -143,7 +143,7 @@ export default function Login() {
             <div className="flex items-center gap-2">
               <Checkbox
                 id={`${id}-remember`}
-                className="dark:border-gray-600 cursor-pointer"
+                className="border-gray-300 dark:border-gray-600 cursor-pointer data-[state=checked]:bg-[#ec4899] data-[state=checked]:border-[#ec4899] data-[state=checked]:text-white"
               />
               <Label
                 htmlFor={`${id}-remember`}
@@ -184,7 +184,7 @@ export default function Login() {
           <p className="text-center text-sm text-gray-600 dark:text-gray-400">
             Don't have an account?{" "}
             <Link
-              href="https://studyinturkiye.com/became-an-agent/"
+              href="https://www.checkuni.com/became-an-agent/"
               target="_blank"
               className="text-primary hover:underline cursor-pointer"
             >

@@ -18,7 +18,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${fontSans.variable} font-sans antialiased`}>
-      <body>
+      <body suppressHydrationWarning>
         <AuthProvider>
           <SearchableDropdownProvider>
             <ThemeProviderWrapper>

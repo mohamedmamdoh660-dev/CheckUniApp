@@ -12,12 +12,14 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   },
 });
 
-// Client for browser usage with proper session handling
-export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined
-  },
-}); 
+import { supabaseServerClient } from './supabase-server-client';
 
+// Client for browser usage with proper session handling
+export const supabaseClient = typeof window !== 'undefined' 
+  ? supabaseServerClient() 
+  : createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });

@@ -236,7 +236,7 @@ export default function StudentInformationForm({
       blue_card: "no",
       first_name: "",
       last_name: "",
-      gender: undefined,
+      gender: "",
       date_of_birth: undefined,
       nationality: "",
       passport_number: "",

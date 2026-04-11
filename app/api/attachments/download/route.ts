@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
     // Call n8n webhook to fetch the actual file content
     const webhookUrl =
-      "https://automation.sitconnect.net/webhook/13eca8cf-8742-4351-9ae6-eaace4fa10ce";
+      "https://automation.checkuni.com/webhook/13eca8cf-8742-4351-9ae6-eaace4fa10ce";
 
     const webhookRes = await fetch(webhookUrl, {
       method: "POST",
@@ -59,7 +59,11 @@ export async function GET(req: NextRequest) {
     });
 
     if (!webhookRes.ok) {
-      return new Response(JSON.stringify({ error: `n8n webhook failed: ${webhookRes.status}` }), {
+      // Log the actual n8n response body for debugging
+      let n8nBody = "";
+      try { n8nBody = await webhookRes.text(); } catch {}
+      console.error(`[download] n8n webhook failed: ${webhookRes.status}`, { attachmentId, recordId, n8nBody });
+      return new Response(JSON.stringify({ error: `n8n webhook failed: ${webhookRes.status}`, details: n8nBody }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });

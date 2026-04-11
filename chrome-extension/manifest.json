@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "SIT Connect AI Assistant",
+  "version": "1.1.0",
+  "description": "AI-powered assistant for SIT Connect agents to query student information instantly.",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "identity"
+  ],
+  "host_permissions": [
+    "https://knqtjanxjwfjfrwoater.supabase.co/*",
+    "https://darwish1.daxow.com/*"
+  ]
+}
