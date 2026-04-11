@@ -104,7 +104,7 @@ export default function ZohoApplicationsManagementPage({
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "zoho_applications" },
-        (payload) => {
+        (payload: any) => {
           if (payload.eventType === "INSERT") {
             if (payload.new.user_id === userProfile?.id) {
               fetchApplications({ resetPagination: true });
