@@ -20,6 +20,8 @@ All notable changes to this project will be documented in this file.
 
 ## [2026-04-11] - Key Prop Fix - Fixed "Each child in a list should have a unique key prop" React warning in `student-detail-page.tsx`. Changed `key={a.app_id}` (which could be `undefined` or duplicate) to `key={a.id || a.app_id || \`app-row-${index}\`}` for a guaranteed unique key.
 
+## [2026-04-11] - Dashboard Error Handling - Added robust error handling and undefined data checks to `SectionCards` and `AdminStatsCards` to prevent the application from crashing (`TypeError: Cannot read properties of undefined`) when the Supabase Server Actions throw a `500 Internal Server Error`.
+
 ## [2026-04-11] - Build Environment Fixes - Solved `Error: supabaseKey is required` during Next.js production build data collection by adding environment variable fallback placeholders in `lib/supabase-auth-client.ts` and `lib/supabase-server-client.ts` to prevent eager initializations from crashing the Coolify pipeline.
 
 ## [2026-04-11] - Webhook URL Update - Updated the attachment download n8n webhook URL in `app/api/attachments/download/route.ts` from `automation.sitconnect.net` to `automation.checkuni.com`.

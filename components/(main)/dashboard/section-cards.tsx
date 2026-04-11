@@ -38,7 +38,11 @@ export function SectionCards() {
           : userProfile?.agency_id,
         userProfile?.id
       );
-      setStats(data);
+      if (data) {
+        setStats(data);
+      } else {
+        console.error("Section stats returned undefined.");
+      }
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
       toast.error("Failed to load dashboard statistics");

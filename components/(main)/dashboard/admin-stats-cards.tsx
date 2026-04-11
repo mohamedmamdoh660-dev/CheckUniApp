@@ -33,7 +33,11 @@ export function AdminStatsCards() {
   const fetchStats = async () => {
     try {
       const data = await getAdminDashboardStats();
-      setStats(data);
+      if (data) {
+        setStats(data);
+      } else {
+        console.error("Dashboard stats returned undefined. This usually means a backend error occurred.");
+      }
     } catch (error) {
       console.error("Error fetching admin dashboard stats:", error);
       toast.error("Failed to load admin dashboard statistics");
