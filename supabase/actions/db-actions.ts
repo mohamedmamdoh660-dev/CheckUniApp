@@ -65,7 +65,7 @@ export const getApplicationsPagination = async (
           .select("id")
           .ilike("name", searchPattern);
         
-        programIds = programs?.map(p => p.id) || [];
+        programIds = programs?.map((p: any) => p.id) || [];
 
         const { data: students } = await supabaseClient
           .from("zoho_students")
@@ -73,7 +73,7 @@ export const getApplicationsPagination = async (
        .or(`email.ilike.${searchPattern},passport_number.ilike.${searchPattern}`);
          
 
-        studentIds = students?.map(s => s.id) || [];
+        studentIds = students?.map((s: any) => s.id) || [];
       }
   
       // Main query

@@ -217,7 +217,7 @@ export async function exportProgramsToPDF(options: ProgramsPdfOptions) {
       <!-- Programs Content -->
       <div style="padding-top: 16px; padding-bottom: 16px; padding-left: 16px; padding-right: 16px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-          ${pagePrograms.map(program => generateProgramCard(program)).join('')}
+          ${pagePrograms.map((program: any) => generateProgramCard(program)).join('')}
         </div>
       </div>
 

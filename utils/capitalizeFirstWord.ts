@@ -3,12 +3,12 @@ export const capitalizeFirstLetter = (name: string) => {
   
   const initials = name
     .split(" ")
-    .map((word) => {
+    .map((word: any) => {
       const firstChar = word[0];
       // Check if the first character is an alphabet letter before including it
       return firstChar && /[a-zA-Z]/.test(firstChar) ? firstChar.toUpperCase() : '';
     })
-    .filter(initial => initial !== '') // Filter out any empty strings
+    .filter((initial: any) => initial !== '') // Filter out any empty strings
     .join("");
   
   return initials.slice(0, 2);
@@ -22,7 +22,7 @@ export function getUniqueItems(emailArray: string[]): string[] {
   return Array.from(uniqueEmailsSet);
 }
 export function sanitizePhoneNumber(phoneArray: string[]): string[] {
-  return phoneArray.map(number => {
+  return phoneArray.map((number: any) => {
     number = number.replace('|', '');
     if (number.startsWith('+')) {
       return number.substring(1);
@@ -37,7 +37,7 @@ export const capitalizeFirstLetterEachWord = (text: string): string => {
 
   return text
     .split(' ') // Split the string into an array of words
-    .map(word => 
+    .map((word: any) => 
       word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() // Capitalize first letter and make the rest lowercase
     )
     .join(' '); // Join the words back into a string

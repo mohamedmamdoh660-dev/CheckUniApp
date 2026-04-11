@@ -21,3 +21,5 @@ All notable changes to this project will be documented in this file.
 ## [2026-04-11] - Key Prop Fix - Fixed "Each child in a list should have a unique key prop" React warning in `student-detail-page.tsx`. Changed `key={a.app_id}` (which could be `undefined` or duplicate) to `key={a.id || a.app_id || \`app-row-${index}\`}` for a guaranteed unique key.
 
 ## [2026-04-11] - Webhook URL Update - Updated the attachment download n8n webhook URL in `app/api/attachments/download/route.ts` from `automation.sitconnect.net` to `automation.checkuni.com`.
+
+## [2026-04-11] - TypeScript Build Errors Fix - Fixed multiple implicit `any` type errors blocking the production build. Added explicit `any` type annotations to `(payload: any)` in Supabase realtime subscriptions and `(row: any)`, `(cell: any)` in CSV/Excel export mappings.

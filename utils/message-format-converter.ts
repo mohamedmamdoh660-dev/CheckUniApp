@@ -114,11 +114,11 @@ export function legacyToWhatsapp(legacyContent: LegacyMessageContent[], userId: 
   // Collect all text content first
   const textItems = legacyContent.filter(item => item.type === 'text' && item.text?.value);
   if (textItems.length > 0) {
-    whatsappMsg.body = textItems.map(item => item.text?.value).join('\n\n');
+    whatsappMsg.body = textItems.map((item: any) => item.text?.value).join('\n\n');
   }
   
   // Process media items and set the message type based on the first media item
-  const mediaItems = legacyContent.filter(item => 
+  const mediaItems = legacyContent.filter((item: any) => 
     item.type === 'image' || 
     item.type === 'document' || 
     item.type === 'audio' || 
@@ -159,7 +159,7 @@ export function detectMessageFormat(content: any): 'whatsapp' | 'legacy' | 'unkn
   
   // Check if it's our legacy format
   if (Array.isArray(content) && content.length > 0 && 
-      content.every(item => typeof item === 'object' && 'type' in item)) {
+      content.every((item: any) => typeof item === 'object' && 'type' in item)) {
     return 'legacy';
   }
   
